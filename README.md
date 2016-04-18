@@ -90,7 +90,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 5.** Retrieve user attributes.
+**Use case 5.** Retrieve user attributes for an authenticated user.
 
 <pre class="prettyprint">
     cognitoUser.getUserAttributes(function(err, result) {
@@ -104,7 +104,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 6.** Verify user attribute.
+**Use case 6.** Verify user attribute for an authenticated user.
 
 <pre class="prettyprint">
     cognitoUser.getAttributeVerificationCode('email', {
@@ -121,7 +121,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 6.** Delete user attribute.
+**Use case 6.** Delete user attribute for an authenticated user.
 
 <pre class="prettyprint">
     var attributeList = [];
@@ -136,7 +136,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 7.** Update user attributes.
+**Use case 7.** Update user attributes for an authenticated user.
 
 <pre class="prettyprint">
     var attributeList = [];
@@ -156,7 +156,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 7.** Enabling MFA for a user on a pool that has an optional MFA setting.
+**Use case 7.** Enabling MFA for a user on a pool that has an optional MFA setting for an authenticated user.
 
 <pre class="prettyprint">
     cognitoUser.enableMFA(function(err, result) {
@@ -168,10 +168,22 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 7.** Disabling MFA for a user on a pool that has an optional MFA setting.
+**Use case 8.** Disabling MFA for a user on a pool that has an optional MFA setting for an authenticated user.
 
 <pre class="prettyprint">
     cognitoUser.disableMFA(function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+    });
+</pre>
+
+**Use case 9.** Changing the current password for an authenticated user.
+
+<pre class="prettyprint">
+    cognitoUser.changePassword('oldPassword', 'newPassword', function(err, result) {
         if (err) {
             alert(err);
             return;
