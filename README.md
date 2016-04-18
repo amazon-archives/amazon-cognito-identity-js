@@ -39,4 +39,5 @@ The Amazon Cognito Identity Provider JavaScript SDK will make requests to the fo
 For most frameworks you can whitelist both domains by whitelisting all AWS endpoints with "*.amazonaws.com".
 
 ## Change Log
+**v0.9.0:**
 * Initial release. Developer preview.
