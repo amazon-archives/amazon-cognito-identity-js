@@ -24,6 +24,14 @@ GitHub repository or posting to the Amazon Cognito Identity Provider forums:
 5. Include Moment.js, a JavaScript library used for date manipulation:
   * [Moment.js](http://momentjs.com/)
 
+## Network Configuration
+The Amazon Cognito Identity Provider JavaScript SDK will make requests to the following endpoints
+* For Event Submission: "https://mobileanalytics.us-east-1.amazonaws.com"
+* For Cognito Authentication: "https://cognito-identity.us-east-1.amazonaws.com"
+  * This endpoint may change based on which region your Identity Pool was created in.
+ 
+For most frameworks you can whitelist both domains by whitelisting all AWS endpoints with "*.amazonaws.com".
+
 <pre class="prettyprint">
     &lt;script src="/js/jsbn.js"&gt;&lt;/script&gt;
     &lt;script src="/js/sjcl.js"&gt;&lt;/script&gt;
