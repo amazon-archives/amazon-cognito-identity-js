@@ -45,7 +45,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 2.** Confirming a registered user using a confirmation code.
+**Use case 2.** Confirming a registered user using a confirmation code received via SMS.
 
 <pre class="prettyprint">
     cognitoUser.confirmRegistration('123456', true, function(err, result) {
@@ -57,7 +57,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 3.** Resending a confirmation code for confirming registration.
+**Use case 3.** Resending a confirmation code via SMS for confirming registration.
 
 <pre class="prettyprint">
     cognitoUser.resendConfirmationCode(function(err, result) {
