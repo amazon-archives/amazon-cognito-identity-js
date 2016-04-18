@@ -10,8 +10,6 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
 
 ## Usage
 
-The JavaScript SDK 
-
 **Step 1.** Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
 
 <pre class="prettyprint">
@@ -46,6 +44,30 @@ The JavaScript SDK
         console.log('user name is ' + cognitoUser.getUsername());
     });
 
+</pre>
+
+**Step 2.** Confirming a registered user using a confirmation code.
+
+<pre class="prettyprint">
+    cognitoUser.confirmRegistration('123456', true, function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+    });
+</pre>
+
+**Step 3.** Resending a confirmation code for confirming registration.
+
+<pre class="prettyprint">
+    cognitoUser.resendConfirmationCode(function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+    });
 </pre>
 
 ## Setup
