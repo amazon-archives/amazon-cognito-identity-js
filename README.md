@@ -209,6 +209,24 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
         }
 </pre>
 
+**Use case 13.** Deleting an authenticated user.
+
+<pre class="prettyprint">
+    cognitoUser.deleteUser(function(err, result) {
+        if (err) {
+           	alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+    });
+</pre>
+
+**Use case 14.** Signing out from the application.
+
+<pre class="prettyprint">
+    cognitoUser.signOut();
+</pre>
+
 ## Setup
 
 1. Download and include the AWS JavaScript SDK:
