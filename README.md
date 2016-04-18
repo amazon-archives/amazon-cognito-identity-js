@@ -121,6 +121,40 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
             });
 </pre>
 
+**Use case 6.** Delete user attribute.
+
+<pre class="prettyprint">
+    var attributeList = [];
+    attributeList.push('nickname');
+
+    cognitoUser.deleteAttributes(attributeList, function(err, result) {
+     	if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+    });
+</pre>
+
+**Use case 7.** Update user attributes.
+
+<pre class="prettyprint">
+    var attributeList = [];
+    var attribute = {
+        Name : 'nickname',
+        Value : 'joe'
+    };
+    var attribute = new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute(attribute);
+    attributeList.push(attribute);
+
+    cognitoUser.updateAttributes(attributeList, function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+    });
+</pre>
 
 ## Setup
 
