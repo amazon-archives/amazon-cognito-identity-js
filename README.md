@@ -21,7 +21,7 @@ GitHub repository or posting to the Amazon Cognito Identity Provider forums:
 
 Please note, that by default the Stanford JavaScript Crypto Library doesn't include the bytes codec so it must be included with the --with-codecBytes option when configuring.
 
-5. Include Moment.js, a JavaScript library used for date manipulation.
+5. Include Moment.js, a JavaScript library used for date manipulation:
   * [Moment.js](http://momentjs.com/)
 
 <pre class="prettyprint">
