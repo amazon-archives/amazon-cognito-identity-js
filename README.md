@@ -26,8 +26,7 @@ GitHub repository or posting to the Amazon Cognito Identity Provider forums:
 
 ## Network Configuration
 The Amazon Cognito Identity Provider JavaScript SDK will make requests to the following endpoints
-* For Event Submission: "https://mobileanalytics.us-east-1.amazonaws.com"
-* For Cognito Authentication: "https://cognito-identity.us-east-1.amazonaws.com"
+* For Amazon Cognito Identity Provider request handling: "https://cognito-idp.us-east-1.amazonaws.com"
   * This endpoint may change based on which region your Identity Pool was created in.
  
 For most frameworks you can whitelist both domains by whitelisting all AWS endpoints with "*.amazonaws.com".
