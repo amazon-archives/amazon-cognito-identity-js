@@ -261,7 +261,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
 4. Include the Stanford Javascript Crypto Library:
   * [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
 
-   Please note, that by default the Stanford JavaScript Crypto Library doesn't include the bytes codec so it must be included with the --with-codecBytes option when configuring.
+   Please note, that by default the Stanford JavaScript Crypto Library doesn't include the bytes codec that the SDK uses so it must be included with the --with-codecBytes option when configuring.
 
 5. Include Moment.js, a JavaScript library used for date manipulation:
   * [Moment.js](http://momentjs.com/)
