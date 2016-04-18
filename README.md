@@ -227,6 +227,26 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     cognitoUser.signOut();
 </pre>
 
+**Use case 15.** Retrieving the current user from local storage.
+
+<pre class="prettyprint">
+    var data = { UserPoolId : 'us-east-1_Iqc3ajYLS',
+                 ClientId : '2lavgo9l86pkdu353sm7khjj1q'
+    };
+    var userPool = new AWS.CognitoIdentityServiceProvider.CognitoUserPool(data);
+    var cognitoUser = userPool.getCurrentUser();
+
+    if (cognitoUser != null) {
+        cognitoUser.getSession(function(err, session) {
+            if (err) {
+           	    alert(err);
+                return;
+            }
+            console.log('session validity: ' + session.isValid());
+        });
+    }
+</pre>
+
 ## Setup
 
 1. Download and include the AWS JavaScript SDK:
