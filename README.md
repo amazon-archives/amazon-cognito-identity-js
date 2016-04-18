@@ -13,7 +13,7 @@ GitHub repository or posting to the Amazon Cognito Identity Provider forums:
 2. Download and include the Amazon Cognito Identity Provider SDK for JavaScript:
   * [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
 
-3. Include the JavaScript BN library:  
+3. Include the JavaScript BN library for BigInteger computations:
   * [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/jsbn.js)
 
 4. Include the Stanford Javascript Crypto Library:
@@ -31,3 +31,6 @@ Please note, that by default the Stanford JavaScript Crypto Library doesn't incl
     &lt;script src="/js/aws-sdk.min.js"&gt;&lt;/script&gt;
     &lt;script src="/js/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
 </pre>
+
+## Change Log
+* Initial release. Developer preview.
