@@ -10,7 +10,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
 
 ## Usage
 
-**Step 1.** Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
+**Use case 1.** Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
 
 <pre class="prettyprint">
     AWS.config.region = 'us-east-1';
@@ -46,7 +46,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
 
 </pre>
 
-**Step 2.** Confirming a registered user using a confirmation code.
+**Use case 2.** Confirming a registered user using a confirmation code.
 
 <pre class="prettyprint">
     cognitoUser.confirmRegistration('123456', true, function(err, result) {
@@ -58,7 +58,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Step 3.** Resending a confirmation code for confirming registration.
+**Use case 3.** Resending a confirmation code for confirming registration.
 
 <pre class="prettyprint">
     cognitoUser.resendConfirmationCode(function(err, result) {
