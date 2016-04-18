@@ -121,7 +121,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 6.** Delete user attribute for an authenticated user.
+**Use case 7.** Delete user attribute for an authenticated user.
 
 <pre class="prettyprint">
     var attributeList = [];
@@ -136,7 +136,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 7.** Update user attributes for an authenticated user.
+**Use case 8.** Update user attributes for an authenticated user.
 
 <pre class="prettyprint">
     var attributeList = [];
@@ -156,7 +156,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 7.** Enabling MFA for a user on a pool that has an optional MFA setting for an authenticated user.
+**Use case 9.** Enabling MFA for a user on a pool that has an optional MFA setting for an authenticated user.
 
 <pre class="prettyprint">
     cognitoUser.enableMFA(function(err, result) {
@@ -168,7 +168,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 8.** Disabling MFA for a user on a pool that has an optional MFA setting for an authenticated user.
+**Use case 10.** Disabling MFA for a user on a pool that has an optional MFA setting for an authenticated user.
 
 <pre class="prettyprint">
     cognitoUser.disableMFA(function(err, result) {
@@ -180,7 +180,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 9.** Changing the current password for an authenticated user.
+**Use case 11.** Changing the current password for an authenticated user.
 
 <pre class="prettyprint">
     cognitoUser.changePassword('oldPassword', 'newPassword', function(err, result) {
