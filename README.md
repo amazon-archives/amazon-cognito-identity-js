@@ -107,18 +107,18 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
 **Use case 6.** Verify user attribute.
 
 <pre class="prettyprint">
-            cognitoUser.getAttributeVerificationCode('email', {
-                onSuccess: function (result) {
-                    console.log('call result: ' + result);
-                },
-               	onFailure: function(err) {
-                    alert(err);
-               	},
-                inputVerificationCode() {
-                    var verificationCode = prompt('Please input verification code: ' ,'');
-                    cognitoUser.verifyAttribute('email', verificationCode, this);
-                }
-            });
+    cognitoUser.getAttributeVerificationCode('email', {
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
+        },
+        onFailure: function(err) {
+            alert(err);
+        },
+        inputVerificationCode() {
+            var verificationCode = prompt('Please input verification code: ' ,'');
+            cognitoUser.verifyAttribute('email', verificationCode, this);
+        }
+    });
 </pre>
 
 **Use case 6.** Delete user attribute.
@@ -148,6 +148,30 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     attributeList.push(attribute);
 
     cognitoUser.updateAttributes(attributeList, function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+    });
+</pre>
+
+**Use case 7.** Enabling MFA for a user on a pool that has an optional MFA setting.
+
+<pre class="prettyprint">
+    cognitoUser.enableMFA(function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+    });
+</pre>
+
+**Use case 7.** Disabling MFA for a user on a pool that has an optional MFA setting.
+
+<pre class="prettyprint">
+    cognitoUser.disableMFA(function(err, result) {
         if (err) {
             alert(err);
             return;
