@@ -4,7 +4,6 @@
 GitHub repository or posting to the Amazon Cognito Identity Provider forums:
 * https://github.com/aws/amazon-cognito-identity-js
 
-
 ## Setup
 
 1. Download and include the AWS JavaScript SDK:
