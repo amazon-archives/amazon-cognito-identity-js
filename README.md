@@ -192,6 +192,23 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
+**Use case 12.** Starting and completing a forgot password flow for a user.
+
+<pre class="prettyprint">
+    cognitoUser.forgotPassword({
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
+        },
+        onFailure: function(err) {
+            alert(err);
+        },
+        inputVerificationCode() {
+            var verificationCode = prompt('Please input verification code ' ,'');
+            var newPassword = prompt('Enter new password ' ,'');
+            cognitoUser.confirmPassword(verificationCode, newPassword, this);
+        }
+</pre>
+
 ## Setup
 
 1. Download and include the AWS JavaScript SDK:
