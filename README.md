@@ -10,6 +10,43 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
 
 ## Usage
 
+The JavaScript SDK 
+
+**Step 1.**
+
+<pre class="prettyprint">
+    AWS.config.region = 'us-east-1';
+    var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
+                ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+    };
+    var userPool = new AWS.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+
+    var attributeList = [];
+    
+    var dataEmail = {
+        Name : 'email',
+        Value : 'email@mydomain.com'
+    };
+    var dataPhoneNumber = {
+        Name : 'phone_number',
+        Value : '+15555555555'
+    };
+    var attributeEmail = new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
+    var attributePhoneNumber = new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute(dataPhoneNumber);
+
+    attributeList.push(attributeEmail);
+    attributeList.push(attributePhoneNumber);
+
+    userPool.signUp('username', 'password', attributeList, null, function(err, result){
+        if (err) {
+            alert(err);
+            return;
+        }
+        cognitoUser = result.user;
+    });
+
+</pre>
+
 ## Setup
 
 1. Download and include the AWS JavaScript SDK:
