@@ -43,7 +43,6 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
         cognitoUser = result.user;
         console.log('user name is ' + cognitoUser.getUsername());
     });
-
 </pre>
 
 **Use case 2.** Confirming a registered user using a confirmation code.
@@ -69,6 +68,59 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
         console.log('call result: ' + result);
     });
 </pre>
+
+**Use case 4.** Authenticating a user and establishing a user session with the Amazon Cognito Identity Provider service.
+
+<pre class="prettyprint">
+    var authenticationData = {
+        Username : 'username',
+        Password : 'password',
+    };
+    var authenticationDetails = new AWS.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+    
+    cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: function (result) {
+            console.log('access token + ' + result.getAccessToken().getJwtToken());
+        },
+
+        onFailure: function(err) {
+            alert(err);
+        },
+
+    });
+</pre>
+
+**Use case 5.** Retrieve user attributes.
+
+<pre class="prettyprint">
+    cognitoUser.getUserAttributes(function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        for (i = 0; i < result.length; i++) {
+            console.log('attribute ' + result[i].getName() + ' has value ' + result[i].getValue());
+        }
+    });
+</pre>
+
+**Use case 6.** Verify user attribute.
+
+<pre class="prettyprint">
+            cognitoUser.getAttributeVerificationCode('email', {
+                onSuccess: function (result) {
+                    console.log('call result: ' + result);
+                },
+               	onFailure: function(err) {
+                    alert(err);
+               	},
+                inputVerificationCode() {
+                    var verificationCode = prompt('Please input verification code: ' ,'');
+                    cognitoUser.verifyAttribute('email', verificationCode, this);
+                }
+            });
+</pre>
+
 
 ## Setup
 
