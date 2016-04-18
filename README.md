@@ -4,6 +4,12 @@
 GitHub repository or posting to the Amazon Cognito Identity Provider forums:
 * https://github.com/aws/amazon-cognito-identity-js
 
+Introduction
+============
+The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enabled applications to sign-up users, authenticate users, view, delete, and update user attributes within the Amazon Cognito Identity Provider service. Other functionality includes password changes and initiating forgot password flows.
+
+## Usage
+
 ## Setup
 
 1. Download and include the AWS JavaScript SDK:
