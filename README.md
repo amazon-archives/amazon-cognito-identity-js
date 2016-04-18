@@ -15,5 +15,8 @@ GitHub repository or posting to the Amazon Cognito Identity Provider forums:
   
 <pre class="prettyprint">
     &lt;script src="/js/aws-sdk.min.js"&gt;&lt;/script&gt;
-    &lt;script src="/js/aws-sdk-mobile-analytics.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/js/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/js/jsbn.js"&gt;&lt;/script&gt;
+    &lt;script src="/js/sjcl.js"&gt;&lt;/script&gt;
+    &lt;script src="/js/moment.min.js"&gt;&lt;/script&gt;
 </pre>
