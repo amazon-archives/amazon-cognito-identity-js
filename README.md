@@ -17,7 +17,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
   * [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
 
 3. Include the JavaScript BN library for BigInteger computations:
-  * [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/jsbn.js)
+  * [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/)
 
 4. Include the Stanford Javascript Crypto Library:
   * [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
@@ -28,9 +28,10 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
   * [Moment.js](http://momentjs.com/)
 
 <pre class="prettyprint">
-    &lt;script src="/js/jsbn.js"&gt;&lt;/script&gt;
+    &lt;script src="http://www-cs-students.stanford.edu/~tjw/jsbn/jsbn.js"&gt;&lt;/script&gt;
+    &lt;script src="http://www-cs-students.stanford.edu/~tjw/jsbn/jsbn2.js"&gt;&lt;/script&gt;
     &lt;script src="/js/sjcl.js"&gt;&lt;/script&gt;
-    &lt;script src="/js/moment.min.js"&gt;&lt;/script&gt;
+    &lt;script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"&gt;&lt;/script&gt;
     &lt;script src="/js/aws-sdk.min.js"&gt;&lt;/script&gt;
     &lt;script src="/js/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
 </pre>
