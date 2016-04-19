@@ -1,4 +1,6 @@
-# Amazon Cognito Identity Provider SDK for JavaScript
+# Amazon Cognito Identity SDK for JavaScript
+
+You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps. Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of millions of users, so you don't have to worry about building, securing, and scaling a solution to handle user management and authentication.
 
 **Developer Preview:** We welcome developer feedback on this project. You can reach us by creating an issue on the 
 GitHub repository or posting to the Amazon Cognito Identity forums:
@@ -6,14 +8,14 @@ GitHub repository or posting to the Amazon Cognito Identity forums:
 
 Introduction
 ============
-The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enabled applications to sign-up users, authenticate users, view, delete, and update user attributes within the Amazon Cognito Identity Provider service. Other functionality includes password changes for authenticated users and initiating and completing forgot password flows for unauthenticated users.
+The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applications to sign-up users, authenticate users, view, delete, and update user attributes within the Amazon Cognito Identity service. Other functionality includes password changes for authenticated users and initiating and completing forgot password flows for unauthenticated users.
 
 ## Setup
 
 1. Download and include the AWS JavaScript SDK:
   * http://aws.amazon.com/sdk-for-browser/
 
-2. Download and include the Amazon Cognito Identity Provider SDK for JavaScript:
+2. Download and include the Amazon Cognito Identity SDK for JavaScript:
   * [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
 
 3. Include the JavaScript BN library for BigInteger computations:
@@ -97,7 +99,7 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
     });
 </pre>
 
-**Use case 4.** Authenticating a user and establishing a user session with the Amazon Cognito Identity Provider service.
+**Use case 4.** Authenticating a user and establishing a user session with the Amazon Cognito Identity service.
 
 <pre class="prettyprint">
     var authenticationData = {
@@ -276,8 +278,8 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
 </pre>
 
 ## Network Configuration
-The Amazon Cognito Identity Provider JavaScript SDK will make requests to the following endpoints
-* For Amazon Cognito Identity Provider request handling: "https://cognito-idp.us-east-1.amazonaws.com"
+The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
+* For Amazon Cognito Identity request handling: "https://cognito-idp.us-east-1.amazonaws.com"
   * This endpoint may change based on which region your Identity Pool was created in.
  
 For most frameworks you can whitelist the domain by whitelisting all AWS endpoints with "*.amazonaws.com".
