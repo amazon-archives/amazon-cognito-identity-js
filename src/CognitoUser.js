@@ -138,6 +138,7 @@ AWS.CognitoIdentityServiceProvider.CognitoUser = (function() {
     /**
      * This is used for a certain user to confirm the registration by using a confirmation code
      * @param confirmationCode
+     * @param forceAliasCreation
      * @param callback
      * @returns error or success
      */
