@@ -5,7 +5,7 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         banner: '/**\n' +
-        ' * Copyright 2014 Amazon.com,\n' +
+        ' * Copyright 2016 Amazon.com,\n' +
         ' * Inc. or its affiliates. All Rights Reserved.\n' +
         ' * \n' +
         ' * Licensed under the Amazon Software License (the "License").\n' +
@@ -55,7 +55,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    "dist/amazon-cognito-sign-in.min.js": [
+                    "dist/amazon-cognito-identity.min.js": [
                         'src/CognitoUser.js',
 			'src/CognitoUserPool.js',
                         'src/CognitoRefreshToken.js',
