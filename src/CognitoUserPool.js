@@ -101,7 +101,7 @@ AWS.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
      /**
      * method for getting the current user of the application from the local storage
      * 
-     * @returns {CognitoUser} with the user retrieved from storage
+     * @returns {CognitoUser} the user retrieved from storage
      */
 
     CognitoUserPool.prototype.getCurrentUser = function getCurrentUser() {
