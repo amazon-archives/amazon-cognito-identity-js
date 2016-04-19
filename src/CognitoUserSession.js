@@ -19,7 +19,7 @@ AWS.CognitoIdentityServiceProvider.CognitoUserSession = (function() {
 
     /**
      * Constructs a new CognitoUserSession object
-     * @param data - contains IdToken, RefreshToken, and a AccessToken
+     * @param data - contains IdToken, RefreshToken, and an AccessToken
      * @constructor
      */
 
