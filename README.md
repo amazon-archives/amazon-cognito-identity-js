@@ -28,12 +28,12 @@ The Amazon Cognito Identity Provider SDK for JavaScript allows JavaScript enable
   * [Moment.js](http://momentjs.com/)
 
 <pre class="prettyprint">
-    &lt;script src="http://www-cs-students.stanford.edu/~tjw/jsbn/jsbn.js"&gt;&lt;/script&gt;
-    &lt;script src="http://www-cs-students.stanford.edu/~tjw/jsbn/jsbn2.js"&gt;&lt;/script&gt;
-    &lt;script src="/js/sjcl.js"&gt;&lt;/script&gt;
-    &lt;script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"&gt;&lt;/script&gt;
-    &lt;script src="/js/aws-sdk.min.js"&gt;&lt;/script&gt;
-    &lt;script src="/js/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/jsbn.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/jsbn2.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/sjcl.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/moment.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/aws-sdk.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
 </pre>
 
 ## Usage
