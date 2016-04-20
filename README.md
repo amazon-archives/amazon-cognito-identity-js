@@ -12,7 +12,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
 ## Setup
 
-1. Create an app for your user pool. Note that the generate client secret box must be unchecked because the JavaScript SDK doesn't support apps with client secret.
+1. Create an app for your user pool. Note that the generate client secret box must be **unchecked** because the JavaScript SDK doesn't support apps that have a client secret.
 
 2. Download and include the Amazon Cognito AWS SDK for JavaScript:
   * [/dist/aws-cognito-sdk.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/aws-cognito-sdk.min.js)
