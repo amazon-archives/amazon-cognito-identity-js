@@ -12,24 +12,26 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
 ## Setup
 
-1. Download and include the Amazon Cognito AWS SDK for JavaScript:
+1. Create an app for your user pool. Note that the generate client secret box must be unchecked because the JavaScript SDK doesn't support apps with client secret.
+
+2. Download and include the Amazon Cognito AWS SDK for JavaScript:
   * [/dist/aws-cognito-sdk.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/aws-cognito-sdk.min.js)
 
-2. Download and include the Amazon Cognito Identity SDK for JavaScript:
+3. Download and include the Amazon Cognito Identity SDK for JavaScript:
   * [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
 
-3. Include the JavaScript BN library for BigInteger computations:
+4. Include the JavaScript BN library for BigInteger computations:
   * [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/)
 
-4. Include the Stanford Javascript Crypto Library:
+5. Include the Stanford Javascript Crypto Library:
   * [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
 
    Please note, that by default the Stanford JavaScript Crypto Library doesn't include the bytes codec that the SDK uses so it must be included with the --with-codecBytes option when configuring the Stanford JavaScript Crypto Library.
 
-5. Include Moment.js, a JavaScript library used for date manipulation:
+6. Include Moment.js, a JavaScript library used for date manipulation:
   * [Moment.js](http://momentjs.com/)
 
-6. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services:
+7. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services:
   * http://aws.amazon.com/sdk-for-browser/
 
 <pre class="prettyprint">
