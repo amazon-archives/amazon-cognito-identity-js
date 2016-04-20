@@ -37,7 +37,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     &lt;script src="/path/to/jsbn2.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/sjcl.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/moment.min.js"&gt;&lt;/script&gt;
-    &lt;script src="/path/to/aws-cognito-sdk-min.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/aws-cognito-sdk.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
 </pre>
 
