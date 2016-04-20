@@ -12,8 +12,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
 ## Setup
 
-1. Download and include the AWS JavaScript SDK:
-  * http://aws.amazon.com/sdk-for-browser/
+1. Download and include the Amazon Cognito AWS SDK for JavaScript:
+  * [/dist/aws-cognito-sdk.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/aws-cognito-sdk.min.js)
 
 2. Download and include the Amazon Cognito Identity SDK for JavaScript:
   * [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
@@ -29,12 +29,15 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 5. Include Moment.js, a JavaScript library used for date manipulation:
   * [Moment.js](http://momentjs.com/)
 
+6. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services:
+  * http://aws.amazon.com/sdk-for-browser/
+
 <pre class="prettyprint">
     &lt;script src="/path/to/jsbn.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/jsbn2.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/sjcl.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/moment.min.js"&gt;&lt;/script&gt;
-    &lt;script src="/path/to/aws-sdk.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/aws-cognito-sdk-min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
 </pre>
 
@@ -47,7 +50,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
                 ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
     };
-    var userPool = new AWS.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
 
     var attributeList = [];
     
@@ -59,8 +62,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         Name : 'phone_number',
         Value : '+15555555555'
     };
-    var attributeEmail = new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
-    var attributePhoneNumber = new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute(dataPhoneNumber);
+    var attributeEmail = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
+    var attributePhoneNumber = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataPhoneNumber);
 
     attributeList.push(attributeEmail);
     attributeList.push(attributePhoneNumber);
@@ -106,7 +109,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         Username : 'username',
         Password : 'password',
     };
-    var authenticationDetails = new AWS.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
     
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: function (result) {
@@ -174,7 +177,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         Name : 'nickname',
         Value : 'joe'
     };
-    var attribute = new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute(attribute);
+    var attribute = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(attribute);
     attributeList.push(attribute);
 
     cognitoUser.updateAttributes(attributeList, function(err, result) {
@@ -263,7 +266,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     var data = { UserPoolId : 'us-east-1_Iqc3ajYLS',
                  ClientId : '2lavgo9l86pkdu353sm7khjj1q'
     };
-    var userPool = new AWS.CognitoIdentityServiceProvider.CognitoUserPool(data);
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
     var cognitoUser = userPool.getCurrentUser();
 
     if (cognitoUser != null) {
