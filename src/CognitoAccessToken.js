@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-AWS.CognitoIdentityServiceProvider.CognitoAccessToken = (function() {
+AWSCognito.CognitoIdentityServiceProvider.CognitoAccessToken = (function() {
 
     /**
      * Constructs a new CognitoAccessToken object

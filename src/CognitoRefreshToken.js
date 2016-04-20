@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-AWS.CognitoIdentityServiceProvider.CognitoRefreshToken = (function() {
+AWSCognito.CognitoIdentityServiceProvider.CognitoRefreshToken = (function() {
 
     /**
      * Constructs a new CognitoRefreshToken object

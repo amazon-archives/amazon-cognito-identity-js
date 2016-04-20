@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-AWS.CognitoIdentityServiceProvider.CognitoUserSession = (function() {
+AWSCognito.CognitoIdentityServiceProvider.CognitoUserSession = (function() {
 
     /**
      * Constructs a new CognitoUserSession object

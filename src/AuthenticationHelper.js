@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-AWS.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
+AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
 
     /**
      * Constructs a new AuthenticationHelper object

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-AWS.CognitoIdentityServiceProvider.CognitoUser = (function() {
+AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
     /**
      * Constructs a new CognitoUser object
@@ -35,8 +35,8 @@ AWS.CognitoIdentityServiceProvider.CognitoUser = (function() {
         this.username = data.Username || '';
         this.pool = data.Pool;
         this.AuthState = null;
- 
-	this.client = new AWS.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
+
+	this.client = new AWSCognito.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
         this.signInUserSession = null;
     };
 
@@ -67,7 +67,7 @@ AWS.CognitoIdentityServiceProvider.CognitoUser = (function() {
      */
 
     CognitoUser.prototype.authenticateUser = function authenticateUser(authDetails, callback) {
-        var authenticationHelper = new AWS.CognitoIdentityServiceProvider.AuthenticationHelper(this.pool.getUserPoolId().split('_')[1]);
+        var authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(this.pool.getUserPoolId().split('_')[1]);
 
         var serverBValue;
         var salt;
@@ -332,7 +332,7 @@ AWS.CognitoIdentityServiceProvider.CognitoUser = (function() {
                             Name : userData.UserAttributes[i].Name,
                             Value : userData.UserAttributes[i].Value
                         };
-                        var userAttribute = new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute(attribute);
+                        var userAttribute = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(attribute);
                         attributeList.push(userAttribute);
                     }
 
@@ -411,16 +411,16 @@ AWS.CognitoIdentityServiceProvider.CognitoUser = (function() {
         var storage = window.localStorage;
 
         if (storage.getItem(idTokenKey)) {
-            var idToken = new AWS.CognitoIdentityServiceProvider.CognitoIdToken({IdToken:storage.getItem(idTokenKey)});
-            var accessToken = new AWS.CognitoIdentityServiceProvider.CognitoAccessToken({AccessToken:storage.getItem(accessTokenKey)});
-            var refreshToken = new AWS.CognitoIdentityServiceProvider.CognitoRefreshToken({RefreshToken:storage.getItem(refreshTokenKey)});
+            var idToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoIdToken({IdToken:storage.getItem(idTokenKey)});
+            var accessToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoAccessToken({AccessToken:storage.getItem(accessTokenKey)});
+            var refreshToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoRefreshToken({RefreshToken:storage.getItem(refreshTokenKey)});
 
             var sessionData = {
                IdToken : idToken,
                AccessToken : accessToken,
                RefreshToken : refreshToken
             };
-            var cachedSession = new AWS.CognitoIdentityServiceProvider.CognitoUserSession(sessionData);
+            var cachedSession = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserSession(sessionData);
             if (cachedSession.isValid()) {
                 this.signInUserSession = cachedSession;
                 return callback(null, this.signInUserSession);
@@ -502,9 +502,9 @@ AWS.CognitoIdentityServiceProvider.CognitoUser = (function() {
      */
 
     CognitoUser.prototype.getCognitoUserSession = function getCognitoUserSession(authResult) {
-        var idToken = new AWS.CognitoIdentityServiceProvider.CognitoIdToken(authResult);
-        var accessToken = new AWS.CognitoIdentityServiceProvider.CognitoAccessToken(authResult);
-        var refreshToken = new AWS.CognitoIdentityServiceProvider.CognitoRefreshToken(authResult);
+        var idToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoIdToken(authResult);
+        var accessToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoAccessToken(authResult);
+        var refreshToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoRefreshToken(authResult);
 
         var sessionData = {
             IdToken : idToken,
@@ -512,7 +512,7 @@ AWS.CognitoIdentityServiceProvider.CognitoUser = (function() {
             RefreshToken : refreshToken        
         };
 
-        return new AWS.CognitoIdentityServiceProvider.CognitoUserSession(sessionData);
+        return new AWSCognito.CognitoIdentityServiceProvider.CognitoUserSession(sessionData);
     };
 
     /**

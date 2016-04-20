@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-AWS.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
+AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
 
 
     /**
@@ -36,7 +36,7 @@ AWS.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
         this.userPoolId = data.UserPoolId;
         this.clientId = data.ClientId;
 
-        this.client = new AWS.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
+        this.client = new AWSCognito.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
     };
 
 
@@ -88,7 +88,7 @@ AWS.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
                 };
 
                 var returnData = {
-                    user : new AWS.CognitoIdentityServiceProvider.CognitoUser(cognitoUser),
+                    user : new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser),
                     userConfirmed : data.UserConfirmed
                 };
 
@@ -115,7 +115,7 @@ AWS.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
                 Pool : this
             };
 
-            return new AWS.CognitoIdentityServiceProvider.CognitoUser(cognitoUser);
+            return new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser);
         } else {
             return null;
         }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-AWS.CognitoIdentityServiceProvider.AuthenticationDetails =  (function() {
+AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails =  (function() {
 
     /**
      * Constructs a new AuthenticationDetails object

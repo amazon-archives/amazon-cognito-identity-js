@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-AWS.CognitoIdentityServiceProvider.CognitoUserAttribute = (function() {
+AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute = (function() {
 
         /**
          * Constructs a new CognitoUserAttribute object
