@@ -80,7 +80,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     });
 </pre>
 
-**Use case 2.** Confirming a registered user using a confirmation code received via SMS.
+**Use case 2.** Confirming a registered, unauthenticated user using a confirmation code received via SMS.
 
 <pre class="prettyprint">
     cognitoUser.confirmRegistration('123456', true, function(err, result) {
@@ -92,7 +92,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     });
 </pre>
 
-**Use case 3.** Resending a confirmation code via SMS for confirming registration.
+**Use case 3.** Resending a confirmation code via SMS for confirming registration for a unauthenticated user.
 
 <pre class="prettyprint">
     cognitoUser.resendConfirmationCode(function(err, result) {
@@ -112,7 +112,15 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         Password : 'password',
     };
     var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-    
+    var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
+                     ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+    };
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userData = {
+        Username : 'username',
+        Pool : userPool
+	   };
+    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: function (result) {
             console.log('access token + ' + result.getAccessToken().getJwtToken());
@@ -227,7 +235,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     });
 </pre>
 
-**Use case 12.** Starting and completing a forgot password flow for a user.
+**Use case 12.** Starting and completing a forgot password flow for an unauthenticated user.
 
 <pre class="prettyprint">
     cognitoUser.forgotPassword({
