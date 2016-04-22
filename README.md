@@ -35,7 +35,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 6. Include Moment.js, a JavaScript library used for date manipulation:
   * [Moment.js](http://momentjs.com/)
 
-7. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services:
+7. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services. The SDK is necessary in order to use AWS.CognitoIdentityCredentials:
   * http://aws.amazon.com/sdk-for-browser/
 
 <pre class="prettyprint">
@@ -45,6 +45,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     &lt;script src="/path/to/moment.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/aws-cognito-sdk.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/aws-sdk-2.3.5.js"&gt;&lt;/script&gt;
+    
 </pre>
 
 ## Usage
