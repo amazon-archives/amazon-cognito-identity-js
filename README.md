@@ -35,7 +35,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 6. Include Moment.js, a JavaScript library used for date manipulation:
   * [Moment.js](http://momentjs.com/)
 
-7. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services:
+7. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services. The SDK is necessary in order to use AWS.CognitoIdentityCredentials:
   * http://aws.amazon.com/sdk-for-browser/
 
 <pre class="prettyprint">
@@ -45,6 +45,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     &lt;script src="/path/to/moment.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/aws-cognito-sdk.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/aws-sdk-2.3.5.js"&gt;&lt;/script&gt;
+    
 </pre>
 
 ## Usage
@@ -52,7 +54,17 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 **Use case 1.** Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
 
 <pre class="prettyprint">
+
+    AWS.config.region = 'us-east-1'; // Region
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: '...' // your identity pool id here
+    });
+
     AWSCognito.config.region = 'us-east-1';
+    AWSCognito.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: '...' // your identity pool id here
+    });
+        
     var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
                 ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
     };
