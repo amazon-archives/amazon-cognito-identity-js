@@ -54,7 +54,17 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 **Use case 1.** Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
 
 <pre class="prettyprint">
+
+    AWS.config.region = 'us-east-1'; // Region
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: '...' // your identity pool id here
+    });
+
     AWSCognito.config.region = 'us-east-1';
+    AWSCognito.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: '...' // your identity pool id here
+    });
+        
     var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
                 ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
     };
