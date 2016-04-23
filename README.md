@@ -99,6 +99,18 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 **Use case 2.** Confirming a registered, unauthenticated user using a confirmation code received via SMS.
 
 <pre class="prettyprint">
+    var poolData = {
+            UserPoolId : 'us-east-1_TcoKGbf7n',
+            ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+        };
+
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userData = {
+            Username : 'username',
+            Pool : userPool
+        };
+
+    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
     cognitoUser.confirmRegistration('123456', true, function(err, result) {
         if (err) {
             alert(err);
