@@ -66,7 +66,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     });
         
     var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
-                ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
     };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
 
@@ -100,15 +100,15 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
 <pre class="prettyprint">
     var poolData = {
-            UserPoolId : 'us-east-1_TcoKGbf7n',
-            ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
-        };
+        UserPoolId : 'us-east-1_TcoKGbf7n',
+        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+    };
 
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
     var userData = {
-            Username : 'username',
-            Pool : userPool
-        };
+        Username : 'username',
+        Pool : userPool
+    };
 
     var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
     cognitoUser.confirmRegistration('123456', true, function(err, result) {
@@ -141,13 +141,13 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     };
     var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
     var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
-                     ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
     };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
     var userData = {
         Username : 'username',
         Pool : userPool
-	   };
+    };
     var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: function (result) {
@@ -278,6 +278,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
             var newPassword = prompt('Enter new password ' ,'');
             cognitoUser.confirmPassword(verificationCode, newPassword, this);
         }
+    });
 </pre>
 
 **Use case 13.** Deleting an authenticated user.
@@ -302,7 +303,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
 <pre class="prettyprint">
     var data = { UserPoolId : 'us-east-1_Iqc3ajYLS',
-                 ClientId : '2lavgo9l86pkdu353sm7khjj1q'
+        ClientId : '2lavgo9l86pkdu353sm7khjj1q'
     };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
     var cognitoUser = userPool.getCurrentUser();
