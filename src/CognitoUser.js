@@ -67,7 +67,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
      */
 
     CognitoUser.prototype.authenticateUser = function authenticateUser(authDetails, callback) {
-        var authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(this.pool.getUserPoolId().split('_')[1]);
+        var authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(this.pool.getUserPoolId().split('_')[1], this.pool.getParanoia());
 
         var serverBValue;
         var salt;
