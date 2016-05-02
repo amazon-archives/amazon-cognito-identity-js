@@ -353,7 +353,7 @@ Paranoia levels can be set through the constructor:
 or by calling the object method:
 
 <pre class="prettyprint">
-    cognitoUser.setParanoia(7);
+    userPool.setParanoia(7);
 </pre>
 
 ## Change Log
