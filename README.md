@@ -337,14 +337,14 @@ Paranoia levels can be set through the constructor:
 <pre class="prettyprint">
     var poolData = {
         UserPoolId : 'us-east-1_TcoKGbf7n',
-        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3',
         Paranoia : 7
     };
 
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
     var userData = {
         Username : 'username',
-        Pool : userPool,
+        Pool : userPool
     };
 
     var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
