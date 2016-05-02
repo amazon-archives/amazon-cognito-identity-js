@@ -23,7 +23,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
      * @constructor
      */
 
-    var AuthenticationHelper = function AuthenticationHelper(PoolName) {
+    var AuthenticationHelper = function AuthenticationHelper(PoolName, paranoia) {
         if (!(this instanceof AuthenticationHelper)) {
        	    throw new Error('AuthenticationHelper constructor was not called with new.');
         }
@@ -46,6 +46,8 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
                               + '43DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF', 16);
         this.g = new BigInteger('2');
         this.k = new BigInteger(this.hexHash('00' + this.N.toString(16) + '0' + this.g.toString(16)), 16);
+
+        this.paranoia = paranoia;
 
         this.smallAValue = this.generateRandomSmallA();
         this.largeAValue = this.calculateA(this.smallAValue);
@@ -80,7 +82,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
      */
 
     AuthenticationHelper.prototype.generateRandomSmallA = function generateRandomSmallA() {
-        var words = sjcl.random.randomWords(32 , 0);
+        var words = sjcl.random.randomWords(32 , this.paranoia);
         var hexRandom = sjcl.codec.hex.fromBits(words);
 
         var randomBigInt = new BigInteger(hexRandom, 16);
