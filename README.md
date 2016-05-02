@@ -326,6 +326,36 @@ The Amazon Cognito Identity JavaScript SDK will make requests to the following e
  
 For most frameworks you can whitelist the domain by whitelisting all AWS endpoints with "*.amazonaws.com".
 
+## Random numbers
+
+In order to authenticate with the Amazon Cognito Identity Service, the client needs to generate a random number as part of the SRP protocol. Note that in some web browsers such as Internet Explorer 8, Internet Explorer 9, or versions 4.2 and 4.3 of the Android Browser, a default paranoia of 0 passed to the Stanford Javascript Crypto Library generates weak random numbers that might compromise client data. Developers should be careful when using the library in such an environment and call the sjcl.random.startCollectors() function before starting the Cognito authentication flow in order to collect entropy required for random number generation. Paranoia level should also be increased.
+See discussion below:
+* https://github.com/bitwiseshiftleft/sjcl/issues/77
+
+Paranoia levels can be set through the constructor:
+
+<pre class="prettyprint">
+    var poolData = {
+        UserPoolId : 'us-east-1_TcoKGbf7n',
+        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+        Paranoia : 7
+    };
+
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userData = {
+        Username : 'username',
+        Pool : userPool,
+    };
+
+    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+</pre>
+
+or by calling the object method:
+
+<pre class="prettyprint">
+    cognitoUser.setParanoia(7);
+</pre>
+
 ## Change Log
 **v0.9.0:**
 * Initial release. Developer preview.
