@@ -35,10 +35,10 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
           
         this.userPoolId = data.UserPoolId;
         this.clientId = data.ClientId;
+       	this.paranoia = data.Paranoia || 0;
 
         this.client = new AWSCognito.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
     };
-
 
     /**
      * Returns the user pool id
@@ -58,6 +58,23 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
         return this.clientId;
     };
 
+    /**
+     * Returns the paranoia level
+     * @returns {int}
+     */
+
+    CognitoUserPool.prototype.getParanoia = function getParanoia() {
+        return this.paranoia;
+    };
+
+    /**
+     * sets paranoia level
+     * @param paranoia
+     */
+
+    CognitoUserPool.prototype.setParanoia = function setParanoia(paranoia) {
+        this.paranoia = paranoia;
+    };
 
     /**
      * method for signing up a user
