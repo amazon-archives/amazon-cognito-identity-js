@@ -5,6 +5,7 @@ You can now use Amazon Cognito to easily add user sign-up and sign-in to your mo
 **Developer Preview:** We welcome developer feedback on this project. You can reach us by creating an issue on the 
 GitHub repository or posting to the Amazon Cognito Identity forums:
 * https://github.com/aws/amazon-cognito-identity-js
+* https://forums.aws.amazon.com/forum.jspa?forumID=173
 
 Introduction
 ============
