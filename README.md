@@ -64,6 +64,9 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     AWSCognito.config.credentials = new AWS.CognitoIdentityCredentials({
         IdentityPoolId: '...' // your identity pool id here
     });
+
+   // Need to provide placeholder keys unless unauthorised user access is enabled for user pool
+   AWSCognito.config.update({accessKeyId: 'anything', secretAccessKey: 'anything'})
         
     var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
         ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
