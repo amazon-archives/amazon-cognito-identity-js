@@ -580,7 +580,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 }
 	    }); 
         } else {
-            return callback(new Error('User is not authenticated'), null);
+            return callback.onFailure(new Error('User is not authenticated'));
         }
     };
 
@@ -607,7 +607,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 }
             });
         } else {
-            return callback(new Error('User is not authenticated'), null);
+            return callback.onFailure(new Error('User is not authenticated'));
         }
     };
 
