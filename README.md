@@ -39,7 +39,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 7. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services. The SDK is necessary in order to use AWS.CognitoIdentityCredentials:
   * http://aws.amazon.com/sdk-for-browser/
 
-```javascript
+<pre class="prettyprint">
     &lt;script src="/path/to/jsbn.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/jsbn2.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/sjcl.js"&gt;&lt;/script&gt;
@@ -48,7 +48,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     &lt;script src="/path/to/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/aws-sdk-2.3.5.js"&gt;&lt;/script&gt;
     
-```
+</pre>
 
 ## Usage
 
