@@ -39,7 +39,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 7. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services. The SDK is necessary in order to use AWS.CognitoIdentityCredentials:
   * http://aws.amazon.com/sdk-for-browser/
 
-<pre class="prettyprint">
+```javascript
     &lt;script src="/path/to/jsbn.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/jsbn2.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/sjcl.js"&gt;&lt;/script&gt;
@@ -48,7 +48,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     &lt;script src="/path/to/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/aws-sdk-2.3.5.js"&gt;&lt;/script&gt;
     
-</pre>
+```
 
 ## Usage
 
@@ -99,7 +99,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
 **Use case 2.** Confirming a registered, unauthenticated user using a confirmation code received via SMS.
 
-<pre class="prettyprint">
+```javascript
     var poolData = {
         UserPoolId : 'us-east-1_TcoKGbf7n',
         ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
@@ -119,11 +119,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         }
         console.log('call result: ' + result);
     });
-</pre>
+```
 
 **Use case 3.** Resending a confirmation code via SMS for confirming registration for a unauthenticated user.
 
-<pre class="prettyprint">
+```javascript
     cognitoUser.resendConfirmationCode(function(err, result) {
         if (err) {
             alert(err);
@@ -131,11 +131,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         }
         console.log('call result: ' + result);
     });
-</pre>
+```
 
 **Use case 4.** Authenticating a user and establishing a user session with the Amazon Cognito Identity service.
 
-<pre class="prettyprint">
+```javascript
     var authenticationData = {
         Username : 'username',
         Password : 'password',
@@ -160,11 +160,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         },
 
     });
-</pre>
+```
 
 **Use case 5.** Retrieve user attributes for an authenticated user.
 
-<pre class="prettyprint">
+```javascript
     cognitoUser.getUserAttributes(function(err, result) {
         if (err) {
             alert(err);
@@ -174,11 +174,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
             console.log('attribute ' + result[i].getName() + ' has value ' + result[i].getValue());
         }
     });
-</pre>
+```
 
 **Use case 6.** Verify user attribute for an authenticated user.
 
-<pre class="prettyprint">
+```javascript
     cognitoUser.getAttributeVerificationCode('email', {
         onSuccess: function (result) {
             console.log('call result: ' + result);
@@ -191,11 +191,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
             cognitoUser.verifyAttribute('email', verificationCode, this);
         }
     });
-</pre>
+```
 
 **Use case 7.** Delete user attribute for an authenticated user.
 
-<pre class="prettyprint">
+```javascript
     var attributeList = [];
     attributeList.push('nickname');
 
@@ -206,11 +206,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         }
         console.log('call result: ' + result);
     });
-</pre>
+```
 
 **Use case 8.** Update user attributes for an authenticated user.
 
-<pre class="prettyprint">
+```javascript
     var attributeList = [];
     var attribute = {
         Name : 'nickname',
@@ -226,11 +226,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         }
         console.log('call result: ' + result);
     });
-</pre>
+```
 
 **Use case 9.** Enabling MFA for a user on a pool that has an optional MFA setting for an authenticated user.
 
-<pre class="prettyprint">
+```javascript
     cognitoUser.enableMFA(function(err, result) {
         if (err) {
             alert(err);
@@ -238,11 +238,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         }
         console.log('call result: ' + result);
     });
-</pre>
+```
 
 **Use case 10.** Disabling MFA for a user on a pool that has an optional MFA setting for an authenticated user.
 
-<pre class="prettyprint">
+```javascript
     cognitoUser.disableMFA(function(err, result) {
         if (err) {
             alert(err);
@@ -250,11 +250,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         }
         console.log('call result: ' + result);
     });
-</pre>
+```
 
 **Use case 11.** Changing the current password for an authenticated user.
 
-<pre class="prettyprint">
+```javascript
     cognitoUser.changePassword('oldPassword', 'newPassword', function(err, result) {
         if (err) {
             alert(err);
@@ -262,11 +262,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         }
         console.log('call result: ' + result);
     });
-</pre>
+```
 
 **Use case 12.** Starting and completing a forgot password flow for an unauthenticated user.
 
-<pre class="prettyprint">
+```javascript
     cognitoUser.forgotPassword({
         onSuccess: function (result) {
             console.log('call result: ' + result);
@@ -280,11 +280,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
             cognitoUser.confirmPassword(verificationCode, newPassword, this);
         }
     });
-</pre>
+```
 
 **Use case 13.** Deleting an authenticated user.
 
-<pre class="prettyprint">
+```javascript
     cognitoUser.deleteUser(function(err, result) {
         if (err) {
            	alert(err);
@@ -292,17 +292,17 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         }
         console.log('call result: ' + result);
     });
-</pre>
+```
 
 **Use case 14.** Signing out from the application.
 
-<pre class="prettyprint">
+```javascript
     cognitoUser.signOut();
-</pre>
+```
 
 **Use case 15.** Retrieving the current user from local storage.
 
-<pre class="prettyprint">
+```javascript
     var data = { UserPoolId : 'us-east-1_Iqc3ajYLS',
         ClientId : '2lavgo9l86pkdu353sm7khjj1q'
     };
@@ -318,7 +318,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
             console.log('session validity: ' + session.isValid());
         });
     }
-</pre>
+```
 
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
@@ -335,7 +335,7 @@ See discussion below:
 
 Paranoia levels can be set through the constructor:
 
-<pre class="prettyprint">
+```javascript
     var poolData = {
         UserPoolId : 'us-east-1_TcoKGbf7n',
         ClientId : '4pe2usejqcdmhi0a25jp4b5sh3',
@@ -349,13 +349,13 @@ Paranoia levels can be set through the constructor:
     };
 
     var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
-</pre>
+```
 
 or by calling the object method:
 
-<pre class="prettyprint">
+```javascript
     userPool.setParanoia(7);
-</pre>
+```
 
 ## Change Log
 **v0.9.0:**
