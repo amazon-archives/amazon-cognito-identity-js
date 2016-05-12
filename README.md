@@ -69,7 +69,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     // Need to provide placeholder keys unless unauthorised user access is enabled for user pool
     AWSCognito.config.update({accessKeyId: 'anything', secretAccessKey: 'anything'})
         
-    var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
+    var poolData = { 
+        UserPoolId : 'us-east-1_TcoKGbf7n',
         ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
     };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
@@ -144,7 +145,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         Password : 'password',
     };
     var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-    var poolData = { UserPoolId : 'us-east-1_TcoKGbf7n',
+    var poolData = { 
+        UserPoolId : 'us-east-1_TcoKGbf7n',
         ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
     };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
