@@ -29,6 +29,11 @@
     "grunt-contrib-uglify": "^0.6.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-jsdoc": "^0.5.7",
-    "qunitjs": "^1.15.0"
+    "qunitjs": "^1.15.0",
+    "jsdom": "^9.1.0",
+    "moment": "^2.13.0",
+    "sjcl": "^1.0.3",
+    "aws-sdk": "^2.3.4",
+    "big-integer": "^1.6.15"
   }
 }

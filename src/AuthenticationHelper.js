@@ -1,3 +1,9 @@
+'use strict';
+const AWS = require('aws-sdk');
+const BigInteger = require('big-integer');
+const sjcl = require('sjcl');
+
+var AWSCognito = AWS;
 /**
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
@@ -134,7 +140,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
         }
 
 	this.UHexHash = this.hexHash(AToHash + BToHash);
-        finalU = new BigInteger(this.UHexHash, 16);
+        const finalU = new BigInteger(this.UHexHash, 16);
 
         return finalU;
     };
@@ -243,3 +249,5 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
     return AuthenticationHelper;
 
 })();
+
+module.exports = AWSCognito;

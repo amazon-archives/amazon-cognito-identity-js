@@ -1,5 +1,7 @@
 # Amazon Cognito Identity SDK for JavaScript
 
+#** \*This is an open source suggestion for integration with a node Environment \* **
+
 You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps. Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of millions of users, so you don't have to worry about building, securing, and scaling a solution to handle user management and authentication.
 
 **Developer Preview:** We welcome developer feedback on this project. You can reach us by creating an issue on the 
@@ -12,7 +14,7 @@ Introduction
 ============
 The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applications to sign-up users, authenticate users, view, delete, and update user attributes within the Amazon Cognito Identity service. Other functionality includes password changes for authenticated users and initiating and completing forgot password flows for unauthenticated users.
 
-## Setup
+## Browser Setup
 
 1. Create an app for your user pool. Note that the generate client secret box must be **unchecked** because the JavaScript SDK doesn't support apps that have a client secret.
 
@@ -50,6 +52,18 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     &lt;script src="/path/to/aws-sdk-2.3.5.js"&gt;&lt;/script&gt;
     
 </pre>
+
+## Node.js Setup
+
+1. Downoload this project and place it into your project folder
+
+2. DO NOT
+```javascript
+npm install
+
+3. Include the index.js file in side the root of this project
+```javascript
+const AWSCognito = require(pathToProject + 'amazon-cognito-identity-js/index');
 
 ## Usage
 
