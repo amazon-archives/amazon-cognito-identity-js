@@ -339,7 +339,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
                 IdentityPoolId : '...' // your identity pool id here
                 Logins : {
                     // Change the key below according to the specific region your user pool is in.
-                    'cognito-idp.us-east-1.amazonaws.com/us-east-1_Iqc3ajYLS' : result.getIdToken().getJwtToken()
+                    'cognito-idp.us-east-1.amazonaws.com/us-east-1_Iqc3ajYLS' : session.getIdToken().getJwtToken()
                 }
             });
 
