@@ -159,6 +159,18 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: function (result) {
             console.log('access token + ' + result.getAccessToken().getJwtToken());
+
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                IdentityPoolId : '...' // your identity pool id here
+                Logins : {
+                    // Change the key below according to the specific region your user pool is in.
+                    'cognito-idp.us-east-1.amazonaws.com/us-east-1_TcoKGbf7n' : result.getIdToken().getJwtToken()
+                }
+            });
+
+            // Instantiate aws sdk service objects now that the credentials have been updated.
+            // example: var s3 = new AWS.S3();
+
         },
 
         onFailure: function(err) {
@@ -322,6 +334,18 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
                 return;
             }
             console.log('session validity: ' + session.isValid());
+
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                IdentityPoolId : '...' // your identity pool id here
+                Logins : {
+                    // Change the key below according to the specific region your user pool is in.
+                    'cognito-idp.us-east-1.amazonaws.com/us-east-1_Iqc3ajYLS' : result.getIdToken().getJwtToken()
+                }
+            });
+
+            // Instantiate aws sdk service objects now that the credentials have been updated.
+            // example: var s3 = new AWS.S3();
+
         });
     }
 ```
