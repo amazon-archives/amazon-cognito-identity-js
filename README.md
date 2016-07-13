@@ -285,8 +285,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 **Use case 12.** Starting and completing a forgot password flow for an unauthenticated user. 
 
 Note that the inputVerificationCode method needs to be defined but does not need to actually do anything. 
-If you would like the user the input the confirmation code on another page, you can make inputVerificationCode call a no-op 
-and call confirmPassword later. 
+If you would like the user to input the confirmation code on another page, 
+you can make inputVerificationCode call a no-op
 
 ```javascript
     cognitoUser.forgotPassword({
