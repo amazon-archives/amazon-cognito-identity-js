@@ -282,7 +282,11 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     });
 ```
 
-**Use case 12.** Starting and completing a forgot password flow for an unauthenticated user.
+**Use case 12.** Starting and completing a forgot password flow for an unauthenticated user. 
+
+Note that the inputVerificationCode method needs to be defined but does not need to actually do anything. 
+If you would like the user the input the confirmation code on another page, you can make inputVerificationCode call a no-op 
+and call confirmPassword later. 
 
 ```javascript
     cognitoUser.forgotPassword({
@@ -299,6 +303,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         }
     });
 ```
+
+ 
 
 **Use case 13.** Deleting an authenticated user.
 
@@ -330,7 +336,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     if (cognitoUser != null) {
         cognitoUser.getSession(function(err, session) {
             if (err) {
-           	    alert(err);
+           	   alert(err);
                 return;
             }
             console.log('session validity: ' + session.isValid());
@@ -348,6 +354,36 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
         });
     }
+```
+
+**Use case 16.** Integrating User Pools with Cognito Identity.
+
+```javascript
+    var cognitoUser = userPool.getCurrentUser();
+
+    if (cognitoUser != null) {
+        cognitoUser.getSession(function(err, result) {
+            if (result) {
+                console.log('You are now logged in.');
+
+                // Add the User's Id Token to the Cognito credentials login map.
+                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                    IdentityPoolId: 'YOUR_IDENTITY_POOL_ID',
+                    Logins: {
+                        'cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>': result.getIdToken().getJwtToken()
+                    }
+                });
+            }
+        });
+    }
+    //call refresh method in order to authenticate user and get new temp credentials
+    AWS.config.credentials.refresh((error) => {
+        if (error) {
+            console.error(error);
+        } else {
+            console.log('Successfully logged!');
+        }
+        });
 ```
 
 ## Network Configuration
