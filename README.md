@@ -57,9 +57,9 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
 ```javascript
 
-    AWS.config.region = 'us-east-1'; // Region if you will use the AWS SDK
+    AWS.config.region = 'us-east-1'; // Configure region in the AWS SDK if you will use it
 
-    AWSCognito.config.region = 'us-east-1';
+    AWSCognito.config.region = 'us-east-1'; //This is required to derive the endpoint
     // Need to provide placeholder keys unless unauthorised user access is enabled for user pool
     AWSCognito.config.update({accessKeyId: 'anything', secretAccessKey: 'anything'})
         
