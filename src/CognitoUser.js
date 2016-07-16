@@ -1,3 +1,10 @@
+'use strict';
+const BigInteger = require('big-integer');
+const AWS = require('aws-sdk');
+const sjcl = require('sjcl');
+const moment = require('moment');
+
+var AWSCognito = AWS;
 /**
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
@@ -124,7 +131,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 var codeDeliveryDetails = dataAuthenticate.CodeDeliveryDetails;
                 if (codeDeliveryDetails == null) {
                     self.signInUserSession = self.getCognitoUserSession(dataAuthenticate.AuthenticationResult);
-                    self.cacheTokens();
+                    // self.cacheTokens();
                     return callback.onSuccess(self.signInUserSession);
                 } else {
                     self.AuthState = dataAuthenticate.AuthState;
@@ -624,3 +631,5 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
     return CognitoUser;
 
 })();
+
+module.exports = AWSCognito;

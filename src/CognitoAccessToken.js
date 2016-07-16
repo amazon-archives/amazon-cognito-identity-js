@@ -1,3 +1,7 @@
+'use strict';
+const AWS = require('aws-sdk');
+
+var AWSCognito = AWS;
 /**
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
@@ -57,3 +61,5 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoAccessToken = (function() {
     return CognitoAccessToken;
 
 })();
+
+module.exports = AWSCognito;

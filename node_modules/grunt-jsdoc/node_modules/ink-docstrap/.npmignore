@@ -1,0 +1,9 @@
+node_modules*
+components*
+bower_components*
+*.map
+.idea*
+ringojs-0.9*
+dox*
+testdocs/*
+npm-debug.log
