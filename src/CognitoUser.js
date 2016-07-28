@@ -107,7 +107,8 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
         this.client.makeUnauthenticatedRequest('initiateAuth', {
             AuthFlow : this.authenticationFlowType,
             ClientId : this.pool.getClientId(),
-            AuthParameters : authParameters
+            AuthParameters : authParameters,
+            ClientMetadata : authDetails.getValidationData()
         }, function (err, data) {
             if (err) {
                 return callback.onFailure(err);
