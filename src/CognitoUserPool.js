@@ -88,8 +88,8 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
      */
 
     CognitoUserPool.prototype.signUp = function signUp(username, password, userAttributes, validationData, callback) {
-        self = this;
-        this.client.signUp ({
+        var self = this;
+        this.client.makeUnauthenticatedRequest('signUp', {
             ClientId : self.clientId,
             Username : username,
             Password : password,
