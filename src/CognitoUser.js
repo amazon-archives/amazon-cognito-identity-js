@@ -350,21 +350,59 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
     CognitoUser.prototype.sendMFACode = function sendMFACode(confirmationCode, callback) {
         var challengeResponses = {};
         challengeResponses['USERNAME'] = this.username;
-        challengeResponses['MFA_CODE'] = confirmationCode;
-        
+        challengeResponses['SMS_MFA_CODE'] = confirmationCode;
+
+        if (this.deviceKey!= null) {
+       	    challengeResponses['DEVICE_KEY'] = this.deviceKey;
+        }        
+
         self = this;
         this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
             ChallengeName : 'SMS_MFA',
             ChallengeResponses : challengeResponses,
             ClientId : this.pool.getClientId(),
             Session : self.Session
-        }, function (err, data) {
+        }, function (err, dataAuthenticate) {
             if (err) {
                 return callback.onFailure(err);
             } else {
-                self.signInUserSession = self.getCognitoUserSession(data.AuthenticationResult);
+                self.signInUserSession = self.getCognitoUserSession(dataAuthenticate.AuthenticationResult);
                 self.cacheTokens();
-                return callback.onSuccess(self.signInUserSession);
+
+                if (dataAuthenticate.AuthenticationResult.NewDeviceMetadata != null) {
+                    var authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(self.pool.getUserPoolId().split('_')[1], self.pool.getParanoia());
+                    var deviceStuff = authenticationHelper.generateHashDevice(dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey, dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
+
+                    var deviceSecretVerifierConfig = {
+                        Salt : sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(authenticationHelper.getSaltDevices().toString(16))),
+                        PasswordVerifier : sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(authenticationHelper.getVerifierDevices().toString(16)))
+                    };
+
+                    self.verifierDevices = sjcl.codec.base64.fromBits(authenticationHelper.getVerifierDevices());
+                    self.deviceGroupKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey;
+                    self.randomPassword = authenticationHelper.getRandomPassword();
+
+                    self.client.makeUnauthenticatedRequest('confirmDevice', {
+                        DeviceKey : dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey,
+                        AccessToken : self.signInUserSession.getAccessToken().getJwtToken(),
+                        DeviceSecretVerifierConfig : deviceSecretVerifierConfig,
+                        DeviceName : navigator.userAgent
+                    }, function (errConfirm, dataConfirm) {
+                        if (errConfirm) {
+       	       	            return callback.onFailure(errConfirm);
+                        }
+                        self.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
+                        self.cacheDeviceKeyAndPassword();
+                        if (dataConfirm.UserConfirmationNecessary === true) {
+                           return callback.onSuccess(self.signInUserSession, dataConfirm.UserConfirmationNecessary);
+                        } else {
+                            return callback.onSuccess(self.signInUserSession);
+                        }
+                    });
+                } else {
+                    return callback.onSuccess(self.signInUserSession);
+                }
+
             }
 	});
     };
