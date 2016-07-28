@@ -32,10 +32,10 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
         if (data == null || data.UserPoolId == null || data.ClientId == null) {
             throw new Error('Both user pool Id and client Id are required.');
         }
-          
+
         this.userPoolId = data.UserPoolId;
         this.clientId = data.ClientId;
-       	this.paranoia = data.Paranoia || 0;
+        this.paranoia = data.Paranoia || 0;
 
         this.client = new AWSCognito.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
     };
@@ -114,10 +114,10 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
         });
     };
 
-    
+
      /**
      * method for getting the current user of the application from the local storage
-     * 
+     *
      * @returns {CognitoUser} the user retrieved from storage
      */
 

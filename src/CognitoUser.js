@@ -28,22 +28,22 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             throw new Error('CognitoUser constructor was not called with new.');
         }
 
-       	if (data == null || data.Username == null || data.Pool== null) {
-       	    throw new Error('Username and pool information are required.');
-       	}
+        if (data == null || data.Username == null || data.Pool== null) {
+            throw new Error('Username and pool information are required.');
+        }
 
         this.username = data.Username || '';
         this.pool = data.Pool;
         this.Session = null;
 
-	this.client = new AWSCognito.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
+        this.client = new AWSCognito.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
 
         this.signInUserSession = null;
         this.authenticationFlowType = 'USER_SRP_AUTH';
     };
 
     /**
-     * Gets the current session for this user 
+     * Gets the current session for this user
      *
      * @returns {CognitoUserSession}
      */
@@ -98,12 +98,12 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
         }
 
         authParameters['USERNAME'] = this.username;
-       	authParameters['SRP_A']	= authenticationHelper.getLargeAValue().toString(16);
+        authParameters['SRP_A'] = authenticationHelper.getLargeAValue().toString(16);
 
         if (this.authenticationFlowType === 'CUSTOM_AUTH') {
             authParameters['CHALLENGE_NAME'] = 'SRP_A';
         }
-     
+
         this.client.makeUnauthenticatedRequest('initiateAuth', {
             AuthFlow : this.authenticationFlowType,
             ClientId : this.pool.getClientId(),
@@ -117,23 +117,23 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             var challengeParameters = data.ChallengeParameters;
 
             self.username = challengeParameters.USER_ID_FOR_SRP;
-	    serverBValue = new BigInteger(challengeParameters.SRP_B, 16);
+            serverBValue = new BigInteger(challengeParameters.SRP_B, 16);
             salt = new BigInteger(challengeParameters.SALT, 16);
             self.getCachedDeviceKeyAndPassword();
 
             var hkdf = authenticationHelper.getPasswordAuthenticationKey(self.username, authDetails.getPassword(), serverBValue, salt);
             var secretBlockBits = sjcl.codec.base64.toBits(challengeParameters.SECRET_BLOCK);
 
-	    var mac = new sjcl.misc.hmac(hkdf, sjcl.hash.sha256);
+            var mac = new sjcl.misc.hmac(hkdf, sjcl.hash.sha256);
             mac.update(sjcl.codec.utf8String.toBits(self.pool.getUserPoolId().split('_')[1]));
-	    mac.update(sjcl.codec.utf8String.toBits(self.username));
-	    mac.update(secretBlockBits);
+            mac.update(sjcl.codec.utf8String.toBits(self.username));
+            mac.update(secretBlockBits);
             var now = moment().utc();
             var dateNow = now.format('ddd MMM D HH:mm:ss UTC YYYY');
-	    mac.update(sjcl.codec.utf8String.toBits(dateNow));
+            mac.update(sjcl.codec.utf8String.toBits(dateNow));
             var signature = mac.digest();
 
-	    var signatureBytes = sjcl.codec.bytes.fromBits(signature);
+            var signatureBytes = sjcl.codec.bytes.fromBits(signature);
 
             var signatureString = sjcl.codec.base64.fromBits(signature);
 
@@ -143,9 +143,9 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             challengeResponses['PASSWORD_CLAIM_SECRET_BLOCK'] = challengeParameters.SECRET_BLOCK;
             challengeResponses['TIMESTAMP'] = dateNow;
             challengeResponses['PASSWORD_CLAIM_SIGNATURE'] = signatureString;
- 
+
             if (self.deviceKey!= null) {
-       	        challengeResponses['DEVICE_KEY'] = self.deviceKey;
+                challengeResponses['DEVICE_KEY'] = self.deviceKey;
             }
 
             self.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
@@ -159,14 +159,14 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 }
 
                 var challengeName = dataAuthenticate.ChallengeName;
-                if (challengeName != null && challengeName == 'SMS_MFA') {
+                if (challengeName != null && challengeName === 'SMS_MFA') {
                     self.Session = dataAuthenticate.Session;
                     return callback.mfaRequired(challengeName);
-                } else if (challengeName != null && challengeName == 'CUSTOM_CHALLENGE') {
-                   self.Session = dataAuthenticate.Session;
-                   return callback.customChallenge(dataAuthenticate.ChallengeParameters);
-                } else if (challengeName != null && challengeName == 'DEVICE_SRP_AUTH') {
-                   self.getDeviceResponse(callback);
+                } else if (challengeName != null && challengeName === 'CUSTOM_CHALLENGE') {
+                    self.Session = dataAuthenticate.Session;
+                    return callback.customChallenge(dataAuthenticate.ChallengeParameters);
+                } else if (challengeName != null && challengeName === 'DEVICE_SRP_AUTH') {
+                    self.getDeviceResponse(callback);
                 } else {
                     self.signInUserSession = self.getCognitoUserSession(dataAuthenticate.AuthenticationResult);
                     self.cacheTokens();
@@ -190,7 +190,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                             DeviceName : navigator.userAgent
                         }, function (errConfirm, dataConfirm) {
                             if (errConfirm) {
-       	       	                return callback.onFailure(errConfirm);
+                                return callback.onFailure(errConfirm);
                             }
                             self.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
                             self.cacheDeviceKeyAndPassword();
@@ -217,7 +217,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
     CognitoUser.prototype.getDeviceResponse = function getDeviceResponse(callback) {
         var authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(this.deviceGroupKey, this.pool.getParanoia());
- 
+
         var self = this;
         var authParameters = {};
 
@@ -225,7 +225,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
         authParameters['DEVICE_KEY'] = this.deviceKey;
         authParameters['SRP_A'] = authenticationHelper.getLargeAValue().toString(16);
 
-	this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+        this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
             ChallengeName : 'DEVICE_SRP_AUTH',
             ClientId : this.pool.getClientId(),
             ChallengeResponses : authParameters
@@ -236,8 +236,8 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
             var challengeParameters = data.ChallengeParameters;
 
-            serverBValue = new BigInteger(challengeParameters.SRP_B, 16);
-            salt = new BigInteger(challengeParameters.SALT, 16);
+            var serverBValue = new BigInteger(challengeParameters.SRP_B, 16);
+            var salt = new BigInteger(challengeParameters.SALT, 16);
 
             var hkdf = authenticationHelper.getPasswordAuthenticationKey(self.deviceKey, self.randomPassword, serverBValue, salt);
             var secretBlockBits = sjcl.codec.base64.toBits(challengeParameters.SECRET_BLOCK);
@@ -279,7 +279,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             });
         });
 
-    }
+    };
 
     /**
      * This is used for a certain user to confirm the registration by using a confirmation code
@@ -291,16 +291,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
     CognitoUser.prototype.confirmRegistration = function confirmRegistration(confirmationCode, forceAliasCreation, callback) {
         this.client.makeUnauthenticatedRequest('confirmSignUp', {
-	    ClientId : this.pool.getClientId(),
-	    ConfirmationCode : confirmationCode,
-	    Username : this.username,
+            ClientId : this.pool.getClientId(),
+            ConfirmationCode : confirmationCode,
+            Username : this.username,
             ForceAliasCreation : forceAliasCreation
         }, function (err, data) {
-	    if (err) {
+            if (err) {
                 return callback(err, null);
             } else {
-		return callback(null, 'SUCCESS');
-	    }
+                return callback(null, 'SUCCESS');
+            }
         });
     };
 
@@ -316,7 +316,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
         challengeResponses['USERNAME'] = this.username;
         challengeResponses['ANSWER'] = answerChallenge;
 
-        self = this;
+        var self = this;
         this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
             ChallengeName : 'CUSTOM_CHALLENGE',
             ChallengeResponses : challengeResponses,
@@ -328,9 +328,9 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             } else {
                 var challengeName = data.ChallengeName;
 
-                if (challengeName != null && challengeName == 'CUSTOM_CHALLENGE') {
-                   self.Session = data.Session;
-                   return callback.customChallenge(data.challengeParameters);
+                if (challengeName != null && challengeName === 'CUSTOM_CHALLENGE') {
+                    self.Session = data.Session;
+                    return callback.customChallenge(data.challengeParameters);
                 } else {
                     self.signInUserSession = self.getCognitoUserSession(data.AuthenticationResult);
                     self.cacheTokens();
@@ -353,10 +353,10 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
         challengeResponses['SMS_MFA_CODE'] = confirmationCode;
 
         if (this.deviceKey!= null) {
-       	    challengeResponses['DEVICE_KEY'] = this.deviceKey;
-        }        
+            challengeResponses['DEVICE_KEY'] = this.deviceKey;
+        }
 
-        self = this;
+        var self = this;
         this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
             ChallengeName : 'SMS_MFA',
             ChallengeResponses : challengeResponses,
@@ -389,12 +389,12 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                         DeviceName : navigator.userAgent
                     }, function (errConfirm, dataConfirm) {
                         if (errConfirm) {
-       	       	            return callback.onFailure(errConfirm);
+                            return callback.onFailure(errConfirm);
                         }
                         self.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
                         self.cacheDeviceKeyAndPassword();
                         if (dataConfirm.UserConfirmationNecessary === true) {
-                           return callback.onSuccess(self.signInUserSession, dataConfirm.UserConfirmationNecessary);
+                            return callback.onSuccess(self.signInUserSession, dataConfirm.UserConfirmationNecessary);
                         } else {
                             return callback.onSuccess(self.signInUserSession);
                         }
@@ -404,7 +404,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 }
 
             }
-	});
+        });
     };
 
     /**
@@ -427,7 +427,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 } else {
                     return callback(null, 'SUCCESS');
                 }
-            }); 
+            });
         } else {
             return callback(new Error('User is not authenticated'), null);
         }
@@ -441,7 +441,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
     CognitoUser.prototype.enableMFA = function enableMFA(callback) {
         if (this.signInUserSession != null && this.signInUserSession.isValid()) {
-            var mfaOptions = []
+            var mfaOptions = [];
             var mfaEnabled = {
                 DeliveryMedium : 'SMS',
                 AttributeName : 'phone_number'
@@ -460,7 +460,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             });
         } else {
             return callback(new Error('User is not authenticated'), null);
-        } 
+        }
     };
 
     /**
@@ -471,10 +471,10 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
     CognitoUser.prototype.disableMFA = function disableMFA(callback) {
         if (this.signInUserSession != null && this.signInUserSession.isValid()) {
-            var mfaOptions = []
+            var mfaOptions = [];
 
             this.client.makeUnauthenticatedRequest('setUserSettings', {
-               	MFAOptions : mfaOptions,
+                MFAOptions : mfaOptions,
                 AccessToken : this.signInUserSession.getAccessToken().getJwtToken()
             }, function (err, data) {
                 if (err) {
@@ -551,7 +551,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 } else {
                     var attributeList = [];
 
-                    for (i = 0; i < userData.UserAttributes.length; i++) {
+                    for (var i = 0; i < userData.UserAttributes.length; i++) {
                         var attribute = {
                             Name : userData.UserAttributes[i].Name,
                             Value : userData.UserAttributes[i].Value
@@ -603,9 +603,9 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             ClientId : this.pool.getClientId(),
             Username : this.username
         }, function (err, data) {
-	    if (err) {
+            if (err) {
                 return callback(err, null);
-	    } else {
+            } else {
                 return callback(null, 'SUCCESS');
             }
         });
@@ -613,7 +613,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
     /**
      * This is used to get a session, either from the session object
-     * or from  the local storage, or by using a refresh token 
+     * or from  the local storage, or by using a refresh token
      *
      * @param callback
      * @returns error or session
@@ -623,7 +623,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
         if (this.username == null) {
             return callback(new Error('Username is null. Cannot retrieve a new session'), null);
         }
- 
+
         if (this.signInUserSession != null && this.signInUserSession.isValid()) {
             return callback(null, this.signInUserSession);
         }
@@ -631,7 +631,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
         var idTokenKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.idToken';
         var accessTokenKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.accessToken';
         var refreshTokenKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.refreshToken';
-         
+
         var storage = window.localStorage;
 
         if (storage.getItem(idTokenKey)) {
@@ -640,9 +640,9 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             var refreshToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoRefreshToken({RefreshToken:storage.getItem(refreshTokenKey)});
 
             var sessionData = {
-               IdToken : idToken,
-               AccessToken : accessToken,
-               RefreshToken : refreshToken
+                IdToken : idToken,
+                AccessToken : accessToken,
+                RefreshToken : refreshToken
             };
             var cachedSession = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserSession(sessionData);
             if (cachedSession.isValid()) {
@@ -673,13 +673,13 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
         var storage = window.localStorage;
 
         if (storage.getItem(lastUserKey)) {
-           this.username = storage.getItem(lastUserKey);
-           var deviceKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceKey';
-           this.deviceKey = storage.getItem(deviceKeyKey);
-           authParameters['DEVICE_KEY'] = this.deviceKey;
+            this.username = storage.getItem(lastUserKey);
+            var deviceKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceKey';
+            this.deviceKey = storage.getItem(deviceKeyKey);
+            authParameters['DEVICE_KEY'] = this.deviceKey;
         }
 
-        self = this;
+        var self = this;
         this.client.makeUnauthenticatedRequest('initiateAuth', {
             ClientId : this.pool.getClientId(),
             AuthFlow : 'REFRESH_TOKEN_AUTH',
@@ -720,7 +720,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
     CognitoUser.prototype.cacheDeviceKeyAndPassword = function cacheDeviceKeyAndPassword() {
         var deviceKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceKey';
         var randomPasswordKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.randomPasswordKey';
-	var deviceGroupKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceGroupKey';
+        var deviceGroupKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceGroupKey';
 
         var storage = window.localStorage;
 
@@ -795,7 +795,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
         var sessionData = {
             IdToken : idToken,
             AccessToken : accessToken,
-            RefreshToken : refreshToken        
+            RefreshToken : refreshToken
         };
 
         return new AWSCognito.CognitoIdentityServiceProvider.CognitoUserSession(sessionData);
@@ -830,7 +830,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
      * @param confirmationCode
      * @param newPassword
      * @param callback
-     * @returns	error or success
+     * @returns error or success
      *
      */
 
@@ -868,7 +868,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 } else {
                     return callback.inputVerificationCode(data);
                 }
-	    }); 
+            });
         } else {
             return callback(new Error('User is not authenticated'), null);
         }
@@ -893,7 +893,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 if (err) {
                     return callback.onFailure(err);
                 } else {
-               	    return callback.onSuccess('SUCCESS');
+                    return callback.onSuccess('SUCCESS');
                 }
             });
         } else {
@@ -930,11 +930,11 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
      * This is used to forget the current device
      *
      * @param callback
-     * @returns error or SUCCESS         
+     * @returns error or SUCCESS
      */
 
     CognitoUser.prototype.forgetDevice = function forgetDevice(callback) {
-        self = this;
+        var self = this;
         if (this.signInUserSession != null && this.signInUserSession.isValid()) {
             this.client.makeUnauthenticatedRequest('forgetDevice', {
                 AccessToken : this.signInUserSession.getAccessToken().getJwtToken(),
@@ -992,7 +992,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             this.client.makeUnauthenticatedRequest('updateDeviceStatus', {
                 AccessToken : this.signInUserSession.getAccessToken().getJwtToken(),
                 DeviceKey : this.deviceKey,
-                DeviceRememberedStatus : 'not_remembered'          
+                DeviceRememberedStatus : 'not_remembered'
             }, function (err, data) {
                 if (err) {
                     return callback.onFailure(err);
@@ -1034,13 +1034,13 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
     /**
      * This is used to globally revoke all tokens issued to a user
-     * 
+     *
      * @param callback
      * @returns error or SUCCESS
      */
 
     CognitoUser.prototype.globalSignOut = function globalSignOut(callback) {
-        self = this;
+        var self = this;
         if (this.signInUserSession != null && this.signInUserSession.isValid()) {
             this.client.makeUnauthenticatedRequest('globalSignOut', {
                 AccessToken : this.signInUserSession.getAccessToken().getJwtToken()
