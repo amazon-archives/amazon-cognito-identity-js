@@ -60,8 +60,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     AWSCognito.config.region = 'us-east-1'; //This is required to derive the endpoint
         
     var poolData = { 
-        UserPoolId : 'us-east-1_TcoKGbf7n',
-        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+        UserPoolId : '...', // Your user pool id here
+        ClientId : '...' // Your client id here
     };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
 
