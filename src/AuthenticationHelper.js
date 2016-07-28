@@ -91,6 +91,53 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
         return smallABigInt;
     };
 
+    AuthenticationHelper.prototype.generateRandomString = function generateRandomString() {
+        var words = sjcl.random.randomWords(10 , this.paranoia);
+        var stringRandom = sjcl.codec.base64.fromBits(words);
+
+        return stringRandom;
+    };
+
+    AuthenticationHelper.prototype.getRandomPassword = function getRandomPassword() {
+        return this.randomPassword;
+    };
+
+    AuthenticationHelper.prototype.getSaltDevices = function getSaltDevices() {
+        return this.SaltToHashDevices;
+    };
+
+    AuthenticationHelper.prototype.getVerifierDevices = function getVerifierDevices(){
+        return this.verifierDevices;
+    };
+
+    AuthenticationHelper.prototype.generateHashDevice = function generateHashDevice(deviceGroupKey, username) {
+        this.randomPassword = this.generateRandomString();
+        var combinedString = deviceGroupKey + username + ':' + this.randomPassword;
+        var hashedString = this.hash(combinedString);
+
+        var words = sjcl.random.randomWords(4 , this.paranoia);
+        var hexRandom = sjcl.codec.hex.fromBits(words);
+        var saltDevices = new BigInteger(hexRandom, 16);
+        var firstCharSalt = saltDevices.toString(16)[0];
+        this.SaltToHashDevices = saltDevices.toString(16);
+
+        if (saltDevices.toString(16).length%2 == 1) {
+            this.SaltToHashDevices = '0' + this.SaltToHashDevices;
+        } else if ('89ABCDEFabcdef'.indexOf(firstCharSalt) != -1) {
+            this.SaltToHashDevices = '00' + this.SaltToHashDevices;
+        }
+        var verifierDevicesNotPadded = this.g.modPow(new BigInteger(this.hexHash(this.SaltToHashDevices + hashedString), 16), this.N);
+
+        var firstCharVerifierDevices = verifierDevicesNotPadded.toString(16)[0];
+        this.verifierDevices = verifierDevicesNotPadded.toString(16);
+
+        if (verifierDevicesNotPadded.toString(16).length%2 == 1) {
+            this.verifierDevices = '0' + this.verifierDevices;
+        } else if ('89ABCDEFabcdef'.indexOf(firstCharVerifierDevices) != -1) {
+            this.verifierDevices = '00' + this.verifierDevices;
+        }
+    }
+
     /*
      * Calculate the client's public value A = g^a%N
      * with the generated random number a
