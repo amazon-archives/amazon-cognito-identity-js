@@ -57,11 +57,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
 ```javascript
 
-    AWS.config.region = 'us-east-1'; // Configure region in the AWS SDK if you will use it
-
     AWSCognito.config.region = 'us-east-1'; //This is required to derive the endpoint
-    // Need to provide placeholder keys unless unauthorised user access is enabled for user pool
-    AWSCognito.config.update({accessKeyId: 'anything', secretAccessKey: 'anything'})
         
     var poolData = { 
         UserPoolId : 'us-east-1_TcoKGbf7n',
@@ -75,6 +71,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
         Name : 'email',
         Value : 'email@mydomain.com'
     };
+
     var dataPhoneNumber = {
         Name : 'phone_number',
         Value : '+15555555555'
@@ -172,6 +169,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
     });
 ```
+
+Note that if device tracking is enabled for the user pool with a setting that user opt-in is required, you need to implement an onSuccess(result, userConfirmationNecessary) callback, collect user input and call either setDeviceStatusRemembered to remember the device or setDeviceStatusNotRemembered to not remember the device.
 
 **Use case 5.** Retrieve user attributes for an authenticated user.
 
@@ -317,7 +316,13 @@ you can make inputVerificationCode call a no-op
     cognitoUser.signOut();
 ```
 
-**Use case 15.** Retrieving the current user from local storage.
+**Use case 15.** Global signout for an authenticated user(invalidates all issued tokens).
+
+```javascript
+    cognitoUser.globalSignOut();
+```
+
+**Use case 16.** Retrieving the current user from local storage.
 
 ```javascript
     var data = { UserPoolId : 'us-east-1_Iqc3ajYLS',
@@ -349,7 +354,7 @@ you can make inputVerificationCode call a no-op
     }
 ```
 
-**Use case 16.** Integrating User Pools with Cognito Identity.
+**Use case 17.** Integrating User Pools with Cognito Identity.
 
 ```javascript
     var cognitoUser = userPool.getCurrentUser();
@@ -378,6 +383,80 @@ you can make inputVerificationCode call a no-op
         }
         });
 ```
+
+**Use case 18.** List all devices for an authenticated user. In this case, we need to pass a limit on the number of devices retrieved at a time and a pagination token is returned to make subsequent calls. The pagination token can be subsequently pasesed. When making the first call, the pagination token should be null.
+
+```javascript
+
+    cognitoUser.listDevices(limit, paginationToken, {
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
+        },
+        onFailure: function(err) {
+            alert(err);
+        }
+    });
+
+```
+
+**Use case 19.** List information about the current device.
+
+```javascript
+
+    cognitoUser.getDevice({
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
+        },
+        onFailure: function(err) {
+            alert(err);
+        }
+    });
+```
+
+
+**Use case 20.** Remember a device.
+
+```javascript
+
+    cognitoUser.setDeviceStatusRemembered({
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
+        },
+        onFailure: function(err) {
+            alert(err);
+        }
+    });
+```
+
+**Use case 21.** Do not remember a device.
+
+```javascript
+
+    cognitoUser.setDeviceStatusNotRemembered({
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
+        },
+	onFailure: function(err) {
+            alert(err);
+        }
+    });
+```
+
+
+**Use case 22.** Forget the current device.
+
+```javascript
+
+    cognitoUser.forgetDevice({
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
+        },
+        onFailure: function(err) {
+            alert(err);
+        }
+    });
+```
+
 
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
@@ -417,5 +496,27 @@ or by calling the object method:
 ```
 
 ## Change Log
+
+**v1.0.0:**
+* GA release. In this GA service launch, the following new features have been added to Amazon Cognito Your User Pools. 
+
+*  Whats new
+
+   * Support for Custom authentication flows. Developes can implement custom authentication flows around Cognito Your User Pools. See developer documentation for details.
+   * Devices support in User Pools. Users can remember devices and skip MFA verification for remebered devices. 
+   * Scopes to control permissions for attributes in a User Pool.  
+   * Configurable expiration time for refresh tokens.
+   * Set custom FROM and REPLY-TO for email verification messages.
+   * Search users in your pool using user attributes.
+   * Global sign-out for a user. 
+
+* What has changed
+
+   * Authentication flow in Javascript SDK now uses Custom Authentication API
+   * Two new exceptions added for getSession API: These exceptions have been added to accurately represent the user state when the username is invalid and when the user is not confirmed. You will have to update your application to handle these exceptions.
+       * UserNotFoundException: Returned when the username user does not exist.
+       *  UserNotConfirmedException: Returned when the user has not been confirmed.
+       *  PasswordResetRequiredException: When administator has requested for a password reset for the user. 
+
 **v0.9.0:**
 * Initial release. Developer preview.
