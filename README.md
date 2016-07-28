@@ -96,8 +96,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
 ```javascript
     var poolData = {
-        UserPoolId : 'us-east-1_TcoKGbf7n',
-        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+        UserPoolId : '...', // Your user pool id here
+        ClientId : '...' // Your client id here
     };
 
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
@@ -137,8 +137,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     };
     var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
     var poolData = { 
-        UserPoolId : 'us-east-1_TcoKGbf7n',
-        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3'
+        UserPoolId : '...', // Your user pool id here
+        ClientId : '...' // Your client id here
     };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
     var userData = {
@@ -325,8 +325,9 @@ you can make inputVerificationCode call a no-op
 **Use case 16.** Retrieving the current user from local storage.
 
 ```javascript
-    var data = { UserPoolId : 'us-east-1_Iqc3ajYLS',
-        ClientId : '2lavgo9l86pkdu353sm7khjj1q'
+    var data = {
+        UserPoolId : '...', // Your user pool id here
+        ClientId : '...' // Your client id here
     };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
     var cognitoUser = userPool.getCurrentUser();
@@ -475,8 +476,8 @@ Paranoia levels can be set through the constructor:
 
 ```javascript
     var poolData = {
-        UserPoolId : 'us-east-1_TcoKGbf7n',
-        ClientId : '4pe2usejqcdmhi0a25jp4b5sh3',
+        UserPoolId : '...', // Your user pool id here
+        ClientId : '...', // Your client id here
         Paranoia : 7
     };
 
