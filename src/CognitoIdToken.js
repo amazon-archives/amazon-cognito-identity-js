@@ -49,7 +49,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoIdToken = (function() {
      */
 
     CognitoIdToken.prototype.getExpiration = function getExpiration() {
-        var payload = this.jwtToken.split(".")[1]
+        var payload = this.jwtToken.split(".")[1];
         var expiration = JSON.parse(sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
         return moment.unix(expiration.exp);
     };
