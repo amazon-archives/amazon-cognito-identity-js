@@ -34,17 +34,13 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 
    Please note, that by default the Stanford JavaScript Crypto Library doesn't include the bytes codec that the SDK uses so it must be included with the --with-codecBytes option when configuring the Stanford JavaScript Crypto Library (see sjlc README/INSTALL). It is known to build on Linux and requires a Java runtime.
 
-6. Include Moment.js, a JavaScript library used for date manipulation:
-  * [Moment.js](http://momentjs.com/)
-
-7. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services. The SDK is necessary in order to use AWS.CognitoIdentityCredentials:
+6. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services. The SDK is necessary in order to use AWS.CognitoIdentityCredentials:
   * http://aws.amazon.com/sdk-for-browser/
 
 <pre class="prettyprint">
     &lt;script src="/path/to/jsbn.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/jsbn2.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/sjcl.js"&gt;&lt;/script&gt;
-    &lt;script src="/path/to/moment.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/aws-cognito-sdk.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
     &lt;script src="/path/to/aws-sdk-2.3.5.js"&gt;&lt;/script&gt;
@@ -498,6 +494,16 @@ or by calling the object method:
 
 ## Change Log
 
+**Next**
+
+* What's new
+
+  * Nothing yet
+
+* What has changed
+
+  * Removed moment.js as a dependency.
+
 **v1.0.0:**
 * GA release. In this GA service launch, the following new features have been added to Amazon Cognito Your User Pools. 
 
@@ -516,8 +522,8 @@ or by calling the object method:
    * Authentication flow in Javascript SDK now uses Custom Authentication API
    * Two new exceptions added for getSession API: These exceptions have been added to accurately represent the user state when the username is invalid and when the user is not confirmed. You will have to update your application to handle these exceptions.
        * UserNotFoundException: Returned when the username user does not exist.
-       *  UserNotConfirmedException: Returned when the user has not been confirmed.
-       *  PasswordResetRequiredException: When administator has requested for a password reset for the user. 
+       * UserNotConfirmedException: Returned when the user has not been confirmed.
+       * PasswordResetRequiredException: When administator has requested for a password reset for the user.
 
 **v0.9.0:**
 * Initial release. Developer preview.
