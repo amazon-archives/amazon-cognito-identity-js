@@ -71,9 +71,9 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserSession = (function() {
      */
 
     CognitoUserSession.prototype.isValid = function isValid() {
-        var now = moment().utc();
+        var now = Math.floor(new Date() / 1000);
 
-        return now.isBefore(this.accessToken.getExpiration()) && now.isBefore(this.idToken.getExpiration());
+        return now < this.accessToken.getExpiration() && now < this.idToken.getExpiration();
     };
 
     return CognitoUserSession;

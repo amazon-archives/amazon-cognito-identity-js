@@ -64,7 +64,8 @@ module.exports = function(grunt) {
                         'src/AuthenticationDetails.js',
                         'src/CognitoUserSession.js',
                         'src/CognitoUserAttribute.js',
-                        'src/AuthenticationHelper.js'
+                        'src/AuthenticationHelper.js',
+                        'src/DateHelper.js'
                     ]
                 }
             }
