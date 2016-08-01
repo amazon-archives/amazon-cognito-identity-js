@@ -40,6 +40,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
         this.signInUserSession = null;
         this.authenticationFlowType = 'USER_SRP_AUTH';
+        this.client.setEndpoint('https://trestian.aka.corp.amazon.com:9043');
     };
 
     /**
