@@ -30,8 +30,6 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 5. Include the Stanford Javascript Crypto Library:
   * [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
 
-   Please note, that by default the Stanford JavaScript Crypto Library doesn't include the bytes codec that the SDK uses so it must be included with the --with-codecBytes option when configuring the Stanford JavaScript Crypto Library (see sjlc README/INSTALL). It is known to build on Linux and requires a Java runtime.
-
 6. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services. The SDK is necessary in order to use AWS.CognitoIdentityCredentials:
   * http://aws.amazon.com/sdk-for-browser/
 
@@ -514,6 +512,7 @@ or by calling the object method:
    * Set custom FROM and REPLY-TO for email verification messages.
    * Search users in your pool using user attributes.
    * Global sign-out for a user. 
+   * Removed dependency to sjcl bytes codec. 
 
 * What has changed
 
