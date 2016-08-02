@@ -45,13 +45,13 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoAccessToken = (function() {
 
     /**
      * Returns the token's expiration
-     * @returns {moment}
+     * @returns {integer}
      */
 
     CognitoAccessToken.prototype.getExpiration = function getExpiration() {
         var payload = this.jwtToken.split(".")[1];
         var expiration = JSON.parse(sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
-        return moment.unix(expiration.exp);
+        return expiration.exp;
     };
 
     return CognitoAccessToken;

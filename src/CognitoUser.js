@@ -40,7 +40,6 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
         this.signInUserSession = null;
         this.authenticationFlowType = 'USER_SRP_AUTH';
-        this.client.setEndpoint('https://trestian.aka.corp.amazon.com:9043');
     };
 
     /**
@@ -89,6 +88,8 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
     CognitoUser.prototype.authenticateUser = function authenticateUser(authDetails, callback) {
         var authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(this.pool.getUserPoolId().split('_')[1], this.pool.getParanoia());
+        var dateHelper = new AWSCognito.CognitoIdentityServiceProvider.DateHelper();
+
         var serverBValue;
         var salt;
         var self = this;
@@ -129,13 +130,9 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             mac.update(sjcl.codec.utf8String.toBits(self.pool.getUserPoolId().split('_')[1]));
             mac.update(sjcl.codec.utf8String.toBits(self.username));
             mac.update(secretBlockBits);
-            var now = moment().utc();
-            var dateNow = now.format('ddd MMM D HH:mm:ss UTC YYYY');
+            var dateNow = dateHelper.getNowString();
             mac.update(sjcl.codec.utf8String.toBits(dateNow));
             var signature = mac.digest();
-
-            var signatureBytes = sjcl.codec.bytes.fromBits(signature);
-
             var signatureString = sjcl.codec.base64.fromBits(signature);
 
             var challengeResponses = {};
@@ -218,6 +215,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
 
     CognitoUser.prototype.getDeviceResponse = function getDeviceResponse(callback) {
         var authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(this.deviceGroupKey, this.pool.getParanoia());
+        var dateHelper = new AWSCognito.CognitoIdentityServiceProvider.DateHelper();
 
         var self = this;
         var authParameters = {};
@@ -247,12 +245,9 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             mac.update(sjcl.codec.utf8String.toBits(self.deviceGroupKey));
             mac.update(sjcl.codec.utf8String.toBits(self.deviceKey));
             mac.update(secretBlockBits);
-            var now = moment().utc();
-            var dateNow = now.format('ddd MMM D HH:mm:ss UTC YYYY');
+            var dateNow = dateHelper.getNowString();
             mac.update(sjcl.codec.utf8String.toBits(dateNow));
             var signature = mac.digest();
-
-            var signatureBytes = sjcl.codec.bytes.fromBits(signature);
             var signatureString = sjcl.codec.base64.fromBits(signature);
 
             var challengeResponses = {};
