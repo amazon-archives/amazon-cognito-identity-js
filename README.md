@@ -30,7 +30,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
 5. Include the Stanford Javascript Crypto Library:
   * [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
 
-6. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services. The SDK is necessary in order to use AWS.CognitoIdentityCredentials:
+6. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services.
   * http://aws.amazon.com/sdk-for-browser/
 
 <pre class="prettyprint">
