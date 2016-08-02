@@ -517,7 +517,7 @@ or by calling the object method:
 * What has changed
 
    * Authentication flow in Javascript SDK now uses Custom Authentication API
-   * Two new exceptions added for getSession API: These exceptions have been added to accurately represent the user state when the username is invalid and when the user is not confirmed. You will have to update your application to handle these exceptions.
+   * Two new exceptions added for the authentication APIs: These exceptions have been added to accurately represent the user state when the username is invalid and when the user is not confirmed. You will have to update your application to handle these exceptions.
        * UserNotFoundException: Returned when the username user does not exist.
        * UserNotConfirmedException: Returned when the user has not been confirmed.
        * PasswordResetRequiredException: When administator has requested for a password reset for the user.
