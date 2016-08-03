@@ -686,6 +686,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
             }
             if (authResult) {
                 self.signInUserSession = self.getCognitoUserSession(authResult.AuthenticationResult);
+                self.cacheTokens();
                 return callback(null, self.signInUserSession);
             }
         });
