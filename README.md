@@ -146,7 +146,7 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
                 IdentityPoolId : '...' // your identity pool id here
                 Logins : {
                     // Change the key below according to the specific region your user pool is in.
-                    'cognito-idp.us-east-1.amazonaws.com/us-east-1_TcoKGbf7n' : result.getIdToken().getJwtToken()
+                    'cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>' : result.getIdToken().getJwtToken()
                 }
             });
 
@@ -336,7 +336,7 @@ you can make inputVerificationCode call a no-op
                 IdentityPoolId : '...' // your identity pool id here
                 Logins : {
                     // Change the key below according to the specific region your user pool is in.
-                    'cognito-idp.us-east-1.amazonaws.com/us-east-1_Iqc3ajYLS' : session.getIdToken().getJwtToken()
+                    'cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>' : session.getIdToken().getJwtToken()
                 }
             });
 
