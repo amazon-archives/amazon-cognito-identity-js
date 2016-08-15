@@ -685,6 +685,9 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function() {
                 return callback(err, null);
             }
             if (authResult) {
+                if (!authResult.AuthenticationResult.hasOwnProperty('RefreshToken')) {
+                    authResult.AuthenticationResult.RefreshToken = refreshToken.getToken();
+                }
                 self.signInUserSession = self.getCognitoUserSession(authResult.AuthenticationResult);
                 self.cacheTokens();
                 return callback(null, self.signInUserSession);
