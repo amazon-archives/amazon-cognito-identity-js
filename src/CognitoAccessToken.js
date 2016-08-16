@@ -20,16 +20,14 @@ import * as sjcl from 'sjcl';
 export default class CognitoAccessToken {
   /**
    * Constructs a new CognitoAccessToken object
-   * @param data - contains tokens
+   * @param AccessToken {string=}
    * @constructor
    */
 
-  constructor(data) {
-    data = data || {};
-
+  constructor({ AccessToken } = {}) {
     // Assign object
-    this.jwtToken = data.AccessToken || '';
-  };
+    this.jwtToken = AccessToken || '';
+  }
 
   /**
    * Returns the record's token.
@@ -47,7 +45,8 @@ export default class CognitoAccessToken {
 
   getExpiration() {
     const payload = this.jwtToken.split('.')[1];
-    const expiration = JSON.parse(sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
+    const expiration = JSON.parse(
+      sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
     return expiration.exp;
   }
 }

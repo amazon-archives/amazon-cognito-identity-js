@@ -18,16 +18,14 @@
 export default class CognitoRefreshToken {
   /**
    * Constructs a new CognitoRefreshToken object
-   * @param data - contains tokens
+   * @param RefreshToken {string=}
    * @constructor
    */
 
-  constructor(data) {
-    data = data || {};
-
+  constructor({ RefreshToken } = {}) {
     // Assign object
-    this.token = data.RefreshToken || '';
-  };
+    this.token = RefreshToken || '';
+  }
 
   /**
    * Returns the record's token.

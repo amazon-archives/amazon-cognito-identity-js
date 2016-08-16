@@ -3,6 +3,13 @@ extends:
 - airbnb-base
 globals:
   AWSCognito: true
+env:
+  browser: true
 rules:
   # Git-controlled
   linebreak-style: off
+  # sjcl hmac breaks new-cap
+  new-cap:
+  - error
+  - newIsCapExceptions:
+    - sjcl.misc.hmac

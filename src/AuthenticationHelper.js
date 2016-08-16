@@ -18,33 +18,35 @@
 import * as sjcl from 'sjcl';
 import { BigInteger } from 'bn';
 
+const initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
+  + '29024E088A67CC74020BBEA63B139B22514A08798E3404DD'
+  + 'EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245'
+  + 'E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED'
+  + 'EE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3D'
+  + 'C2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F'
+  + '83655D23DCA3AD961C62F356208552BB9ED529077096966D'
+  + '670C354E4ABC9804F1746C08CA18217C32905E462E36CE3B'
+  + 'E39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9'
+  + 'DE2BCBF6955817183995497CEA956AE515D2261898FA0510'
+  + '15728E5A8AAAC42DAD33170D04507A33A85521ABDF1CBA64'
+  + 'ECFB850458DBEF0A8AEA71575D060C7DB3970F85A6E1E4C7'
+  + 'ABF5AE8CDB0933D71E8C94E04A25619DCEE3D2261AD2EE6B'
+  + 'F12FFA06D98A0864D87602733EC86A64521F2B18177B200C'
+  + 'BBE117577A615D6C770988C0BAD946E208E24FA074E5AB31'
+  + '43DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF';
+
 export default class AuthenticationHelper {
-    /**
-     * Constructs a new AuthenticationHelper object
-     * @param PoolName
-     * @param paranoia
-     * @constructor
-     */
+  /**
+   * Constructs a new AuthenticationHelper object
+   * @param PoolName
+   * @param paranoia
+   * @constructor
+   */
 
   constructor(PoolName, paranoia) {
-    this.N = new BigInteger('FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
-                              + '29024E088A67CC74020BBEA63B139B22514A08798E3404DD'
-                              + 'EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245'
-                              + 'E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED'
-                              + 'EE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3D'
-                              + 'C2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F'
-                              + '83655D23DCA3AD961C62F356208552BB9ED529077096966D'
-                              + '670C354E4ABC9804F1746C08CA18217C32905E462E36CE3B'
-                              + 'E39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9'
-                              + 'DE2BCBF6955817183995497CEA956AE515D2261898FA0510'
-                              + '15728E5A8AAAC42DAD33170D04507A33A85521ABDF1CBA64'
-                              + 'ECFB850458DBEF0A8AEA71575D060C7DB3970F85A6E1E4C7'
-                              + 'ABF5AE8CDB0933D71E8C94E04A25619DCEE3D2261AD2EE6B'
-                              + 'F12FFA06D98A0864D87602733EC86A64521F2B18177B200C'
-                              + 'BBE117577A615D6C770988C0BAD946E208E24FA074E5AB31'
-                              + '43DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF', 16);
+    this.N = new BigInteger(initN, 16);
     this.g = new BigInteger('2');
-    this.k = new BigInteger(this.hexHash('00' + this.N.toString(16) + '0' + this.g.toString(16)), 16);
+    this.k = new BigInteger(this.hexHash(`00${this.N.toString(16)}0${this.g.toString(16)}`), 16);
 
     this.paranoia = paranoia;
 
@@ -56,29 +58,29 @@ export default class AuthenticationHelper {
     this.poolName = PoolName;
   }
 
-    /**
-     * Returns small A, a random number
-     * @returns {BigInteger}
-     */
+  /**
+   * Returns small A, a random number
+   * @returns {BigInteger}
+   */
 
   getSmallAValue() {
     return this.smallAValue;
   }
 
-    /**
-     * Returns large A, a value generated from
-     * @returns {BigInteger}
-     */
+  /**
+   * Returns large A, a value generated from
+   * @returns {BigInteger}
+   */
 
   getLargeAValue() {
     return this.largeAValue;
   }
 
-    /*
-     * helper function to generate a random big integer
-     * @returns {BigInteger}
-     *
-     */
+  /*
+   * helper function to generate a random big integer
+   * @returns {BigInteger}
+   *
+   */
 
   generateRandomSmallA() {
     const words = sjcl.random.randomWords(32, this.paranoia);
@@ -111,7 +113,7 @@ export default class AuthenticationHelper {
 
   generateHashDevice(deviceGroupKey, username) {
     this.randomPassword = this.generateRandomString();
-    const combinedString = deviceGroupKey + username + ':' + this.randomPassword;
+    const combinedString = `${deviceGroupKey}${username}:${this.randomPassword}`;
     const hashedString = this.hash(combinedString);
 
     const words = sjcl.random.randomWords(4, this.paranoia);
@@ -121,29 +123,31 @@ export default class AuthenticationHelper {
     this.SaltToHashDevices = saltDevices.toString(16);
 
     if (saltDevices.toString(16).length % 2 === 1) {
-      this.SaltToHashDevices = '0' + this.SaltToHashDevices;
+      this.SaltToHashDevices = `0${this.SaltToHashDevices}`;
     } else if ('89ABCDEFabcdef'.indexOf(firstCharSalt) !== -1) {
-      this.SaltToHashDevices = '00' + this.SaltToHashDevices;
+      this.SaltToHashDevices = `00${this.SaltToHashDevices}`;
     }
-    const verifierDevicesNotPadded = this.g.modPow(new BigInteger(this.hexHash(this.SaltToHashDevices + hashedString), 16), this.N);
+    const verifierDevicesNotPadded = this.g.modPow(
+      new BigInteger(this.hexHash(this.SaltToHashDevices + hashedString), 16),
+      this.N);
 
     const firstCharVerifierDevices = verifierDevicesNotPadded.toString(16)[0];
     this.verifierDevices = verifierDevicesNotPadded.toString(16);
 
     if (verifierDevicesNotPadded.toString(16).length % 2 === 1) {
-      this.verifierDevices = '0' + this.verifierDevices;
+      this.verifierDevices = `0${this.verifierDevices}`;
     } else if ('89ABCDEFabcdef'.indexOf(firstCharVerifierDevices) !== -1) {
-      this.verifierDevices = '00' + this.verifierDevices;
+      this.verifierDevices = `00${this.verifierDevices}`;
     }
   }
 
-    /*
-     * Calculate the client's public value A = g^a%N
-     * with the generated random number a
-     * @param random number a
-     * @returns {BigInteger}
-     *
-     */
+  /*
+   * Calculate the client's public value A = g^a%N
+   * with the generated random number a
+   * @param random number a
+   * @returns {BigInteger}
+   *
+   */
 
   calculateA(a) {
     const A = this.g.modPow(a, this.N);
@@ -154,12 +158,12 @@ export default class AuthenticationHelper {
     return A;
   }
 
-    /*
-     * Calculate the client's value U which is the hash of A and B
-     * @param A
-     * @param B
-     * @returns {BigInteger}
-     */
+  /*
+   * Calculate the client's value U which is the hash of A and B
+   * @param A
+   * @param B
+   * @returns {BigInteger}
+   */
 
   calculateU(A, B) {
     const firstCharA = A.toString(16)[0];
@@ -168,15 +172,15 @@ export default class AuthenticationHelper {
     let BToHash = B.toString(16);
 
     if (A.toString(16).length % 2 === 1) {
-      AToHash = '0' + AToHash;
+      AToHash = `0${AToHash}`;
     } else if ('89ABCDEFabcdef'.indexOf(firstCharA) !== -1) {
-      AToHash = '00' + AToHash;
+      AToHash = `00${AToHash}`;
     }
 
     if (B.toString(16).length % 2 === 1) {
-      BToHash = '0' + BToHash;
+      BToHash = `0${BToHash}`;
     } else if ('89ABCDEFabcdef'.indexOf(firstCharB) !== -1) {
-      BToHash = '00' + BToHash;
+      BToHash = `00${BToHash}`;
     }
 
     this.UHexHash = this.hexHash(AToHash + BToHash);
@@ -185,54 +189,56 @@ export default class AuthenticationHelper {
     return finalU;
   }
 
-    /*
-     * Calculate a hash from a bitArray
-     * @param bitArray
-     * @returns {String}
-     */
+  /*
+   * Calculate a hash from a bitArray
+   * @param bitArray
+   * @returns {String}
+   */
 
   hash(bitArray) {
     const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(bitArray));
     return (new Array(64 - hashHex.length).join('0')) + hashHex;
   }
 
-    /*
-     * Calculate a hash from a hex string
-     * @param String
-     * @returns {String}
-     */
+  /*
+   * Calculate a hash from a hex string
+   * @param String
+   * @returns {String}
+   */
 
   hexHash(hexStr) {
     const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(sjcl.codec.hex.toBits(hexStr)));
     return (new Array(64 - hashHex.length).join('0')) + hashHex;
   }
 
-    /*
-     * Standard hkdf algorithm
-     * @param BitArray ikm
-     * @param BitArray salt
-     * @returns {BitArray}
-     */
+  /*
+   * Standard hkdf algorithm
+   * @param BitArray ikm
+   * @param BitArray salt
+   * @returns {BitArray}
+   */
 
   computehkdf(ikm, salt) {
     const mac = new sjcl.misc.hmac(salt, sjcl.hash.sha256);
     mac.update(ikm);
     const prk = mac.digest();
     const hmac = new sjcl.misc.hmac(prk, sjcl.hash.sha256);
-    const infoBitsUpdate = sjcl.bitArray.concat(this.infoBits, sjcl.codec.utf8String.toBits((String.fromCharCode(1))));
+    const infoBitsUpdate = sjcl.bitArray.concat(
+      this.infoBits,
+      sjcl.codec.utf8String.toBits(String.fromCharCode(1)));
     hmac.update(infoBitsUpdate);
 
     return sjcl.bitArray.clamp(hmac.digest(), 128);
   }
 
-    /*
-     * Calculates the final hkdf based on computed S value, and computed U value and the key
-     * @param String username
-     * @param String password
-     * @param BigInteger serverBValue
-     * @param BigInteger salt
-     * @returns {BitArray}
-     */
+  /*
+   * Calculates the final hkdf based on computed S value, and computed U value and the key
+   * @param String username
+   * @param String password
+   * @param BigInteger serverBValue
+   * @param BigInteger salt
+   * @returns {BitArray}
+   */
 
   getPasswordAuthenticationKey(username, password, serverBValue, salt) {
     if (serverBValue.mod(this.N).equals(new BigInteger('0', 16))) {
@@ -245,43 +251,48 @@ export default class AuthenticationHelper {
       throw new Error('U cannot be zero.');
     }
 
-    const usernamePassword = this.poolName + username + ':' + password;
+    const usernamePassword = `${this.poolName}${username}:${password}`;
     const usernamePasswordHash = this.hash(usernamePassword);
 
     const firstCharSalt = salt.toString(16)[0];
     let SaltToHash = salt.toString(16);
 
     if (salt.toString(16).length % 2 === 1) {
-      SaltToHash = '0' + SaltToHash;
+      SaltToHash = `0${SaltToHash}`;
     } else if ('89ABCDEFabcdef'.indexOf(firstCharSalt) !== -1) {
-      SaltToHash = '00' + SaltToHash;
+      SaltToHash = `00${SaltToHash}`;
     }
 
     const xValue = new BigInteger(this.hexHash(SaltToHash + usernamePasswordHash), 16);
 
     const gModPowXN = this.g.modPow(xValue, this.N);
     const intValue2 = serverBValue.subtract(this.k.multiply(gModPowXN));
-    const sValue = intValue2.modPow(this.smallAValue.add(this.UValue.multiply(xValue)), this.N).mod(this.N);
+    const sValue = intValue2.modPow(
+      this.smallAValue.add(this.UValue.multiply(xValue)),
+      this.N
+    ).mod(this.N);
 
     let SToHash = sValue.toString(16);
     const firstCharS = sValue.toString(16)[0];
 
     if (sValue.toString(16).length % 2 === 1) {
-      SToHash = '0' + SToHash;
+      SToHash = `0${SToHash}`;
     } else if ('89ABCDEFabcdef'.indexOf(firstCharS) !== -1) {
-      SToHash = '00' + SToHash;
+      SToHash = `00${SToHash}`;
     }
 
     let UValueToHash = this.UHexHash;
     const firstCharU = this.UHexHash[0];
 
     if (this.UHexHash.length % 2 === 1) {
-      UValueToHash = '0' + UValueToHash;
+      UValueToHash = `0${UValueToHash}`;
     } else if (this.UHexHash.length % 2 === 0 && '89ABCDEFabcdef'.indexOf(firstCharU) !== -1) {
-      UValueToHash = '00' + UValueToHash;
+      UValueToHash = `00${UValueToHash}`;
     }
 
-    const hkdf = this.computehkdf(sjcl.codec.hex.toBits(SToHash), sjcl.codec.hex.toBits(UValueToHash));
+    const hkdf = this.computehkdf(
+      sjcl.codec.hex.toBits(SToHash),
+      sjcl.codec.hex.toBits(UValueToHash));
 
     return hkdf;
   }

@@ -18,15 +18,14 @@
 export default class CognitoUserAttribute {
   /**
    * Constructs a new CognitoUserAttribute object
-   * @param data - contains name, value pair for the attribute
+   * @param Name {string=}
+   * @param Value {string=}
    * @constructor
    */
 
-  constructor(data) {
-    data = data || {};
-
-    this.Name = data.Name || '';
-    this.Value = data.Value || '';
+  constructor({ Name, Value } = {}) {
+    this.Name = Name || '';
+    this.Value = Value || '';
   }
 
   /**

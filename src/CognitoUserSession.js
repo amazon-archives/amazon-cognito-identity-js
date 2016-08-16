@@ -18,19 +18,20 @@
 export default class CognitoUserSession {
     /**
      * Constructs a new CognitoUserSession object
-     * @param data - contains IdToken, RefreshToken, and an AccessToken
+     * @param IdToken {string}
+     * @param RefreshToken {string=}
+     * @param AccessToken {string}
      * @constructor
      */
 
-  constructor(data) {
-    data = data || {};
-    if (data.AccessToken == null || data.IdToken == null) {
+  constructor({ IdToken, RefreshToken, AccessToken } = {}) {
+    if (AccessToken == null || IdToken == null) {
       throw new Error('Id token and Access Token must be present.');
     }
 
-    this.idToken = data.IdToken;
-    this.refreshToken = data.RefreshToken;
-    this.accessToken = data.AccessToken;
+    this.idToken = IdToken;
+    this.refreshToken = RefreshToken;
+    this.accessToken = AccessToken;
   }
 
     /**
@@ -62,7 +63,8 @@ export default class CognitoUserSession {
 
     /**
      * Checks to see if the session is still valid
-     * @returns {boolean} if the session is still valid based on session expiry information found in tokens and the current time
+     * @returns {boolean} if the session is still valid based on session expiry information found
+     * in tokens and the current time
      */
 
   isValid() {

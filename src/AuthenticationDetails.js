@@ -18,16 +18,15 @@
 export default class AuthenticationDetails {
   /**
    * Constructs a new AuthenticationDetails object
-   * @param data - contains username, password, and a map of validation data
+   * @param ValidationData {Array=}
+   * @param Username {string}
+   * @param Password {string}
    * @constructor
    */
-  constructor(data) {
-    data = data || {};
-
-    // Assign object data
-    this.validationData = data.ValidationData || [];
-    this.username = data.Username;
-    this.password = data.Password;
+  constructor({ ValidationData, Username, Password } = {}) {
+    this.validationData = ValidationData || [];
+    this.username = Username;
+    this.password = Password;
   }
 
   /**

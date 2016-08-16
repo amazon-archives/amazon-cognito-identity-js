@@ -85,29 +85,28 @@ export default class CognitoUserPool {
    */
 
   signUp(username, password, userAttributes, validationData, callback) {
-    const self = this;
     this.client.makeUnauthenticatedRequest('signUp', {
-      ClientId: self.clientId,
+      ClientId: this.clientId,
       Username: username,
       Password: password,
       UserAttributes: userAttributes,
       ValidationData: validationData,
-    }, function (err, data) {
+    }, (err, data) => {
       if (err) {
         return callback(err, null);
-      } else {
-        const cognitoUser = {
-          Username: username,
-          Pool: self,
-        };
-
-        const returnData = {
-          user: new CognitoUser(cognitoUser),
-          userConfirmed: data.UserConfirmed,
-        };
-
-        return callback(null, returnData);
       }
+
+      const cognitoUser = {
+        Username: username,
+        Pool: this,
+      };
+
+      const returnData = {
+        user: new CognitoUser(cognitoUser),
+        userConfirmed: data.UserConfirmed,
+      };
+
+      return callback(null, returnData);
     });
   }
 
@@ -119,7 +118,7 @@ export default class CognitoUserPool {
    */
 
   getCurrentUser() {
-    const lastUserKey = 'CognitoIdentityServiceProvider.' + this.clientId + '.LastAuthUser';
+    const lastUserKey = `CognitoIdentityServiceProvider.${this.clientId}.LastAuthUser`;
     const storage = window.localStorage;
 
     const lastAuthUser = storage.getItem(lastUserKey);
@@ -130,8 +129,8 @@ export default class CognitoUserPool {
       };
 
       return new CognitoUser(cognitoUser);
-    } else {
-      return null;
     }
+
+    return null;
   }
 }

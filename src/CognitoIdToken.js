@@ -20,15 +20,13 @@ import * as sjcl from 'sjcl';
 export default class CognitoIdToken {
   /**
    * Constructs a new CognitoIdToken object
-   * @param data - contains tokens
+   * @param IdToken {string=}
    * @constructor
    */
 
-  constructor(data) {
-    data = data || {};
-
+  constructor({ IdToken } = {}) {
     // Assign object
-    this.jwtToken = data.IdToken || '';
+    this.jwtToken = IdToken || '';
   }
 
   /**
@@ -47,7 +45,8 @@ export default class CognitoIdToken {
 
   getExpiration() {
     const payload = this.jwtToken.split('.')[1];
-    const expiration = JSON.parse(sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
+    const expiration = JSON.parse(
+      sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
     return expiration.exp;
   }
 }

@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
+const monthNames =
+  ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const weekNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 export default class DateHelper {
   getNowString() {
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const weekNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
     const now = new Date();
 
     const weekDay = weekNames[now.getUTCDay()];
@@ -28,25 +29,24 @@ export default class DateHelper {
 
     let hours = now.getUTCHours();
     if (hours < 10) {
-      hours = '0' + hours;
+      hours = `0${hours}`;
     }
 
     let minutes = now.getUTCMinutes();
     if (minutes < 10) {
-      minutes = '0' + minutes;
+      minutes = `0${minutes}`;
     }
 
     let seconds = now.getUTCSeconds();
     if (seconds < 10) {
-      seconds = '0' + seconds;
+      seconds = `0${seconds}`;
     }
 
     const year = now.getUTCFullYear();
 
         // ddd MMM D HH:mm:ss UTC YYYY
-    const dateNow = weekDay + ' ' + month + ' ' + day + ' ' + hours + ':' + minutes + ':' + seconds + ' UTC ' + year;
-
+    const dateNow = `${weekDay} ${month} ${day} ${hours}:${minutes}:${seconds} UTC ${year}`;
 
     return dateNow;
-  };
+  }
 }
