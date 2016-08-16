@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-import * as AWSCognito from '../dist/aws-cognito-sdk';
 import CognitoUser from './CognitoUser';
 
 export default class CognitoUserPool {

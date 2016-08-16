@@ -18,7 +18,6 @@
 import * as sjcl from 'sjcl';
 import { BigInteger } from 'bn';
 
-import * as AWSCognito from '../dist/aws-cognito-sdk';
 import AuthenticationHelper from './AuthenticationHelper';
 import CognitoAccessToken from './CognitoAccessToken';
 import CognitoIdToken from './CognitoIdToken';
