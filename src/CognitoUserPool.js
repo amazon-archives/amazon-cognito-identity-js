@@ -15,66 +15,64 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
-
-
+AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function () {
     /**
      * Constructs a new CognitoUserPool object
      * @param data contains the client id and the user pool id
      * @constructor
      */
 
-    var CognitoUserPool = function CognitoUserPool(data) {
-        if (!(this instanceof CognitoUserPool)) {
-            throw new Error('CognitoUserPool constructor was not called with new.');
-        }
+  const CognitoUserPool = function CognitoUserPool(data) {
+    if (!(this instanceof CognitoUserPool)) {
+      throw new Error('CognitoUserPool constructor was not called with new.');
+    }
 
-        if (data == null || data.UserPoolId == null || data.ClientId == null) {
-            throw new Error('Both user pool Id and client Id are required.');
-        }
+    if (data == null || data.UserPoolId == null || data.ClientId == null) {
+      throw new Error('Both user pool Id and client Id are required.');
+    }
 
-        this.userPoolId = data.UserPoolId;
-        this.clientId = data.ClientId;
-        this.paranoia = data.Paranoia || 0;
+    this.userPoolId = data.UserPoolId;
+    this.clientId = data.ClientId;
+    this.paranoia = data.Paranoia || 0;
 
-        this.client = new AWSCognito.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
-    };
+    this.client = new AWSCognito.CognitoIdentityServiceProvider({ apiVersion: '2016-04-19' });
+  };
 
     /**
      * Returns the user pool id
      * @returns {string}
      */
 
-    CognitoUserPool.prototype.getUserPoolId = function getUserPoolId() {
-        return this.userPoolId;
-    };
+  CognitoUserPool.prototype.getUserPoolId = function getUserPoolId() {
+    return this.userPoolId;
+  };
 
     /**
      * Returns the client id
      * @returns {string}
      */
 
-    CognitoUserPool.prototype.getClientId = function getClientId() {
-        return this.clientId;
-    };
+  CognitoUserPool.prototype.getClientId = function getClientId() {
+    return this.clientId;
+  };
 
     /**
      * Returns the paranoia level
      * @returns {int}
      */
 
-    CognitoUserPool.prototype.getParanoia = function getParanoia() {
-        return this.paranoia;
-    };
+  CognitoUserPool.prototype.getParanoia = function getParanoia() {
+    return this.paranoia;
+  };
 
     /**
      * sets paranoia level
      * @param paranoia
      */
 
-    CognitoUserPool.prototype.setParanoia = function setParanoia(paranoia) {
-        this.paranoia = paranoia;
-    };
+  CognitoUserPool.prototype.setParanoia = function setParanoia(paranoia) {
+    this.paranoia = paranoia;
+  };
 
     /**
      * method for signing up a user
@@ -87,32 +85,32 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
      * @returns object containing cognito user and if the user is confirmed or not
      */
 
-    CognitoUserPool.prototype.signUp = function signUp(username, password, userAttributes, validationData, callback) {
-        var self = this;
-        this.client.makeUnauthenticatedRequest('signUp', {
-            ClientId : self.clientId,
-            Username : username,
-            Password : password,
-            UserAttributes : userAttributes,
-            ValidationData : validationData
-        }, function (err, data) {
-            if (err) {
-                return callback(err, null);
-            } else {
-                var cognitoUser = {
-                    Username : username,
-                    Pool : self
-                };
+  CognitoUserPool.prototype.signUp = function signUp(username, password, userAttributes, validationData, callback) {
+    const self = this;
+    this.client.makeUnauthenticatedRequest('signUp', {
+      ClientId: self.clientId,
+      Username: username,
+      Password: password,
+      UserAttributes: userAttributes,
+      ValidationData: validationData,
+    }, function (err, data) {
+      if (err) {
+        return callback(err, null);
+      } else {
+        const cognitoUser = {
+          Username: username,
+          Pool: self,
+        };
 
-                var returnData = {
-                    user : new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser),
-                    userConfirmed : data.UserConfirmed
-                };
+        const returnData = {
+          user: new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser),
+          userConfirmed: data.UserConfirmed,
+        };
 
-                return callback(null, returnData);
-            }
-        });
-    };
+        return callback(null, returnData);
+      }
+    });
+  };
 
 
      /**
@@ -121,23 +119,22 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
      * @returns {CognitoUser} the user retrieved from storage
      */
 
-    CognitoUserPool.prototype.getCurrentUser = function getCurrentUser() {
-        var lastUserKey = 'CognitoIdentityServiceProvider.' + this.clientId + '.LastAuthUser';
-        var storage = window.localStorage;
+  CognitoUserPool.prototype.getCurrentUser = function getCurrentUser() {
+    const lastUserKey = 'CognitoIdentityServiceProvider.' + this.clientId + '.LastAuthUser';
+    const storage = window.localStorage;
 
-        var lastAuthUser = storage.getItem(lastUserKey);
-        if (lastAuthUser) {
-            var cognitoUser = {
-                Username : lastAuthUser,
-                Pool : this
-            };
+    const lastAuthUser = storage.getItem(lastUserKey);
+    if (lastAuthUser) {
+      const cognitoUser = {
+        Username: lastAuthUser,
+        Pool: this,
+      };
 
-            return new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser);
-        } else {
-            return null;
-        }
-    };
+      return new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser);
+    } else {
+      return null;
+    }
+  };
 
-    return CognitoUserPool;
-
+  return CognitoUserPool;
 })();

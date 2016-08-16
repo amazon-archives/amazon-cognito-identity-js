@@ -15,45 +15,43 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoAccessToken = (function() {
-
+AWSCognito.CognitoIdentityServiceProvider.CognitoAccessToken = (function () {
     /**
      * Constructs a new CognitoAccessToken object
      * @param data - contains tokens
      * @constructor
      */
 
-    var CognitoAccessToken = function CognitoAccessToken(data) {
-        if (!(this instanceof CognitoAccessToken)) {
-            throw new Error('CognitoAccessToken constructor was not called with new.');
-        }
+  const CognitoAccessToken = function CognitoAccessToken(data) {
+    if (!(this instanceof CognitoAccessToken)) {
+      throw new Error('CognitoAccessToken constructor was not called with new.');
+    }
 
-        data = data || {};
+    data = data || {};
 
         // Assign object
-        this.jwtToken = data.AccessToken || '';
-    };
+    this.jwtToken = data.AccessToken || '';
+  };
 
     /**
      * Returns the record's token.
      * @returns {string}
      */
 
-    CognitoAccessToken.prototype.getJwtToken = function getJwtToken() {
-        return this.jwtToken;
-    };
+  CognitoAccessToken.prototype.getJwtToken = function getJwtToken() {
+    return this.jwtToken;
+  };
 
     /**
      * Returns the token's expiration
      * @returns {integer}
      */
 
-    CognitoAccessToken.prototype.getExpiration = function getExpiration() {
-        var payload = this.jwtToken.split(".")[1];
-        var expiration = JSON.parse(sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
-        return expiration.exp;
-    };
+  CognitoAccessToken.prototype.getExpiration = function getExpiration() {
+    const payload = this.jwtToken.split('.')[1];
+    const expiration = JSON.parse(sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
+    return expiration.exp;
+  };
 
-    return CognitoAccessToken;
-
+  return CognitoAccessToken;
 })();

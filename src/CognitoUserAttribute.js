@@ -15,33 +15,32 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute = (function() {
-
+AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute = (function () {
     /**
      * Constructs a new CognitoUserAttribute object
      * @param data - contains name, value pair for the attribute
      * @constructor
      */
 
-    var CognitoUserAttribute = function CognitoUserAttribute(data) {
-        if (!(this instanceof CognitoUserAttribute)) {
-            throw new Error('CognitoUserAttribute constructor was not called with new.');
-        }
+  const CognitoUserAttribute = function CognitoUserAttribute(data) {
+    if (!(this instanceof CognitoUserAttribute)) {
+      throw new Error('CognitoUserAttribute constructor was not called with new.');
+    }
 
-        data = data || {};
+    data = data || {};
 
-        this.Name = data.Name || '';
-        this.Value = data.Value || '';
-    };
+    this.Name = data.Name || '';
+    this.Value = data.Value || '';
+  };
 
     /**
      * Returns the record's value.
      * @returns {string}
      */
 
-    CognitoUserAttribute.prototype.getValue = function getValue() {
-        return this.Value;
-    };
+  CognitoUserAttribute.prototype.getValue = function getValue() {
+    return this.Value;
+  };
 
     /**
      * Sets the record's value.
@@ -49,19 +48,19 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute = (function() {
      * @returns {CognitoUserAttribute}
      */
 
-    CognitoUserAttribute.prototype.setValue = function setValue(value) {
-        this.Value = value;
-        return this;
-    };
+  CognitoUserAttribute.prototype.setValue = function setValue(value) {
+    this.Value = value;
+    return this;
+  };
 
     /**
      * Returns the record's name.
      * @returns {string}
      */
 
-    CognitoUserAttribute.prototype.getName = function getName() {
-        return this.Name;
-    };
+  CognitoUserAttribute.prototype.getName = function getName() {
+    return this.Name;
+  };
 
     /**
      * Sets the record's name
@@ -69,32 +68,31 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute = (function() {
      * @returns {CognitoUserAttribute}
      */
 
-    CognitoUserAttribute.prototype.setName = function setName(name) {
-        this.Name = name;
-        return this;
-    };
+  CognitoUserAttribute.prototype.setName = function setName(name) {
+    this.Name = name;
+    return this;
+  };
 
     /**
      * Returns a string representation of the record.
      * @returns {string}
      */
 
-    CognitoUserAttribute.prototype.toString = function toString() {
-        return JSON.stringify(this);
-    };
+  CognitoUserAttribute.prototype.toString = function toString() {
+    return JSON.stringify(this);
+  };
 
     /**
      * Returns a flat object representing the record.
      * @returns {object}
      */
 
-    CognitoUserAttribute.prototype.toJSON = function toJSON() {
-        return {
-            Name: this.Name,
-            Value: this.Value
-        };
+  CognitoUserAttribute.prototype.toJSON = function toJSON() {
+    return {
+      Name: this.Name,
+      Value: this.Value,
     };
+  };
 
-    return CognitoUserAttribute;
-
+  return CognitoUserAttribute;
 })();

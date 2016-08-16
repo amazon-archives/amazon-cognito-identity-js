@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
-
+AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
     /**
      * Constructs a new AuthenticationHelper object
      * @param Poolname
      * @constructor
      */
 
-    var AuthenticationHelper = function AuthenticationHelper(PoolName, paranoia) {
-        if (!(this instanceof AuthenticationHelper)) {
-            throw new Error('AuthenticationHelper constructor was not called with new.');
-        }
+  const AuthenticationHelper = function AuthenticationHelper(PoolName, paranoia) {
+    if (!(this instanceof AuthenticationHelper)) {
+      throw new Error('AuthenticationHelper constructor was not called with new.');
+    }
 
-        this.N = new BigInteger('FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
+    this.N = new BigInteger('FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
                               + '29024E088A67CC74020BBEA63B139B22514A08798E3404DD'
                               + 'EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245'
                               + 'E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED'
@@ -44,36 +43,36 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
                               + 'F12FFA06D98A0864D87602733EC86A64521F2B18177B200C'
                               + 'BBE117577A615D6C770988C0BAD946E208E24FA074E5AB31'
                               + '43DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF', 16);
-        this.g = new BigInteger('2');
-        this.k = new BigInteger(this.hexHash('00' + this.N.toString(16) + '0' + this.g.toString(16)), 16);
+    this.g = new BigInteger('2');
+    this.k = new BigInteger(this.hexHash('00' + this.N.toString(16) + '0' + this.g.toString(16)), 16);
 
-        this.paranoia = paranoia;
+    this.paranoia = paranoia;
 
-        this.smallAValue = this.generateRandomSmallA();
-        this.largeAValue = this.calculateA(this.smallAValue);
+    this.smallAValue = this.generateRandomSmallA();
+    this.largeAValue = this.calculateA(this.smallAValue);
 
-        this.infoBits = sjcl.codec.utf8String.toBits('Caldera Derived Key');
+    this.infoBits = sjcl.codec.utf8String.toBits('Caldera Derived Key');
 
-        this.poolName = PoolName;
-    };
+    this.poolName = PoolName;
+  };
 
     /**
      * Returns small A, a random number
      * @returns {BigInteger}
      */
 
-    AuthenticationHelper.prototype.getSmallAValue = function getSmallAValue() {
-        return this.smallAValue;
-    };
+  AuthenticationHelper.prototype.getSmallAValue = function getSmallAValue() {
+    return this.smallAValue;
+  };
 
     /**
      * Returns large A, a value generated from
      * @returns {BigInteger}
      */
 
-    AuthenticationHelper.prototype.getLargeAValue = function getLargeAValue() {
-        return this.largeAValue;
-    };
+  AuthenticationHelper.prototype.getLargeAValue = function getLargeAValue() {
+    return this.largeAValue;
+  };
 
     /*
      * helper function to generate a random big integer
@@ -81,62 +80,62 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
      *
      */
 
-    AuthenticationHelper.prototype.generateRandomSmallA = function generateRandomSmallA() {
-        var words = sjcl.random.randomWords(32 , this.paranoia);
-        var hexRandom = sjcl.codec.hex.fromBits(words);
+  AuthenticationHelper.prototype.generateRandomSmallA = function generateRandomSmallA() {
+    const words = sjcl.random.randomWords(32, this.paranoia);
+    const hexRandom = sjcl.codec.hex.fromBits(words);
 
-        var randomBigInt = new BigInteger(hexRandom, 16);
-        var smallABigInt = randomBigInt.mod(this.N);
+    const randomBigInt = new BigInteger(hexRandom, 16);
+    const smallABigInt = randomBigInt.mod(this.N);
 
-        return smallABigInt;
-    };
+    return smallABigInt;
+  };
 
-    AuthenticationHelper.prototype.generateRandomString = function generateRandomString() {
-        var words = sjcl.random.randomWords(10 , this.paranoia);
-        var stringRandom = sjcl.codec.base64.fromBits(words);
+  AuthenticationHelper.prototype.generateRandomString = function generateRandomString() {
+    const words = sjcl.random.randomWords(10, this.paranoia);
+    const stringRandom = sjcl.codec.base64.fromBits(words);
 
-        return stringRandom;
-    };
+    return stringRandom;
+  };
 
-    AuthenticationHelper.prototype.getRandomPassword = function getRandomPassword() {
-        return this.randomPassword;
-    };
+  AuthenticationHelper.prototype.getRandomPassword = function getRandomPassword() {
+    return this.randomPassword;
+  };
 
-    AuthenticationHelper.prototype.getSaltDevices = function getSaltDevices() {
-        return this.SaltToHashDevices;
-    };
+  AuthenticationHelper.prototype.getSaltDevices = function getSaltDevices() {
+    return this.SaltToHashDevices;
+  };
 
-    AuthenticationHelper.prototype.getVerifierDevices = function getVerifierDevices(){
-        return this.verifierDevices;
-    };
+  AuthenticationHelper.prototype.getVerifierDevices = function getVerifierDevices() {
+    return this.verifierDevices;
+  };
 
-    AuthenticationHelper.prototype.generateHashDevice = function generateHashDevice(deviceGroupKey, username) {
-        this.randomPassword = this.generateRandomString();
-        var combinedString = deviceGroupKey + username + ':' + this.randomPassword;
-        var hashedString = this.hash(combinedString);
+  AuthenticationHelper.prototype.generateHashDevice = function generateHashDevice(deviceGroupKey, username) {
+    this.randomPassword = this.generateRandomString();
+    const combinedString = deviceGroupKey + username + ':' + this.randomPassword;
+    const hashedString = this.hash(combinedString);
 
-        var words = sjcl.random.randomWords(4 , this.paranoia);
-        var hexRandom = sjcl.codec.hex.fromBits(words);
-        var saltDevices = new BigInteger(hexRandom, 16);
-        var firstCharSalt = saltDevices.toString(16)[0];
-        this.SaltToHashDevices = saltDevices.toString(16);
+    const words = sjcl.random.randomWords(4, this.paranoia);
+    const hexRandom = sjcl.codec.hex.fromBits(words);
+    const saltDevices = new BigInteger(hexRandom, 16);
+    const firstCharSalt = saltDevices.toString(16)[0];
+    this.SaltToHashDevices = saltDevices.toString(16);
 
-        if (saltDevices.toString(16).length%2 === 1) {
-            this.SaltToHashDevices = '0' + this.SaltToHashDevices;
-        } else if ('89ABCDEFabcdef'.indexOf(firstCharSalt) !== -1) {
-            this.SaltToHashDevices = '00' + this.SaltToHashDevices;
-        }
-        var verifierDevicesNotPadded = this.g.modPow(new BigInteger(this.hexHash(this.SaltToHashDevices + hashedString), 16), this.N);
+    if (saltDevices.toString(16).length % 2 === 1) {
+      this.SaltToHashDevices = '0' + this.SaltToHashDevices;
+    } else if ('89ABCDEFabcdef'.indexOf(firstCharSalt) !== -1) {
+      this.SaltToHashDevices = '00' + this.SaltToHashDevices;
+    }
+    const verifierDevicesNotPadded = this.g.modPow(new BigInteger(this.hexHash(this.SaltToHashDevices + hashedString), 16), this.N);
 
-        var firstCharVerifierDevices = verifierDevicesNotPadded.toString(16)[0];
-        this.verifierDevices = verifierDevicesNotPadded.toString(16);
+    const firstCharVerifierDevices = verifierDevicesNotPadded.toString(16)[0];
+    this.verifierDevices = verifierDevicesNotPadded.toString(16);
 
-        if (verifierDevicesNotPadded.toString(16).length%2 === 1) {
-            this.verifierDevices = '0' + this.verifierDevices;
-        } else if ('89ABCDEFabcdef'.indexOf(firstCharVerifierDevices) !== -1) {
-            this.verifierDevices = '00' + this.verifierDevices;
-        }
-    };
+    if (verifierDevicesNotPadded.toString(16).length % 2 === 1) {
+      this.verifierDevices = '0' + this.verifierDevices;
+    } else if ('89ABCDEFabcdef'.indexOf(firstCharVerifierDevices) !== -1) {
+      this.verifierDevices = '00' + this.verifierDevices;
+    }
+  };
 
     /*
      * Calculate the client's public value A = g^a%N
@@ -146,14 +145,14 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
      *
      */
 
-    AuthenticationHelper.prototype.calculateA = function calculateA(a) {
-        var A = this.g.modPow(a, this.N);
+  AuthenticationHelper.prototype.calculateA = function calculateA(a) {
+    const A = this.g.modPow(a, this.N);
 
-        if (A.mod(this.N).toString() === '0') {
-            throw new Error('Illegal paramater. A mod N cannot be 0.');
-        }
-        return A;
-    };
+    if (A.mod(this.N).toString() === '0') {
+      throw new Error('Illegal paramater. A mod N cannot be 0.');
+    }
+    return A;
+  };
 
     /*
      * Calculate the client's value U which is the hash of A and B
@@ -162,29 +161,29 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
      * @returns {BigInteger}
      */
 
-    AuthenticationHelper.prototype.calculateU = function calculateU(A, B) {
-        var firstCharA = A.toString(16)[0];
-        var firstCharB = B.toString(16)[0];
-        var AToHash = A.toString(16);
-        var BToHash = B.toString(16);
+  AuthenticationHelper.prototype.calculateU = function calculateU(A, B) {
+    const firstCharA = A.toString(16)[0];
+    const firstCharB = B.toString(16)[0];
+    let AToHash = A.toString(16);
+    let BToHash = B.toString(16);
 
-        if (A.toString(16).length%2 === 1) {
-            AToHash = '0' + AToHash;
-        } else if ('89ABCDEFabcdef'.indexOf(firstCharA) !== -1) {
-            AToHash = '00' + AToHash;
-        }
+    if (A.toString(16).length % 2 === 1) {
+      AToHash = '0' + AToHash;
+    } else if ('89ABCDEFabcdef'.indexOf(firstCharA) !== -1) {
+      AToHash = '00' + AToHash;
+    }
 
-        if (B.toString(16).length % 2 === 1) {
-            BToHash = '0' + BToHash;
-        } else if ('89ABCDEFabcdef'.indexOf(firstCharB) !== -1) {
-            BToHash = '00' + BToHash;
-        }
+    if (B.toString(16).length % 2 === 1) {
+      BToHash = '0' + BToHash;
+    } else if ('89ABCDEFabcdef'.indexOf(firstCharB) !== -1) {
+      BToHash = '00' + BToHash;
+    }
 
-        this.UHexHash = this.hexHash(AToHash + BToHash);
-        var finalU = new BigInteger(this.UHexHash, 16);
+    this.UHexHash = this.hexHash(AToHash + BToHash);
+    const finalU = new BigInteger(this.UHexHash, 16);
 
-        return finalU;
-    };
+    return finalU;
+  };
 
     /*
      * Calculate a hash from a bitArray
@@ -192,10 +191,10 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
      * @returns {String}
      */
 
-    AuthenticationHelper.prototype.hash = function hash(bitArray) {
-        var hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(bitArray));
-        return (new Array(64 - hashHex.length).join('0')) + hashHex;
-    };
+  AuthenticationHelper.prototype.hash = function hash(bitArray) {
+    const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(bitArray));
+    return (new Array(64 - hashHex.length).join('0')) + hashHex;
+  };
 
     /*
      * Calculate a hash from a hex string
@@ -203,10 +202,10 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
      * @returns {String}
      */
 
-    AuthenticationHelper.prototype.hexHash = function hexHash(hexStr) {
-        var hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(sjcl.codec.hex.toBits(hexStr)));
-        return (new Array(64 - hashHex.length).join('0')) + hashHex;
-    };
+  AuthenticationHelper.prototype.hexHash = function hexHash(hexStr) {
+    const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(sjcl.codec.hex.toBits(hexStr)));
+    return (new Array(64 - hashHex.length).join('0')) + hashHex;
+  };
 
     /*
      * Standard hkdf algorithm
@@ -215,16 +214,16 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
      * @returns {BitArray}
      */
 
-    AuthenticationHelper.prototype.computehkdf = function computehkdf(ikm, salt) {
-        var mac = new sjcl.misc.hmac(salt, sjcl.hash.sha256);
-        mac.update(ikm);
-        var prk = mac.digest();
-        var hmac = new sjcl.misc.hmac(prk, sjcl.hash.sha256);
-        var infoBitsUpdate = sjcl.bitArray.concat(this.infoBits,sjcl.codec.utf8String.toBits((String.fromCharCode(1))));
-        hmac.update(infoBitsUpdate);
+  AuthenticationHelper.prototype.computehkdf = function computehkdf(ikm, salt) {
+    const mac = new sjcl.misc.hmac(salt, sjcl.hash.sha256);
+    mac.update(ikm);
+    const prk = mac.digest();
+    const hmac = new sjcl.misc.hmac(prk, sjcl.hash.sha256);
+    const infoBitsUpdate = sjcl.bitArray.concat(this.infoBits, sjcl.codec.utf8String.toBits((String.fromCharCode(1))));
+    hmac.update(infoBitsUpdate);
 
-        return sjcl.bitArray.clamp(hmac.digest(), 128);
-    };
+    return sjcl.bitArray.clamp(hmac.digest(), 128);
+  };
 
     /*
      * Calculates the final hkdf based on computed S value, and computed U value and the key
@@ -235,58 +234,57 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function() {
      * @returns {BitArray}
      */
 
-    AuthenticationHelper.prototype.getPasswordAuthenticationKey = function getPasswordAuthenticationKey(username, password, serverBValue, salt) {
-        if (serverBValue.mod(this.N).equals(new BigInteger("0", 16))) {
-            throw new Error('B cannot be zero.');
-        }
+  AuthenticationHelper.prototype.getPasswordAuthenticationKey = function getPasswordAuthenticationKey(username, password, serverBValue, salt) {
+    if (serverBValue.mod(this.N).equals(new BigInteger('0', 16))) {
+      throw new Error('B cannot be zero.');
+    }
 
-        this.UValue = this.calculateU(this.largeAValue, serverBValue);
+    this.UValue = this.calculateU(this.largeAValue, serverBValue);
 
-        if (this.UValue.equals(new BigInteger("0", 16))) {
-            throw new Error('U cannot be zero.');
-        }
+    if (this.UValue.equals(new BigInteger('0', 16))) {
+      throw new Error('U cannot be zero.');
+    }
 
-        var usernamePassword = this.poolName + username + ':' + password;
-        var usernamePasswordHash = this.hash(usernamePassword);
+    const usernamePassword = this.poolName + username + ':' + password;
+    const usernamePasswordHash = this.hash(usernamePassword);
 
-        var firstCharSalt = salt.toString(16)[0];
-        var SaltToHash = salt.toString(16);
+    const firstCharSalt = salt.toString(16)[0];
+    let SaltToHash = salt.toString(16);
 
-        if (salt.toString(16).length%2 === 1) {
-            SaltToHash = '0' + SaltToHash;
-        } else if ('89ABCDEFabcdef'.indexOf(firstCharSalt) !== -1) {
-            SaltToHash = '00' + SaltToHash;
-        }
+    if (salt.toString(16).length % 2 === 1) {
+      SaltToHash = '0' + SaltToHash;
+    } else if ('89ABCDEFabcdef'.indexOf(firstCharSalt) !== -1) {
+      SaltToHash = '00' + SaltToHash;
+    }
 
-        var xValue = new BigInteger(this.hexHash(SaltToHash + usernamePasswordHash), 16);
+    const xValue = new BigInteger(this.hexHash(SaltToHash + usernamePasswordHash), 16);
 
-        var gModPowXN = this.g.modPow(xValue, this.N);
-        var intValue2 = serverBValue.subtract(this.k.multiply(gModPowXN));
-        var sValue = intValue2.modPow(this.smallAValue.add(this.UValue.multiply(xValue)), this.N).mod(this.N);
+    const gModPowXN = this.g.modPow(xValue, this.N);
+    const intValue2 = serverBValue.subtract(this.k.multiply(gModPowXN));
+    const sValue = intValue2.modPow(this.smallAValue.add(this.UValue.multiply(xValue)), this.N).mod(this.N);
 
-        var SToHash = sValue.toString(16);
-        var firstCharS = sValue.toString(16)[0];
+    let SToHash = sValue.toString(16);
+    const firstCharS = sValue.toString(16)[0];
 
-        if (sValue.toString(16).length%2 === 1) {
-            SToHash = '0' + SToHash;
-        } else if ('89ABCDEFabcdef'.indexOf(firstCharS) !== -1) {
-            SToHash = '00' + SToHash;
-        }
+    if (sValue.toString(16).length % 2 === 1) {
+      SToHash = '0' + SToHash;
+    } else if ('89ABCDEFabcdef'.indexOf(firstCharS) !== -1) {
+      SToHash = '00' + SToHash;
+    }
 
-        var UValueToHash = this.UHexHash;
-        var firstCharU = this.UHexHash[0];
+    let UValueToHash = this.UHexHash;
+    const firstCharU = this.UHexHash[0];
 
-        if (this.UHexHash.length%2 === 1) {
-            UValueToHash = '0' + UValueToHash;
-        } else if (this.UHexHash.length%2 === 0 && '89ABCDEFabcdef'.indexOf(firstCharU) !== -1) {
-            UValueToHash = '00' + UValueToHash;
-        }
+    if (this.UHexHash.length % 2 === 1) {
+      UValueToHash = '0' + UValueToHash;
+    } else if (this.UHexHash.length % 2 === 0 && '89ABCDEFabcdef'.indexOf(firstCharU) !== -1) {
+      UValueToHash = '00' + UValueToHash;
+    }
 
-        var hkdf = this.computehkdf(sjcl.codec.hex.toBits(SToHash), sjcl.codec.hex.toBits(UValueToHash));
+    const hkdf = this.computehkdf(sjcl.codec.hex.toBits(SToHash), sjcl.codec.hex.toBits(UValueToHash));
 
-        return hkdf;
-    };
+    return hkdf;
+  };
 
-    return AuthenticationHelper;
-
+  return AuthenticationHelper;
 })();

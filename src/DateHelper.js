@@ -15,44 +15,42 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.DateHelper = (function() {
+AWSCognito.CognitoIdentityServiceProvider.DateHelper = (function () {
+  const DateHelper = function DateHelper() {};
 
-    var DateHelper = function DateHelper() {};
+  DateHelper.prototype.getNowString = function getSmallAValue() {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const weekNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    DateHelper.prototype.getNowString = function getSmallAValue() {
-        var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        var weekNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const now = new Date();
 
-        var now = new Date();
+    const weekDay = weekNames[now.getUTCDay()];
+    const month = monthNames[now.getUTCMonth()];
+    const day = now.getUTCDate();
 
-        var weekDay = weekNames[now.getUTCDay()];
-        var month = monthNames[now.getUTCMonth()];
-        var day = now.getUTCDate();
+    let hours = now.getUTCHours();
+    if (hours < 10) {
+      hours = '0' + hours;
+    }
 
-        var hours = now.getUTCHours();
-        if (hours < 10) {
-            hours = '0' + hours;
-        }
+    let minutes = now.getUTCMinutes();
+    if (minutes < 10) {
+      minutes = '0' + minutes;
+    }
 
-        var minutes = now.getUTCMinutes();
-        if (minutes < 10) {
-            minutes = '0' + minutes;
-        }
+    let seconds = now.getUTCSeconds();
+    if (seconds < 10) {
+      seconds = '0' + seconds;
+    }
 
-        var seconds = now.getUTCSeconds();
-        if (seconds < 10) {
-            seconds = '0' + seconds;
-        }
-
-        var year = now.getUTCFullYear();
+    const year = now.getUTCFullYear();
 
         // ddd MMM D HH:mm:ss UTC YYYY
-        var dateNow = weekDay + ' ' + month + ' ' + day + ' ' + hours + ':' + minutes + ':' + seconds + ' UTC ' + year;
+    const dateNow = weekDay + ' ' + month + ' ' + day + ' ' + hours + ':' + minutes + ':' + seconds + ' UTC ' + year;
 
 
-        return dateNow;
-    };
+    return dateNow;
+  };
 
-    return DateHelper;
-
+  return DateHelper;
 })();

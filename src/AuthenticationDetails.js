@@ -15,54 +15,52 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails =  (function() {
-
+AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails = (function () {
     /**
      * Constructs a new AuthenticationDetails object
      * @param data - contains username, password, and a map of validation data
      * @constructor
      */
 
-    var AuthenticationDetails = function AuthenticationDetails(data) {
-        if (!(this instanceof AuthenticationDetails)) {
-            throw new Error('AuthenticationDetails constructor was not called with new.');
-        }
+  const AuthenticationDetails = function AuthenticationDetails(data) {
+    if (!(this instanceof AuthenticationDetails)) {
+      throw new Error('AuthenticationDetails constructor was not called with new.');
+    }
 
-        data = data || {};
+    data = data || {};
 
         // Assign object data
-        this.validationData = data.ValidationData || [];
-        this.username = data.Username;
-        this.password = data.Password;
-    };
+    this.validationData = data.ValidationData || [];
+    this.username = data.Username;
+    this.password = data.Password;
+  };
 
     /**
      * Returns the record's username
      * @returns {string}
      */
 
-    AuthenticationDetails.prototype.getUsername = function getUsername() {
-        return this.username;
-    };
+  AuthenticationDetails.prototype.getUsername = function getUsername() {
+    return this.username;
+  };
 
     /**
      * Returns the record's password
      * @returns {string}
      */
 
-    AuthenticationDetails.prototype.getPassword = function getPassword() {
-        return this.password;
-    };
+  AuthenticationDetails.prototype.getPassword = function getPassword() {
+    return this.password;
+  };
 
     /**
      * Returns the record's validationData
      * @returns {Array}
      */
 
-    AuthenticationDetails.prototype.getValidationData = function getValidationData() {
-        return this.validationData;
-    };
+  AuthenticationDetails.prototype.getValidationData = function getValidationData() {
+    return this.validationData;
+  };
 
-    return AuthenticationDetails;
-
+  return AuthenticationDetails;
 })();
