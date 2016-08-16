@@ -1,0 +1,8 @@
+root: true
+extends:
+- airbnb-base
+globals:
+  AWSCognito: true
+rules:
+  # Git-controlled
+  linebreak-style: off
