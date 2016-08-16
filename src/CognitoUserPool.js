@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function () {
-    /**
-     * Constructs a new CognitoUserPool object
-     * @param data contains the client id and the user pool id
-     * @constructor
-     */
+import * as AWSCognito from '../dist/aws-cognito-sdk';
+import CognitoUser from './CognitoUser';
 
-  const CognitoUserPool = function CognitoUserPool(data) {
-    if (!(this instanceof CognitoUserPool)) {
-      throw new Error('CognitoUserPool constructor was not called with new.');
-    }
+export default class CognitoUserPool {
+  /**
+   * Constructs a new CognitoUserPool object
+   * @param data contains the client id and the user pool id
+   * @constructor
+   */
 
+  constructor(data) {
     if (data == null || data.UserPoolId == null || data.ClientId == null) {
       throw new Error('Both user pool Id and client Id are required.');
     }
@@ -36,56 +35,56 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function () {
     this.paranoia = data.Paranoia || 0;
 
     this.client = new AWSCognito.CognitoIdentityServiceProvider({ apiVersion: '2016-04-19' });
-  };
+  }
 
-    /**
-     * Returns the user pool id
-     * @returns {string}
-     */
+  /**
+   * Returns the user pool id
+   * @returns {string}
+   */
 
-  CognitoUserPool.prototype.getUserPoolId = function getUserPoolId() {
+  getUserPoolId() {
     return this.userPoolId;
-  };
+  }
 
-    /**
-     * Returns the client id
-     * @returns {string}
-     */
+  /**
+   * Returns the client id
+   * @returns {string}
+   */
 
-  CognitoUserPool.prototype.getClientId = function getClientId() {
+  getClientId() {
     return this.clientId;
-  };
+  }
 
-    /**
-     * Returns the paranoia level
-     * @returns {int}
-     */
+  /**
+   * Returns the paranoia level
+   * @returns {int}
+   */
 
-  CognitoUserPool.prototype.getParanoia = function getParanoia() {
+  getParanoia() {
     return this.paranoia;
-  };
+  }
 
-    /**
-     * sets paranoia level
-     * @param paranoia
-     */
+  /**
+   * sets paranoia level
+   * @param paranoia
+   */
 
-  CognitoUserPool.prototype.setParanoia = function setParanoia(paranoia) {
+  setParanoia(paranoia) {
     this.paranoia = paranoia;
-  };
+  }
 
-    /**
-     * method for signing up a user
-     * @param username
-     * @param password
-     * @param userAttributes
-     * @param validationData
-     * @param callback
-     *
-     * @returns object containing cognito user and if the user is confirmed or not
-     */
+  /**
+   * method for signing up a user
+   * @param username
+   * @param password
+   * @param userAttributes
+   * @param validationData
+   * @param callback
+   *
+   * @returns object containing cognito user and if the user is confirmed or not
+   */
 
-  CognitoUserPool.prototype.signUp = function signUp(username, password, userAttributes, validationData, callback) {
+  signUp(username, password, userAttributes, validationData, callback) {
     const self = this;
     this.client.makeUnauthenticatedRequest('signUp', {
       ClientId: self.clientId,
@@ -103,23 +102,23 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function () {
         };
 
         const returnData = {
-          user: new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser),
+          user: new CognitoUser(cognitoUser),
           userConfirmed: data.UserConfirmed,
         };
 
         return callback(null, returnData);
       }
     });
-  };
+  }
 
 
-     /**
-     * method for getting the current user of the application from the local storage
-     *
-     * @returns {CognitoUser} the user retrieved from storage
-     */
+  /**
+   * method for getting the current user of the application from the local storage
+   *
+   * @returns {CognitoUser} the user retrieved from storage
+   */
 
-  CognitoUserPool.prototype.getCurrentUser = function getCurrentUser() {
+  getCurrentUser() {
     const lastUserKey = 'CognitoIdentityServiceProvider.' + this.clientId + '.LastAuthUser';
     const storage = window.localStorage;
 
@@ -130,11 +129,9 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function () {
         Pool: this,
       };
 
-      return new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser);
+      return new CognitoUser(cognitoUser);
     } else {
       return null;
     }
-  };
-
-  return CognitoUserPool;
-})();
+  }
+}

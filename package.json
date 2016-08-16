@@ -42,5 +42,9 @@
   },
   "scripts": {
     "lint": "eslint src"
+  },
+  "dependencies": {
+    "bn": "^1.0.1",
+    "sjcl": "^1.0.3"
   }
 }

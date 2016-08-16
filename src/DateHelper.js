@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.DateHelper = (function () {
-  const DateHelper = function DateHelper() {};
-
-  DateHelper.prototype.getNowString = function getSmallAValue() {
+export default class DateHelper {
+  getNowString() {
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const weekNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -51,6 +49,4 @@ AWSCognito.CognitoIdentityServiceProvider.DateHelper = (function () {
 
     return dateNow;
   };
-
-  return DateHelper;
-})();
+}

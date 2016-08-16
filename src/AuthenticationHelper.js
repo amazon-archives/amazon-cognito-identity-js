@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
+import * as sjcl from 'sjcl';
+import { BigInteger } from 'bn';
+
+export default class AuthenticationHelper {
     /**
      * Constructs a new AuthenticationHelper object
-     * @param Poolname
+     * @param PoolName
+     * @param paranoia
      * @constructor
      */
 
-  const AuthenticationHelper = function AuthenticationHelper(PoolName, paranoia) {
-    if (!(this instanceof AuthenticationHelper)) {
-      throw new Error('AuthenticationHelper constructor was not called with new.');
-    }
-
+  constructor(PoolName, paranoia) {
     this.N = new BigInteger('FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
                               + '29024E088A67CC74020BBEA63B139B22514A08798E3404DD'
                               + 'EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245'
@@ -54,25 +54,25 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
     this.infoBits = sjcl.codec.utf8String.toBits('Caldera Derived Key');
 
     this.poolName = PoolName;
-  };
+  }
 
     /**
      * Returns small A, a random number
      * @returns {BigInteger}
      */
 
-  AuthenticationHelper.prototype.getSmallAValue = function getSmallAValue() {
+  getSmallAValue() {
     return this.smallAValue;
-  };
+  }
 
     /**
      * Returns large A, a value generated from
      * @returns {BigInteger}
      */
 
-  AuthenticationHelper.prototype.getLargeAValue = function getLargeAValue() {
+  getLargeAValue() {
     return this.largeAValue;
-  };
+  }
 
     /*
      * helper function to generate a random big integer
@@ -80,7 +80,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
      *
      */
 
-  AuthenticationHelper.prototype.generateRandomSmallA = function generateRandomSmallA() {
+  generateRandomSmallA() {
     const words = sjcl.random.randomWords(32, this.paranoia);
     const hexRandom = sjcl.codec.hex.fromBits(words);
 
@@ -88,28 +88,28 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
     const smallABigInt = randomBigInt.mod(this.N);
 
     return smallABigInt;
-  };
+  }
 
-  AuthenticationHelper.prototype.generateRandomString = function generateRandomString() {
+  generateRandomString() {
     const words = sjcl.random.randomWords(10, this.paranoia);
     const stringRandom = sjcl.codec.base64.fromBits(words);
 
     return stringRandom;
-  };
+  }
 
-  AuthenticationHelper.prototype.getRandomPassword = function getRandomPassword() {
+  getRandomPassword() {
     return this.randomPassword;
-  };
+  }
 
-  AuthenticationHelper.prototype.getSaltDevices = function getSaltDevices() {
+  getSaltDevices() {
     return this.SaltToHashDevices;
-  };
+  }
 
-  AuthenticationHelper.prototype.getVerifierDevices = function getVerifierDevices() {
+  getVerifierDevices() {
     return this.verifierDevices;
-  };
+  }
 
-  AuthenticationHelper.prototype.generateHashDevice = function generateHashDevice(deviceGroupKey, username) {
+  generateHashDevice(deviceGroupKey, username) {
     this.randomPassword = this.generateRandomString();
     const combinedString = deviceGroupKey + username + ':' + this.randomPassword;
     const hashedString = this.hash(combinedString);
@@ -135,7 +135,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
     } else if ('89ABCDEFabcdef'.indexOf(firstCharVerifierDevices) !== -1) {
       this.verifierDevices = '00' + this.verifierDevices;
     }
-  };
+  }
 
     /*
      * Calculate the client's public value A = g^a%N
@@ -145,14 +145,14 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
      *
      */
 
-  AuthenticationHelper.prototype.calculateA = function calculateA(a) {
+  calculateA(a) {
     const A = this.g.modPow(a, this.N);
 
     if (A.mod(this.N).toString() === '0') {
       throw new Error('Illegal paramater. A mod N cannot be 0.');
     }
     return A;
-  };
+  }
 
     /*
      * Calculate the client's value U which is the hash of A and B
@@ -161,7 +161,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
      * @returns {BigInteger}
      */
 
-  AuthenticationHelper.prototype.calculateU = function calculateU(A, B) {
+  calculateU(A, B) {
     const firstCharA = A.toString(16)[0];
     const firstCharB = B.toString(16)[0];
     let AToHash = A.toString(16);
@@ -183,7 +183,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
     const finalU = new BigInteger(this.UHexHash, 16);
 
     return finalU;
-  };
+  }
 
     /*
      * Calculate a hash from a bitArray
@@ -191,10 +191,10 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
      * @returns {String}
      */
 
-  AuthenticationHelper.prototype.hash = function hash(bitArray) {
+  hash(bitArray) {
     const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(bitArray));
     return (new Array(64 - hashHex.length).join('0')) + hashHex;
-  };
+  }
 
     /*
      * Calculate a hash from a hex string
@@ -202,10 +202,10 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
      * @returns {String}
      */
 
-  AuthenticationHelper.prototype.hexHash = function hexHash(hexStr) {
+  hexHash(hexStr) {
     const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(sjcl.codec.hex.toBits(hexStr)));
     return (new Array(64 - hashHex.length).join('0')) + hashHex;
-  };
+  }
 
     /*
      * Standard hkdf algorithm
@@ -214,7 +214,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
      * @returns {BitArray}
      */
 
-  AuthenticationHelper.prototype.computehkdf = function computehkdf(ikm, salt) {
+  computehkdf(ikm, salt) {
     const mac = new sjcl.misc.hmac(salt, sjcl.hash.sha256);
     mac.update(ikm);
     const prk = mac.digest();
@@ -223,7 +223,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
     hmac.update(infoBitsUpdate);
 
     return sjcl.bitArray.clamp(hmac.digest(), 128);
-  };
+  }
 
     /*
      * Calculates the final hkdf based on computed S value, and computed U value and the key
@@ -234,7 +234,7 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
      * @returns {BitArray}
      */
 
-  AuthenticationHelper.prototype.getPasswordAuthenticationKey = function getPasswordAuthenticationKey(username, password, serverBValue, salt) {
+  getPasswordAuthenticationKey(username, password, serverBValue, salt) {
     if (serverBValue.mod(this.N).equals(new BigInteger('0', 16))) {
       throw new Error('B cannot be zero.');
     }
@@ -284,7 +284,5 @@ AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper = (function () {
     const hkdf = this.computehkdf(sjcl.codec.hex.toBits(SToHash), sjcl.codec.hex.toBits(UValueToHash));
 
     return hkdf;
-  };
-
-  return AuthenticationHelper;
-})();
+  }
+}

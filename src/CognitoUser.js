@@ -15,18 +15,25 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
-    /**
-     * Constructs a new CognitoUser object
-     * @param data
-     * @constructor
-     */
+import * as sjcl from 'sjcl';
+import { BigInteger } from 'bn';
 
-  const CognitoUser = function CognitoUser(data) {
-    if (!(this instanceof CognitoUser)) {
-      throw new Error('CognitoUser constructor was not called with new.');
-    }
+import * as AWSCognito from '../dist/aws-cognito-sdk';
+import AuthenticationHelper from './AuthenticationHelper';
+import CognitoAccessToken from './CognitoAccessToken';
+import CognitoIdToken from './CognitoIdToken';
+import CognitoRefreshToken from './CognitoRefreshToken';
+import CognitoUserSession from './CognitoUserSession';
+import DateHelper from './DateHelper';
 
+export default class CognitoUser {
+  /**
+   * Constructs a new CognitoUser object
+   * @param data
+   * @constructor
+   */
+
+  constructor(data) {
     if (data == null || data.Username == null || data.Pool == null) {
       throw new Error('Username and pool information are required.');
     }
@@ -39,55 +46,55 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
 
     this.signInUserSession = null;
     this.authenticationFlowType = 'USER_SRP_AUTH';
-  };
+  }
 
-    /**
-     * Gets the current session for this user
-     *
-     * @returns {CognitoUserSession}
-     */
+  /**
+   * Gets the current session for this user
+   *
+   * @returns {CognitoUserSession}
+   */
 
-  CognitoUser.prototype.getSignInUserSession = function getSignInUserSession() {
+  getSignInUserSession() {
     return this.signInUserSession;
-  };
+  }
 
-    /**
-     * Returns the user's username
-     * @returns {string}
-     */
+  /**
+   * Returns the user's username
+   * @returns {string}
+   */
 
-  CognitoUser.prototype.getUsername = function getUsername() {
+  getUsername() {
     return this.username;
-  };
+  }
 
-    /**
-     * Returns the authentication flow type
-     * @returns {String}
-     */
+  /**
+   * Returns the authentication flow type
+   * @returns {String}
+   */
 
-  CognitoUser.prototype.getAuthenticationFlowType = function getAuthenticationFlowType() {
+  getAuthenticationFlowType() {
     return this.authenticationFlowType;
-  };
+  }
 
-    /**
-     * sets authentication flow type
-     * @param authenticationFlowType
-     */
+  /**
+   * sets authentication flow type
+   * @param authenticationFlowType
+   */
 
-  CognitoUser.prototype.setAuthenticationFlowType = function setAuthenticationFlowType(authenticationFlowType) {
+  setAuthenticationFlowType(authenticationFlowType) {
     this.authenticationFlowType = authenticationFlowType;
-  };
+  }
 
-    /**
-     * This is used for authenticating the user. it calls the AuthenticationHelper for SRP related stuff
-     * @param authentication details, contains the authentication data
-     * @param callback
-     * @returns {CognitoUserSession}
-     */
+  /**
+   * This is used for authenticating the user. it calls the AuthenticationHelper for SRP related stuff
+   * @param authentication details, contains the authentication data
+   * @param callback
+   * @returns {CognitoUserSession}
+   */
 
-  CognitoUser.prototype.authenticateUser = function authenticateUser(authDetails, callback) {
-    const authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(this.pool.getUserPoolId().split('_')[1], this.pool.getParanoia());
-    const dateHelper = new AWSCognito.CognitoIdentityServiceProvider.DateHelper();
+  authenticateUser(authDetails, callback) {
+    const authenticationHelper = new AuthenticationHelper(this.pool.getUserPoolId().split('_')[1], this.pool.getParanoia());
+    const dateHelper = new DateHelper();
 
     let serverBValue;
     let salt;
@@ -172,49 +179,49 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
             const deviceStuff = authenticationHelper.generateHashDevice(dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey, dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
             const deviceSecretVerifierConfig = {
-                Salt: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(authenticationHelper.getSaltDevices().toString(16))),
-                PasswordVerifier: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(authenticationHelper.getVerifierDevices().toString(16))),
-              };
+              Salt: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(authenticationHelper.getSaltDevices().toString(16))),
+              PasswordVerifier: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(authenticationHelper.getVerifierDevices().toString(16))),
+            };
 
             self.verifierDevices = sjcl.codec.base64.fromBits(authenticationHelper.getVerifierDevices());
             self.deviceGroupKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey;
             self.randomPassword = authenticationHelper.getRandomPassword();
 
             self.client.makeUnauthenticatedRequest('confirmDevice', {
-                DeviceKey: dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey,
-                AccessToken: self.signInUserSession.getAccessToken().getJwtToken(),
-                DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
-                DeviceName: navigator.userAgent,
-              }, function (errConfirm, dataConfirm) {
-                  if (errConfirm) {
-                    return callback.onFailure(errConfirm);
-                  }
-                  self.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
-                  self.cacheDeviceKeyAndPassword();
-                  if (dataConfirm.UserConfirmationNecessary === true) {
-                    return callback.onSuccess(self.signInUserSession, dataConfirm.UserConfirmationNecessary);
-                  } else {
-                    return callback.onSuccess(self.signInUserSession);
-                  }
-                });
+              DeviceKey: dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey,
+              AccessToken: self.signInUserSession.getAccessToken().getJwtToken(),
+              DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
+              DeviceName: navigator.userAgent,
+            }, function (errConfirm, dataConfirm) {
+              if (errConfirm) {
+                return callback.onFailure(errConfirm);
+              }
+              self.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
+              self.cacheDeviceKeyAndPassword();
+              if (dataConfirm.UserConfirmationNecessary === true) {
+                return callback.onSuccess(self.signInUserSession, dataConfirm.UserConfirmationNecessary);
+              } else {
+                return callback.onSuccess(self.signInUserSession);
+              }
+            });
           } else {
             return callback.onSuccess(self.signInUserSession);
           }
         }
       });
     });
-  };
+  }
 
-    /**
-     * This is used to get a session using device authentication. It is called at the end of user authentication
-     *
-     * @param callback
-     * @response error or session
-     */
+  /**
+   * This is used to get a session using device authentication. It is called at the end of user authentication
+   *
+   * @param callback
+   * @response error or session
+   */
 
-  CognitoUser.prototype.getDeviceResponse = function getDeviceResponse(callback) {
-    const authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(this.deviceGroupKey, this.pool.getParanoia());
-    const dateHelper = new AWSCognito.CognitoIdentityServiceProvider.DateHelper();
+  getDeviceResponse(callback) {
+    const authenticationHelper = new AuthenticationHelper(this.deviceGroupKey, this.pool.getParanoia());
+    const dateHelper = new DateHelper();
 
     const self = this;
     const authParameters = {};
@@ -275,15 +282,15 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     });
   };
 
-    /**
-     * This is used for a certain user to confirm the registration by using a confirmation code
-     * @param confirmationCode
-     * @param forceAliasCreation
-     * @param callback
-     * @returns error or success
-     */
+  /**
+   * This is used for a certain user to confirm the registration by using a confirmation code
+   * @param confirmationCode
+   * @param forceAliasCreation
+   * @param callback
+   * @returns error or success
+   */
 
-  CognitoUser.prototype.confirmRegistration = function confirmRegistration(confirmationCode, forceAliasCreation, callback) {
+  confirmRegistration(confirmationCode, forceAliasCreation, callback) {
     this.client.makeUnauthenticatedRequest('confirmSignUp', {
       ClientId: this.pool.getClientId(),
       ConfirmationCode: confirmationCode,
@@ -296,16 +303,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
         return callback(null, 'SUCCESS');
       }
     });
-  };
+  }
 
-    /**
-     * This is used by the user once he has the responses to a custom challenge
-     * @param answerChallenge
-     * @param callback
-     * @returns {CognitoUserSession}
-     */
+  /**
+   * This is used by the user once he has the responses to a custom challenge
+   * @param answerChallenge
+   * @param callback
+   * @returns {CognitoUserSession}
+   */
 
-  CognitoUser.prototype.sendCustomChallengeAnswer = function sendCustomChallengeAnswer(answerChallenge, callback) {
+  sendCustomChallengeAnswer(answerChallenge, callback) {
     const challengeResponses = {};
     challengeResponses['USERNAME'] = this.username;
     challengeResponses['ANSWER'] = answerChallenge;
@@ -334,14 +341,14 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     });
   };
 
-    /**
-     * This is used by the user once he has an MFA code
-     * @param confirmationCode
-     * @param callback
-     * @returns {CognitoUserSession}
-     */
+  /**
+   * This is used by the user once he has an MFA code
+   * @param confirmationCode
+   * @param callback
+   * @returns {CognitoUserSession}
+   */
 
-  CognitoUser.prototype.sendMFACode = function sendMFACode(confirmationCode, callback) {
+  sendMFACode(confirmationCode, callback) {
     const challengeResponses = {};
     challengeResponses['USERNAME'] = this.username;
     challengeResponses['SMS_MFA_CODE'] = confirmationCode;
@@ -364,7 +371,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
         self.cacheTokens();
 
         if (dataAuthenticate.AuthenticationResult.NewDeviceMetadata != null) {
-          const authenticationHelper = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationHelper(self.pool.getUserPoolId().split('_')[1], self.pool.getParanoia());
+          const authenticationHelper = new AuthenticationHelper(self.pool.getUserPoolId().split('_')[1], self.pool.getParanoia());
           const deviceStuff = authenticationHelper.generateHashDevice(dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey, dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
           const deviceSecretVerifierConfig = {
@@ -398,17 +405,17 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
         }
       }
     });
-  };
+  }
 
-    /**
-     * This is used by an authenticated user to change the current password
-     * @param oldUserPassword
-     * @param newUserPassword
-     * @param callback
-     * @returns error or success
-     */
+  /**
+   * This is used by an authenticated user to change the current password
+   * @param oldUserPassword
+   * @param newUserPassword
+   * @param callback
+   * @returns error or success
+   */
 
-  CognitoUser.prototype.changePassword = function changePassword(oldUserPassword, newUserPassword, callback) {
+  changePassword(oldUserPassword, newUserPassword, callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('changePassword', {
         PreviousPassword: oldUserPassword,
@@ -424,15 +431,15 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used by an authenticated user to enable MFA for himself
-     * @param callback
-     * @returns error or success
-     */
+  /**
+   * This is used by an authenticated user to enable MFA for himself
+   * @param callback
+   * @returns error or success
+   */
 
-  CognitoUser.prototype.enableMFA = function enableMFA(callback) {
+  enableMFA(callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       const mfaOptions = [];
       const mfaEnabled = {
@@ -454,15 +461,15 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used by an authenticated user to disable MFA for himself
-     * @param callback
-     * @returns error or success
-     */
+  /**
+   * This is used by an authenticated user to disable MFA for himself
+   * @param callback
+   * @returns error or success
+   */
 
-  CognitoUser.prototype.disableMFA = function disableMFA(callback) {
+  disableMFA(callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       const mfaOptions = [];
 
@@ -479,16 +486,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
 
-    /**
-     * This is used by an authenticated user to delete himself
-     * @param callback
-     * @returns error or success
-     */
+  /**
+   * This is used by an authenticated user to delete himself
+   * @param callback
+   * @returns error or success
+   */
 
-  CognitoUser.prototype.deleteUser = function deleteUser(callback) {
+  deleteUser(callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('deleteUser', {
         AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
@@ -502,16 +509,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used by an authenticated user to change a list of attributes
-     * @param attributes
-     * @param callback
-     * @returns error or success
-     */
+  /**
+   * This is used by an authenticated user to change a list of attributes
+   * @param attributes
+   * @param callback
+   * @returns error or success
+   */
 
-  CognitoUser.prototype.updateAttributes = function updateAttributes(attributes, callback) {
+  updateAttributes(attributes, callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('updateUserAttributes', {
         AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
@@ -526,15 +533,15 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used by an authenticated user to get a list of attributes
-     * @param callback
-     * @returns error or success
-     */
+  /**
+   * This is used by an authenticated user to get a list of attributes
+   * @param callback
+   * @returns error or success
+   */
 
-  CognitoUser.prototype.getUserAttributes = function getUserAttributes(callback) {
+  getUserAttributes(callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('getUser', {
         AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
@@ -549,7 +556,7 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
               Name: userData.UserAttributes[i].Name,
               Value: userData.UserAttributes[i].Value,
             };
-            const userAttribute = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(attribute);
+            const userAttribute = new CognitoUserAttribute(attribute);
             attributeList.push(userAttribute);
           }
 
@@ -559,16 +566,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used by an authenticated user to delete a list of attributes
-     * @param attributeList
-     * @param callback
-     * @returns error or success
-     */
+  /**
+   * This is used by an authenticated user to delete a list of attributes
+   * @param attributeList
+   * @param callback
+   * @returns error or success
+   */
 
-  CognitoUser.prototype.deleteAttributes = function deleteAttributes(attributeList, callback) {
+  deleteAttributes(attributeList, callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('deleteUserAttributes', {
         UserAttributeNames: attributeList,
@@ -583,15 +590,15 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used by a user to resend a confirmation code
-     * @param callback
-     * @returns error or success
-     */
+  /**
+   * This is used by a user to resend a confirmation code
+   * @param callback
+   * @returns error or success
+   */
 
-  CognitoUser.prototype.resendConfirmationCode = function resendConfirmationCode(callback) {
+  resendConfirmationCode(callback) {
     this.client.makeUnauthenticatedRequest('resendConfirmationCode', {
       ClientId: this.pool.getClientId(),
       Username: this.username,
@@ -602,17 +609,17 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
         return callback(null, 'SUCCESS');
       }
     });
-  };
+  }
 
-    /**
-     * This is used to get a session, either from the session object
-     * or from  the local storage, or by using a refresh token
-     *
-     * @param callback
-     * @returns error or session
-     */
+  /**
+   * This is used to get a session, either from the session object
+   * or from  the local storage, or by using a refresh token
+   *
+   * @param callback
+   * @returns error or session
+   */
 
-  CognitoUser.prototype.getSession = function getSession(callback) {
+  getSession(callback) {
     if (this.username == null) {
       return callback(new Error('Username is null. Cannot retrieve a new session'), null);
     }
@@ -628,16 +635,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     const storage = window.localStorage;
 
     if (storage.getItem(idTokenKey)) {
-      const idToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoIdToken({ IdToken: storage.getItem(idTokenKey) });
-      const accessToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoAccessToken({ AccessToken: storage.getItem(accessTokenKey) });
-      const refreshToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoRefreshToken({ RefreshToken: storage.getItem(refreshTokenKey) });
+      const idToken = new CognitoIdToken({ IdToken: storage.getItem(idTokenKey) });
+      const accessToken = new CognitoAccessToken({ AccessToken: storage.getItem(accessTokenKey) });
+      const refreshToken = new CognitoRefreshToken({ RefreshToken: storage.getItem(refreshTokenKey) });
 
       const sessionData = {
         IdToken: idToken,
         AccessToken: accessToken,
         RefreshToken: refreshToken,
       };
-      const cachedSession = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserSession(sessionData);
+      const cachedSession = new CognitoUserSession(sessionData);
       if (cachedSession.isValid()) {
         this.signInUserSession = cachedSession;
         return callback(null, this.signInUserSession);
@@ -649,17 +656,17 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
         }
       }
     }
-  };
+  }
 
 
-    /**
-     * This uses the refreshToken to retrieve a new session
-     * @param refreshToken
-     * @param callback
-     * @returns error or new session
-     */
+  /**
+   * This uses the refreshToken to retrieve a new session
+   * @param refreshToken
+   * @param callback
+   * @returns error or new session
+   */
 
-  CognitoUser.prototype.refreshSession = function refreshSession(refreshToken, callback) {
+  refreshSession(refreshToken, callback) {
     const authParameters = {};
     authParameters['REFRESH_TOKEN'] = refreshToken.getToken();
     const lastUserKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.LastAuthUser';
@@ -690,13 +697,13 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
         return callback(null, self.signInUserSession);
       }
     });
-  };
+  }
 
-    /**
-     * This is used to save the session tokens to local storage
-     */
+  /**
+   * This is used to save the session tokens to local storage
+   */
 
-  CognitoUser.prototype.cacheTokens = function cacheTokens() {
+  cacheTokens() {
     const idTokenKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.idToken';
     const accessTokenKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.accessToken';
     const refreshTokenKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.refreshToken';
@@ -708,13 +715,13 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     storage.setItem(accessTokenKey, this.signInUserSession.getAccessToken().getJwtToken());
     storage.setItem(refreshTokenKey, this.signInUserSession.getRefreshToken().getToken());
     storage.setItem(lastUserKey, this.username);
-  };
+  }
 
-    /**
-     * This is used to cache the device key and device group and device password
-     */
+  /**
+   * This is used to cache the device key and device group and device password
+   */
 
-  CognitoUser.prototype.cacheDeviceKeyAndPassword = function cacheDeviceKeyAndPassword() {
+  cacheDeviceKeyAndPassword() {
     const deviceKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceKey';
     const randomPasswordKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.randomPasswordKey';
     const deviceGroupKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceGroupKey';
@@ -724,13 +731,13 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     storage.setItem(deviceKeyKey, this.deviceKey);
     storage.setItem(randomPasswordKey, this.randomPassword);
     storage.setItem(deviceGroupKeyKey, this.deviceGroupKey);
-  };
+  }
 
-    /**
-     * This is used to get current device key and device group and device password
-     */
+  /**
+   * This is used to get current device key and device group and device password
+   */
 
-  CognitoUser.prototype.getCachedDeviceKeyAndPassword = function getCachedDeviceKeyAndPassword() {
+  getCachedDeviceKeyAndPassword() {
     const deviceKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceKey';
     const randomPasswordKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.randomPasswordKey';
     const deviceGroupKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceGroupKey';
@@ -742,13 +749,13 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
       this.randomPassword = storage.getItem(randomPasswordKey);
       this.deviceGroupKey = storage.getItem(deviceGroupKeyKey);
     }
-  };
+  }
 
-    /**
-     * This is used to clear the device key info from local storage
-     */
+  /**
+   * This is used to clear the device key info from local storage
+   */
 
-  CognitoUser.prototype.clearCachedDeviceKeyAndPassword = function clearCachedDeviceKeyAndPassword() {
+  clearCachedDeviceKeyAndPassword() {
     const deviceKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceKey';
     const randomPasswordKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.randomPasswordKey';
     const deviceGroupKeyKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.deviceGroupKey';
@@ -758,13 +765,13 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     storage.removeItem(deviceKeyKey);
     storage.removeItem(randomPasswordKey);
     storage.removeItem(deviceGroupKeyKey);
-  };
+  }
 
-    /**
-     * This is used to clear the session tokens from local storage
-     */
+  /**
+   * This is used to clear the session tokens from local storage
+   */
 
-  CognitoUser.prototype.clearCachedTokens = function clearCachedTokens() {
+  clearCachedTokens() {
     const idTokenKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.idToken';
     const accessTokenKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.accessToken';
     const refreshTokenKey = 'CognitoIdentityServiceProvider.' + this.pool.getClientId() + '.' + this.username + '.refreshToken';
@@ -776,18 +783,18 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     storage.removeItem(accessTokenKey);
     storage.removeItem(refreshTokenKey);
     storage.removeItem(lastUserKey);
-  };
+  }
 
-    /**
-     * This is used to build a user session from tokens retrieved in the authentication result
-     * @param authResult
-     *
-     */
+  /**
+   * This is used to build a user session from tokens retrieved in the authentication result
+   * @param authResult
+   *
+   */
 
-  CognitoUser.prototype.getCognitoUserSession = function getCognitoUserSession(authResult) {
-    const idToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoIdToken(authResult);
-    const accessToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoAccessToken(authResult);
-    const refreshToken = new AWSCognito.CognitoIdentityServiceProvider.CognitoRefreshToken(authResult);
+  getCognitoUserSession(authResult) {
+    const idToken = new CognitoIdToken(authResult);
+    const accessToken = new CognitoAccessToken(authResult);
+    const refreshToken = new CognitoRefreshToken(authResult);
 
     const sessionData = {
       IdToken: idToken,
@@ -795,17 +802,17 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
       RefreshToken: refreshToken,
     };
 
-    return new AWSCognito.CognitoIdentityServiceProvider.CognitoUserSession(sessionData);
-  };
+    return new CognitoUserSession(sessionData);
+  }
 
-    /**
-     * This is used to initiate a forgot password request
-     * @param callback
-     * @returns error or success
-     *
-     */
+  /**
+   * This is used to initiate a forgot password request
+   * @param callback
+   * @returns error or success
+   *
+   */
 
-  CognitoUser.prototype.forgotPassword = function forgotPassword(callback) {
+  forgotPassword(callback) {
     this.client.makeUnauthenticatedRequest('forgotPassword', {
       ClientId: this.pool.getClientId(),
       Username: this.username,
@@ -820,18 +827,18 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
         }
       }
     });
-  };
+  }
 
-    /**
-     * This is used to confirm a new password using a confirmationCode
-     * @param confirmationCode
-     * @param newPassword
-     * @param callback
-     * @returns error or success
-     *
-     */
+  /**
+   * This is used to confirm a new password using a confirmationCode
+   * @param confirmationCode
+   * @param newPassword
+   * @param callback
+   * @returns error or success
+   *
+   */
 
-  CognitoUser.prototype.confirmPassword = function confirmPassword(confirmationCode, newPassword, callback) {
+  confirmPassword(confirmationCode, newPassword, callback) {
     this.client.makeUnauthenticatedRequest('confirmForgotPassword', {
       ClientId: this.pool.getClientId(),
       Username: this.username,
@@ -844,17 +851,17 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
         return callback.onSuccess();
       }
     });
-  };
+  }
 
-    /**
-     * This is used to initiate an attribute confirmation request
-     * @param attributeName
-     * @param callback
-     * @returns error or success
-     *
-     */
+  /**
+   * This is used to initiate an attribute confirmation request
+   * @param attributeName
+   * @param callback
+   * @returns error or success
+   *
+   */
 
-  CognitoUser.prototype.getAttributeVerificationCode = function getAttributeVerificationCode(attributeName, callback) {
+  getAttributeVerificationCode(attributeName, callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('getUserAttributeVerificationCode', {
         AttributeName: attributeName,
@@ -869,18 +876,18 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used to confirm an attribute using a confirmation code
-     * @param confirmationCode
-     * @param attributeName
-     * @param callback
-     * @returns error or success
-     *
-     */
+  /**
+   * This is used to confirm an attribute using a confirmation code
+   * @param confirmationCode
+   * @param attributeName
+   * @param callback
+   * @returns error or success
+   *
+   */
 
-  CognitoUser.prototype.verifyAttribute = function verifyAttribute(attributeName, confirmationCode, callback) {
+  verifyAttribute(attributeName, confirmationCode, callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('verifyUserAttribute', {
         AttributeName: attributeName,
@@ -896,17 +903,17 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
 
-   /**
-     * This is used to get the device information using the current device key
-     *
-     * @param callback
-     * @returns error or current device data
-     */
+  /**
+   * This is used to get the device information using the current device key
+   *
+   * @param callback
+   * @returns error or current device data
+   */
 
-  CognitoUser.prototype.getDevice = function getDevice(callback) {
+  getDevice(callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('getDevice', {
         AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
@@ -921,16 +928,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-   /**
-     * This is used to forget the current device
-     *
-     * @param callback
-     * @returns error or SUCCESS
-     */
+  /**
+   * This is used to forget the current device
+   *
+   * @param callback
+   * @returns error or SUCCESS
+   */
 
-  CognitoUser.prototype.forgetDevice = function forgetDevice(callback) {
+  forgetDevice(callback) {
     const self = this;
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('forgetDevice', {
@@ -950,16 +957,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used to set the device status as remembered
-     *
-     * @param callback
-     * @returns error or SUCCESS
-     */
+  /**
+   * This is used to set the device status as remembered
+   *
+   * @param callback
+   * @returns error or SUCCESS
+   */
 
-  CognitoUser.prototype.setDeviceStatusRemembered = function setDeviceStatusRemembered(callback) {
+  setDeviceStatusRemembered(callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('updateDeviceStatus', {
         AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
@@ -975,16 +982,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used to set the device status as not remembered
-     *
-     * @param callback
-     * @returns error or SUCCESS
-     */
+  /**
+   * This is used to set the device status as not remembered
+   *
+   * @param callback
+   * @returns error or SUCCESS
+   */
 
-  CognitoUser.prototype.setDeviceStatusNotRemembered = function setDeviceStatusNotRemembered(callback) {
+  setDeviceStatusNotRemembered(callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('updateDeviceStatus', {
         AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
@@ -1000,18 +1007,18 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used to list all devices for a user
-     *
-     * @param limit the number of devices returned in a call
-     * @param paginationToken the pagination token in case any was returned before
-     * @param callback
-     * @returns error or device data and pagination token
-     */
+  /**
+   * This is used to list all devices for a user
+   *
+   * @param limit the number of devices returned in a call
+   * @param paginationToken the pagination token in case any was returned before
+   * @param callback
+   * @returns error or device data and pagination token
+   */
 
-  CognitoUser.prototype.listDevices = function listDevices(limit, paginationToken, callback) {
+  listDevices(limit, paginationToken, callback) {
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('listDevices', {
         AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
@@ -1027,16 +1034,16 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used to globally revoke all tokens issued to a user
-     *
-     * @param callback
-     * @returns error or SUCCESS
-     */
+  /**
+   * This is used to globally revoke all tokens issued to a user
+   *
+   * @param callback
+   * @returns error or SUCCESS
+   */
 
-  CognitoUser.prototype.globalSignOut = function globalSignOut(callback) {
+  globalSignOut(callback) {
     const self = this;
     if (this.signInUserSession != null && this.signInUserSession.isValid()) {
       this.client.makeUnauthenticatedRequest('globalSignOut', {
@@ -1052,17 +1059,15 @@ AWSCognito.CognitoIdentityServiceProvider.CognitoUser = (function () {
     } else {
       return callback(new Error('User is not authenticated'), null);
     }
-  };
+  }
 
-    /**
-     * This is used for the user to signOut of the application and clear the cached tokens.
-     *
-     */
+  /**
+   * This is used for the user to signOut of the application and clear the cached tokens.
+   *
+   */
 
-  CognitoUser.prototype.signOut = function signOut() {
+  signOut() {
     this.signInUserSession = null;
     this.clearCachedTokens();
-  };
-
-  return CognitoUser;
-})();
+  }
+}

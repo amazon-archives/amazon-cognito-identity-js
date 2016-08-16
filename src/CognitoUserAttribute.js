@@ -15,84 +15,78 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute = (function () {
-    /**
-     * Constructs a new CognitoUserAttribute object
-     * @param data - contains name, value pair for the attribute
-     * @constructor
-     */
+export default class CognitoUserAttribute {
+  /**
+   * Constructs a new CognitoUserAttribute object
+   * @param data - contains name, value pair for the attribute
+   * @constructor
+   */
 
-  const CognitoUserAttribute = function CognitoUserAttribute(data) {
-    if (!(this instanceof CognitoUserAttribute)) {
-      throw new Error('CognitoUserAttribute constructor was not called with new.');
-    }
-
+  constructor(data) {
     data = data || {};
 
     this.Name = data.Name || '';
     this.Value = data.Value || '';
-  };
+  }
 
-    /**
-     * Returns the record's value.
-     * @returns {string}
-     */
+  /**
+   * Returns the record's value.
+   * @returns {string}
+   */
 
-  CognitoUserAttribute.prototype.getValue = function getValue() {
+  getValue() {
     return this.Value;
-  };
+  }
 
-    /**
-     * Sets the record's value.
-     * @param value
-     * @returns {CognitoUserAttribute}
-     */
+  /**
+   * Sets the record's value.
+   * @param value
+   * @returns {CognitoUserAttribute}
+   */
 
-  CognitoUserAttribute.prototype.setValue = function setValue(value) {
+  setValue(value) {
     this.Value = value;
     return this;
-  };
+  }
 
-    /**
-     * Returns the record's name.
-     * @returns {string}
-     */
+  /**
+   * Returns the record's name.
+   * @returns {string}
+   */
 
-  CognitoUserAttribute.prototype.getName = function getName() {
+  getName() {
     return this.Name;
-  };
+  }
 
-    /**
-     * Sets the record's name
-     * @param name
-     * @returns {CognitoUserAttribute}
-     */
+  /**
+   * Sets the record's name
+   * @param name
+   * @returns {CognitoUserAttribute}
+   */
 
-  CognitoUserAttribute.prototype.setName = function setName(name) {
+  setName(name) {
     this.Name = name;
     return this;
-  };
+  }
 
-    /**
-     * Returns a string representation of the record.
-     * @returns {string}
-     */
+  /**
+   * Returns a string representation of the record.
+   * @returns {string}
+   */
 
-  CognitoUserAttribute.prototype.toString = function toString() {
+  toString() {
     return JSON.stringify(this);
-  };
+  }
 
-    /**
-     * Returns a flat object representing the record.
-     * @returns {object}
-     */
+  /**
+   * Returns a flat object representing the record.
+   * @returns {object}
+   */
 
-  CognitoUserAttribute.prototype.toJSON = function toJSON() {
+  toJSON() {
     return {
       Name: this.Name,
       Value: this.Value,
     };
-  };
-
-  return CognitoUserAttribute;
-})();
+  }
+}

@@ -15,32 +15,26 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoRefreshToken = (function () {
-    /**
-     * Constructs a new CognitoRefreshToken object
-     * @param data - contains tokens
-     * @constructor
-     */
+export default class CognitoRefreshToken {
+  /**
+   * Constructs a new CognitoRefreshToken object
+   * @param data - contains tokens
+   * @constructor
+   */
 
-  const CognitoRefreshToken = function CognitoRefreshToken(data) {
-    if (!(this instanceof CognitoRefreshToken)) {
-      throw new Error('CognitoRefreshToken constructor was not called with new.');
-    }
-
+  constructor(data) {
     data = data || {};
 
-        // Assign object
+    // Assign object
     this.token = data.RefreshToken || '';
   };
 
-    /**
-     * Returns the record's token.
-     * @returns {string}
-     */
+  /**
+   * Returns the record's token.
+   * @returns {string}
+   */
 
-  CognitoRefreshToken.prototype.getToken = function getToken() {
+  getToken() {
     return this.token;
-  };
-
-  return CognitoRefreshToken;
-})();
+  }
+}
