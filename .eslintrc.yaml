@@ -1,10 +1,10 @@
 root: true
 extends:
 - airbnb-base
-globals:
-  AWSCognito: true
 env:
   browser: true
+settings:
+  import/resolver: webpack
 rules:
   # Git-controlled
   linebreak-style: off
@@ -13,6 +13,7 @@ rules:
   - error
   - newIsCapExceptions:
     - sjcl.misc.hmac
+  # Check JSDocs
   valid-jsdoc: error
   require-jsdoc:
   - error
@@ -20,3 +21,6 @@ rules:
       FunctionDeclaration: true
       ClassDeclaration: true
       MethodDefinition: true
+  # Seems this doesn't use import/resolver? import/no-unresolved catches most of these anyway.
+  # https://github.com/benmosher/eslint-plugin-import/issues/496
+  import/no-extraneous-dependencies: off

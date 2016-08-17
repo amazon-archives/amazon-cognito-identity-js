@@ -1,7 +1,7 @@
 /* eslint-disable */
 var webpack = require('webpack');
 
-var banner = '/**\n' +
+var banner = '/*!\n' +
 ' * Copyright 2016 Amazon.com,\n' +
 ' * Inc. or its affiliates. All Rights Reserved.\n' +
 ' * \n' +
@@ -19,18 +19,28 @@ var banner = '/**\n' +
 ' */\n\n';
 
 module.exports = {
-  entry: './src',
+  entry: './enhance',
   output: {
     path: 'dist',
     filename: 'amazon-cognito-identity.min.js',
-    library: ['AWSCognito', 'CognitoIdentityProviderService'],
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    library: 'AmazonCognitoIdentity'
   },
   devtool: 'source-map',
+  externals: {
+    // Not in documentation, see: thttps://github.com/webpack/webpack/tree/master/examples/externals
+    'aws-sdk': {
+      root: 'AWSCognito',
+      commonjs2: 'aws-sdk',
+      commonjs: 'aws-sdk',
+      amd: 'aws-sdk'
+    },
+    // Exclude 3rd-party code from the bundle.
+    sjcl: true,
+    jsbn: true
+  },
   plugins: [
-    new webpack.ProvidePlugin({
-      AWSCognito: __dirname + '/dist/aws-cognito-sdk.js'
-    }),
+    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
@@ -38,14 +48,7 @@ module.exports = {
     }),
     new webpack.BannerPlugin(banner, { raw: true })
   ],
-  resolve: {
-    alias: {
-      // skip dynamic lookup of node native bigint, bignum modules which causes webpack warning.
-      bn$: 'bn/lib/pure'
-    }
-  },
   module: {
-    noParse: /dist/, // Don't check AWSCognito for require(), avoid webpack warning
     loaders: [
       {
         test: /\.js$/,

@@ -16,7 +16,7 @@
  */
 
 import * as sjcl from 'sjcl';
-import { BigInteger } from 'bn';
+import { BigInteger } from 'jsbn';
 
 const initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
   + '29024E088A67CC74020BBEA63B139B22514A08798E3404DD'

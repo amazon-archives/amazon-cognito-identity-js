@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+import { CognitoIdentityServiceProvider } from 'aws-sdk';
+
 import CognitoUser from './CognitoUser';
 
 /** @class */
@@ -35,7 +37,7 @@ export default class CognitoUserPool {
     this.clientId = data.ClientId;
     this.paranoia = data.Paranoia || 0;
 
-    this.client = new AWSCognito.CognitoIdentityServiceProvider({ apiVersion: '2016-04-19' });
+    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19' });
   }
 
   /**
