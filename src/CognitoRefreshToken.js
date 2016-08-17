@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -15,23 +15,20 @@
  * limitations under the License.
  */
 
+/** @class */
 export default class CognitoRefreshToken {
   /**
    * Constructs a new CognitoRefreshToken object
-   * @param RefreshToken {string=}
-   * @constructor
+   * @param {string=} RefreshToken The JWT refresh token.
    */
-
   constructor({ RefreshToken } = {}) {
     // Assign object
     this.token = RefreshToken || '';
   }
 
   /**
-   * Returns the record's token.
-   * @returns {string}
+   * @returns {string} the record's token.
    */
-
   getToken() {
     return this.token;
   }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -17,32 +17,27 @@
 
 import * as sjcl from 'sjcl';
 
+/** @class */
 export default class CognitoAccessToken {
   /**
    * Constructs a new CognitoAccessToken object
-   * @param AccessToken {string=}
-   * @constructor
+   * @param {string=} AccessToken The JWT access token.
    */
-
   constructor({ AccessToken } = {}) {
     // Assign object
     this.jwtToken = AccessToken || '';
   }
 
   /**
-   * Returns the record's token.
-   * @returns {string}
+   * @returns {string} the record's token.
    */
-
   getJwtToken() {
     return this.jwtToken;
   }
 
   /**
-   * Returns the token's expiration
-   * @returns {integer}
+   * @returns {int} the token's expiration (exp member).
    */
-
   getExpiration() {
     const payload = this.jwtToken.split('.')[1];
     const expiration = JSON.parse(

@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -35,14 +35,13 @@ const initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
   + 'BBE117577A615D6C770988C0BAD946E208E24FA074E5AB31'
   + '43DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF';
 
+/** @class */
 export default class AuthenticationHelper {
   /**
    * Constructs a new AuthenticationHelper object
-   * @param PoolName
-   * @param paranoia
-   * @constructor
+   * @param {string} PoolName Cognito user pool name.
+   * @param {int} paranoia Random number generation paranoia level.
    */
-
   constructor(PoolName, paranoia) {
     this.N = new BigInteger(initN, 16);
     this.g = new BigInteger('2');
@@ -59,29 +58,24 @@ export default class AuthenticationHelper {
   }
 
   /**
-   * Returns small A, a random number
-   * @returns {BigInteger}
+   * @returns {BigInteger} small A, a random number
    */
-
   getSmallAValue() {
     return this.smallAValue;
   }
 
   /**
-   * Returns large A, a value generated from
-   * @returns {BigInteger}
+   * @returns {BigInteger} large A, a value generated from small A
    */
-
   getLargeAValue() {
     return this.largeAValue;
   }
 
-  /*
+  /**
    * helper function to generate a random big integer
-   * @returns {BigInteger}
-   *
+   * @returns {BigInteger} a random value.
+   * @private
    */
-
   generateRandomSmallA() {
     const words = sjcl.random.randomWords(32, this.paranoia);
     const hexRandom = sjcl.codec.hex.fromBits(words);
@@ -92,6 +86,11 @@ export default class AuthenticationHelper {
     return smallABigInt;
   }
 
+  /**
+   * helper function to generate a random string
+   * @returns {string} a random value.
+   * @private
+   */
   generateRandomString() {
     const words = sjcl.random.randomWords(10, this.paranoia);
     const stringRandom = sjcl.codec.base64.fromBits(words);
@@ -99,18 +98,33 @@ export default class AuthenticationHelper {
     return stringRandom;
   }
 
+  /**
+   * @returns {string} Generated random value included in password hash.
+   */
   getRandomPassword() {
     return this.randomPassword;
   }
 
+  /**
+   * @returns {string} Generated random value included in devices hash.
+   */
   getSaltDevices() {
     return this.SaltToHashDevices;
   }
 
+  /**
+   * @returns {string} Value used to verify devices.
+   */
   getVerifierDevices() {
     return this.verifierDevices;
   }
 
+  /**
+   * Generate salts and compute verifier.
+   * @param {string} deviceGroupKey Devices to generate verifier for.
+   * @param {string} username User to generate verifier for.
+   * @returns {void}
+   */
   generateHashDevice(deviceGroupKey, username) {
     this.randomPassword = this.generateRandomString();
     const combinedString = `${deviceGroupKey}${username}:${this.randomPassword}`;
@@ -141,14 +155,13 @@ export default class AuthenticationHelper {
     }
   }
 
-  /*
+  /**
    * Calculate the client's public value A = g^a%N
    * with the generated random number a
-   * @param random number a
-   * @returns {BigInteger}
-   *
+   * @param {BigInteger} a Randomly generated small A.
+   * @returns {BigInteger} Computed large A.
+   * @private
    */
-
   calculateA(a) {
     const A = this.g.modPow(a, this.N);
 
@@ -158,13 +171,13 @@ export default class AuthenticationHelper {
     return A;
   }
 
-  /*
+  /**
    * Calculate the client's value U which is the hash of A and B
-   * @param A
-   * @param B
-   * @returns {BigInteger}
+   * @param {BigInteger} A Large A value.
+   * @param {BigInteger} B Server B value.
+   * @returns {BigInteger} Computed U value.
+   * @private
    */
-
   calculateU(A, B) {
     const firstCharA = A.toString(16)[0];
     const firstCharB = B.toString(16)[0];
@@ -189,35 +202,35 @@ export default class AuthenticationHelper {
     return finalU;
   }
 
-  /*
+  /**
    * Calculate a hash from a bitArray
-   * @param bitArray
-   * @returns {String}
+   * @param {sjcl.bitArray} bitArray Value to hash.
+   * @returns {String} Hex-encoded hash.
+   * @private
    */
-
   hash(bitArray) {
     const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(bitArray));
     return (new Array(64 - hashHex.length).join('0')) + hashHex;
   }
 
-  /*
+  /**
    * Calculate a hash from a hex string
-   * @param String
-   * @returns {String}
+   * @param {String} hexStr Value to hash.
+   * @returns {String} Hex-encoded hash.
+   * @private
    */
-
   hexHash(hexStr) {
     const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(sjcl.codec.hex.toBits(hexStr)));
     return (new Array(64 - hashHex.length).join('0')) + hashHex;
   }
 
-  /*
+  /**
    * Standard hkdf algorithm
-   * @param BitArray ikm
-   * @param BitArray salt
-   * @returns {BitArray}
+   * @param {sjcl.bitArray} ikm Input key material.
+   * @param {sjcl.bitArray} salt Salt value.
+   * @returns {sjcl.bitArray} Strong key material.
+   * @private
    */
-
   computehkdf(ikm, salt) {
     const mac = new sjcl.misc.hmac(salt, sjcl.hash.sha256);
     mac.update(ikm);
@@ -231,15 +244,14 @@ export default class AuthenticationHelper {
     return sjcl.bitArray.clamp(hmac.digest(), 128);
   }
 
-  /*
+  /**
    * Calculates the final hkdf based on computed S value, and computed U value and the key
-   * @param String username
-   * @param String password
-   * @param BigInteger serverBValue
-   * @param BigInteger salt
-   * @returns {BitArray}
+   * @param {String} username Username.
+   * @param {String} password Password.
+   * @param {BigInteger} serverBValue Server B value.
+   * @param {BigInteger} salt Generated salt.
+   * @returns {sjcl.bitArray} Computed HKDF value.
    */
-
   getPasswordAuthenticationKey(username, password, serverBValue, salt) {
     if (serverBValue.mod(this.N).equals(new BigInteger('0', 16))) {
       throw new Error('B cannot be zero.');

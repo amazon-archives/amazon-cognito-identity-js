@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -17,13 +17,15 @@
 
 import CognitoUser from './CognitoUser';
 
+/** @class */
 export default class CognitoUserPool {
   /**
    * Constructs a new CognitoUserPool object
-   * @param data contains the client id and the user pool id
-   * @constructor
+   * @param {object} data Creation options.
+   * @param {string} data.UserPoolId Cognito user pool id.
+   * @param {string} data.ClientId User pool application client id.
+   * @param {int=} data.Paranoia Random number generation paranoia level.
    */
-
   constructor(data) {
     if (data == null || data.UserPoolId == null || data.ClientId == null) {
       throw new Error('Both user pool Id and client Id are required.');
@@ -37,52 +39,49 @@ export default class CognitoUserPool {
   }
 
   /**
-   * Returns the user pool id
-   * @returns {string}
+   * @returns {string} the user pool id
    */
-
   getUserPoolId() {
     return this.userPoolId;
   }
 
   /**
-   * Returns the client id
-   * @returns {string}
+   * @returns {string} the client id
    */
-
   getClientId() {
     return this.clientId;
   }
 
   /**
-   * Returns the paranoia level
-   * @returns {int}
+   * @returns {int} the paranoia level
    */
-
   getParanoia() {
     return this.paranoia;
   }
 
   /**
    * sets paranoia level
-   * @param paranoia
+   * @param {int} paranoia The new paranoia level.
+   * @returns {void}
    */
-
   setParanoia(paranoia) {
     this.paranoia = paranoia;
   }
 
   /**
-   * method for signing up a user
-   * @param username
-   * @param password
-   * @param userAttributes
-   * @param validationData
-   * @param callback
-   *
-   * @returns object containing cognito user and if the user is confirmed or not
+   * @typedef {object} SignUpResult
+   * @property {CognitoUser} user New user.
+   * @property {bool} userConfirmed If the user is already confirmed.
    */
-
+  /**
+   * method for signing up a user
+   * @param {string} username User's username.
+   * @param {string} password Plain-text initial password entered by user.
+   * @param {(AttributeArg[])=} userAttributes New user attributes.
+   * @param {(AttributeArg[])=} validationData Application metadata.
+   * @param {nodeCallback<SignUpResult>} callback Called on error or with the new user.
+   * @returns {void}
+   */
   signUp(username, password, userAttributes, validationData, callback) {
     this.client.makeUnauthenticatedRequest('signUp', {
       ClientId: this.clientId,
@@ -115,7 +114,6 @@ export default class CognitoUserPool {
    *
    * @returns {CognitoUser} the user retrieved from storage
    */
-
   getCurrentUser() {
     const lastUserKey = `CognitoIdentityServiceProvider.${this.clientId}.LastAuthUser`;
     const storage = window.localStorage;

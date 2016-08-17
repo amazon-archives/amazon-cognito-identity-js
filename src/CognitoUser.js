@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -26,13 +26,54 @@ import CognitoUserSession from './CognitoUserSession';
 import DateHelper from './DateHelper';
 import CognitoUserAttribute from './CognitoUserAttribute';
 
+/**
+ * @callback nodeCallback
+ * @template T result
+ * @param {*} err The operation failure reason, or null.
+ * @param {T} result The operation result.
+ */
+
+/**
+ * @callback onFailure
+ * @param {*} err Failure reason.
+ */
+
+/**
+ * @callback onSuccess
+ * @template T result
+ * @param {T} result The operation result.
+ */
+
+/**
+ * @callback mfaRequired
+ * @param {*} details MFA challenge details.
+ */
+
+/**
+ * @callback customChallenge
+ * @param {*} details Custom challenge details.
+ */
+
+/**
+ * @callback inputVerificationCode
+ * @param {*} data Server response.
+ */
+
+/**
+ * @callback authSuccess
+ * @param {CognitoUserSession} session The new session.
+ * @param {bool=} userConfirmationNecessary User must be confirmed.
+ */
+
+
+/** @class */
 export default class CognitoUser {
   /**
    * Constructs a new CognitoUser object
-   * @param data
-   * @constructor
+   * @param {object} data Creation options
+   * @param {string} data.Username The user's username.
+   * @param {CognitoUserPool} data.Pool Pool containing the user.
    */
-
   constructor(data) {
     if (data == null || data.Username == null || data.Pool == null) {
       throw new Error('Username and pool information are required.');
@@ -49,38 +90,31 @@ export default class CognitoUser {
   }
 
   /**
-   * Gets the current session for this user
-   *
-   * @returns {CognitoUserSession}
+   * @returns {CognitoUserSession} the current session for this user
    */
-
   getSignInUserSession() {
     return this.signInUserSession;
   }
 
   /**
-   * Returns the user's username
-   * @returns {string}
+   * @returns {string} the user's username
    */
-
   getUsername() {
     return this.username;
   }
 
   /**
-   * Returns the authentication flow type
-   * @returns {String}
+   * @returns {String} the authentication flow type
    */
-
   getAuthenticationFlowType() {
     return this.authenticationFlowType;
   }
 
   /**
    * sets authentication flow type
-   * @param authenticationFlowType
+   * @param {string} authenticationFlowType New value.
+   * @returns {void}
    */
-
   setAuthenticationFlowType(authenticationFlowType) {
     this.authenticationFlowType = authenticationFlowType;
   }
@@ -88,11 +122,15 @@ export default class CognitoUser {
   /**
    * This is used for authenticating the user. it calls the AuthenticationHelper for SRP related
    * stuff
-   * @param authDetails authentication details, contains the authentication data
-   * @param callback
-   * @returns {CognitoUserSession}
+   * @param {AuthenticationDetails} authDetails Contains the authentication data
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {mfaRequired} callback.mfaRequired MFA code required to continue.
+   * @param {customChallenge} callback.customChallenge
+   *    Custom challenge response required to continue.
+   * @param {authSuccess} callback.onSuccess Called on success with the new session.
+   * @returns {void}
    */
-
   authenticateUser(authDetails, callback) {
     const authenticationHelper = new AuthenticationHelper(
       this.pool.getUserPoolId().split('_')[1],
@@ -237,10 +275,12 @@ export default class CognitoUser {
    * This is used to get a session using device authentication. It is called at the end of user
    * authentication
    *
-   * @param callback
-   * @response error or session
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {authSuccess} callback.onSuccess Called on success with the new session.
+   * @returns {void}
+   * @private
    */
-
   getDeviceResponse(callback) {
     const authenticationHelper = new AuthenticationHelper(
       this.deviceGroupKey,
@@ -312,12 +352,11 @@ export default class CognitoUser {
 
   /**
    * This is used for a certain user to confirm the registration by using a confirmation code
-   * @param confirmationCode
-   * @param forceAliasCreation
-   * @param callback
-   * @returns error or success
+   * @param {string} confirmationCode Code entered by user.
+   * @param {bool} forceAliasCreation Allow migrating from an existing email / phone number.
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
    */
-
   confirmRegistration(confirmationCode, forceAliasCreation, callback) {
     this.client.makeUnauthenticatedRequest('confirmSignUp', {
       ClientId: this.pool.getClientId(),
@@ -334,11 +373,14 @@ export default class CognitoUser {
 
   /**
    * This is used by the user once he has the responses to a custom challenge
-   * @param answerChallenge
-   * @param callback
-   * @returns {CognitoUserSession}
+   * @param {string} answerChallenge The custom challange answer.
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {customChallenge} callback.customChallenge
+   *    Custom challenge response required to continue.
+   * @param {authSuccess} callback.onSuccess Called on success with the new session.
+   * @returns {void}
    */
-
   sendCustomChallengeAnswer(answerChallenge, callback) {
     const challengeResponses = {};
     challengeResponses.USERNAME = this.username;
@@ -369,11 +411,12 @@ export default class CognitoUser {
 
   /**
    * This is used by the user once he has an MFA code
-   * @param confirmationCode
-   * @param callback
-   * @returns {CognitoUserSession}
+   * @param {string} confirmationCode The MFA code entered by the user.
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {authSuccess} callback.onSuccess Called on success with the new session.
+   * @returns {void}
    */
-
   sendMFACode(confirmationCode, callback) {
     const challengeResponses = {};
     challengeResponses.USERNAME = this.username;
@@ -445,12 +488,11 @@ export default class CognitoUser {
 
   /**
    * This is used by an authenticated user to change the current password
-   * @param oldUserPassword
-   * @param newUserPassword
-   * @param callback
-   * @returns error or success
+   * @param {string} oldUserPassword The current password.
+   * @param {string} newUserPassword The requested new password.
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
    */
-
   changePassword(oldUserPassword, newUserPassword, callback) {
     if (!(this.signInUserSession != null && this.signInUserSession.isValid())) {
       return callback(new Error('User is not authenticated'), null);
@@ -471,10 +513,9 @@ export default class CognitoUser {
 
   /**
    * This is used by an authenticated user to enable MFA for himself
-   * @param callback
-   * @returns error or success
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
    */
-
   enableMFA(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -501,10 +542,9 @@ export default class CognitoUser {
 
   /**
    * This is used by an authenticated user to disable MFA for himself
-   * @param callback
-   * @returns error or success
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
    */
-
   disableMFA(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -527,10 +567,9 @@ export default class CognitoUser {
 
   /**
    * This is used by an authenticated user to delete himself
-   * @param callback
-   * @returns error or success
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
    */
-
   deleteUser(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -548,12 +587,14 @@ export default class CognitoUser {
   }
 
   /**
-   * This is used by an authenticated user to change a list of attributes
-   * @param attributes
-   * @param callback
-   * @returns error or success
+   * @typedef {CognitoUserAttribute | { Name:string, Value:string }} AttributeArg
    */
-
+  /**
+   * This is used by an authenticated user to change a list of attributes
+   * @param {AttributeArg[]} attributes A list of the new user attributes.
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
+   */
   updateAttributes(attributes, callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -573,10 +614,9 @@ export default class CognitoUser {
 
   /**
    * This is used by an authenticated user to get a list of attributes
-   * @param callback
-   * @returns error or success
+   * @param {nodeCallback<CognitoUserAttribute[]>} callback Called on success or error.
+   * @returns {void}
    */
-
   getUserAttributes(callback) {
     if (!(this.signInUserSession != null && this.signInUserSession.isValid())) {
       return callback(new Error('User is not authenticated'), null);
@@ -607,11 +647,10 @@ export default class CognitoUser {
 
   /**
    * This is used by an authenticated user to delete a list of attributes
-   * @param attributeList
-   * @param callback
-   * @returns error or success
+   * @param {string[]} attributeList Names of the attributes to delete.
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
    */
-
   deleteAttributes(attributeList, callback) {
     if (!(this.signInUserSession != null && this.signInUserSession.isValid())) {
       return callback(new Error('User is not authenticated'), null);
@@ -631,10 +670,9 @@ export default class CognitoUser {
 
   /**
    * This is used by a user to resend a confirmation code
-   * @param callback
-   * @returns error or success
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
    */
-
   resendConfirmationCode(callback) {
     this.client.makeUnauthenticatedRequest('resendConfirmationCode', {
       ClientId: this.pool.getClientId(),
@@ -651,10 +689,9 @@ export default class CognitoUser {
    * This is used to get a session, either from the session object
    * or from  the local storage, or by using a refresh token
    *
-   * @param callback
-   * @returns error or session
+   * @param {nodeCallback<CognitoUserSession>} callback Called on success or error.
+   * @returns {void}
    */
-
   getSession(callback) {
     if (this.username == null) {
       return callback(new Error('Username is null. Cannot retrieve a new session'), null);
@@ -705,11 +742,10 @@ export default class CognitoUser {
 
   /**
    * This uses the refreshToken to retrieve a new session
-   * @param refreshToken
-   * @param callback
-   * @returns error or new session
+   * @param {CognitoRefreshToken} refreshToken A previous session's refresh token.
+   * @param {nodeCallback<CognitoUserSession>} callback Called on success or error.
+   * @returns {void}
    */
-
   refreshSession(refreshToken, callback) {
     const authParameters = {};
     authParameters.REFRESH_TOKEN = refreshToken.getToken();
@@ -747,8 +783,8 @@ export default class CognitoUser {
 
   /**
    * This is used to save the session tokens to local storage
+   * @returns {void}
    */
-
   cacheTokens() {
     const keyPrefix = `CognitoIdentityServiceProvider.${this.pool.getClientId()}`;
     const idTokenKey = `${keyPrefix}.${this.username}.idToken`;
@@ -766,8 +802,8 @@ export default class CognitoUser {
 
   /**
    * This is used to cache the device key and device group and device password
+   * @returns {void}
    */
-
   cacheDeviceKeyAndPassword() {
     const keyPrefix = `CognitoIdentityServiceProvider.${this.pool.getClientId()}.${this.username}`;
     const deviceKeyKey = `${keyPrefix}.deviceKey`;
@@ -783,8 +819,8 @@ export default class CognitoUser {
 
   /**
    * This is used to get current device key and device group and device password
+   * @returns {void}
    */
-
   getCachedDeviceKeyAndPassword() {
     const keyPrefix = `CognitoIdentityServiceProvider.${this.pool.getClientId()}.${this.username}`;
     const deviceKeyKey = `${keyPrefix}.deviceKey`;
@@ -802,8 +838,8 @@ export default class CognitoUser {
 
   /**
    * This is used to clear the device key info from local storage
+   * @returns {void}
    */
-
   clearCachedDeviceKeyAndPassword() {
     const keyPrefix = `CognitoIdentityServiceProvider.${this.pool.getClientId()}.${this.username}`;
     const deviceKeyKey = `${keyPrefix}.deviceKey`;
@@ -819,8 +855,8 @@ export default class CognitoUser {
 
   /**
    * This is used to clear the session tokens from local storage
+   * @returns {void}
    */
-
   clearCachedTokens() {
     const keyPrefix = `CognitoIdentityServiceProvider.${this.pool.getClientId()}`;
     const idTokenKey = `${keyPrefix}.${this.username}.idToken`;
@@ -838,10 +874,10 @@ export default class CognitoUser {
 
   /**
    * This is used to build a user session from tokens retrieved in the authentication result
-   * @param authResult
-   *
+   * @param {object} authResult Successful auth response from server.
+   * @returns {CognitoUserSession} The new user session.
+   * @private
    */
-
   getCognitoUserSession(authResult) {
     const idToken = new CognitoIdToken(authResult);
     const accessToken = new CognitoAccessToken(authResult);
@@ -858,11 +894,13 @@ export default class CognitoUser {
 
   /**
    * This is used to initiate a forgot password request
-   * @param callback
-   * @returns error or success
-   *
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {inputVerificationCode?} callback.inputVerificationCode
+   *    Optional callback raised instead of onSuccess with response data.
+   * @param {onSuccess<void>?} callback.onSuccess Called on success.
+   * @returns {void}
    */
-
   forgotPassword(callback) {
     this.client.makeUnauthenticatedRequest('forgotPassword', {
       ClientId: this.pool.getClientId(),
@@ -880,13 +918,13 @@ export default class CognitoUser {
 
   /**
    * This is used to confirm a new password using a confirmationCode
-   * @param confirmationCode
-   * @param newPassword
-   * @param callback
-   * @returns error or success
-   *
+   * @param {string} confirmationCode Code entered by user.
+   * @param {string} newPassword Confirm new password.
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {onSuccess<void>} callback.onSuccess Called on success.
+   * @returns {void}
    */
-
   confirmPassword(confirmationCode, newPassword, callback) {
     this.client.makeUnauthenticatedRequest('confirmForgotPassword', {
       ClientId: this.pool.getClientId(),
@@ -903,12 +941,12 @@ export default class CognitoUser {
 
   /**
    * This is used to initiate an attribute confirmation request
-   * @param attributeName
-   * @param callback
-   * @returns error or success
-   *
+   * @param {string} attributeName User attribute that needs confirmation.
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {inputVerificationCode} callback.inputVerificationCode Called on success.
+   * @returns {void}
    */
-
   getAttributeVerificationCode(attributeName, callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -928,13 +966,13 @@ export default class CognitoUser {
 
   /**
    * This is used to confirm an attribute using a confirmation code
-   * @param confirmationCode
-   * @param attributeName
-   * @param callback
-   * @returns error or success
-   *
+   * @param {string} attributeName Attribute being confirmed.
+   * @param {string} confirmationCode Code entered by user.
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {onSuccess<string>} callback.onSuccess Called on success.
+   * @returns {void}
    */
-
   verifyAttribute(attributeName, confirmationCode, callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -953,14 +991,13 @@ export default class CognitoUser {
     return undefined;
   }
 
-
   /**
    * This is used to get the device information using the current device key
-   *
-   * @param callback
-   * @returns error or current device data
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {onSuccess<*>} callback.onSuccess Called on success with device data.
+   * @returns {void}
    */
-
   getDevice(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -980,11 +1017,11 @@ export default class CognitoUser {
 
   /**
    * This is used to forget the current device
-   *
-   * @param callback
-   * @returns error or SUCCESS
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {onSuccess<string>} callback.onSuccess Called on success.
+   * @returns {void}
    */
-
   forgetDevice(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -1008,11 +1045,11 @@ export default class CognitoUser {
 
   /**
    * This is used to set the device status as remembered
-   *
-   * @param callback
-   * @returns error or SUCCESS
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {onSuccess<string>} callback.onSuccess Called on success.
+   * @returns {void}
    */
-
   setDeviceStatusRemembered(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -1033,11 +1070,11 @@ export default class CognitoUser {
 
   /**
    * This is used to set the device status as not remembered
-   *
-   * @param callback
-   * @returns error or SUCCESS
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {onSuccess<string>} callback.onSuccess Called on success.
+   * @returns {void}
    */
-
   setDeviceStatusNotRemembered(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -1059,12 +1096,13 @@ export default class CognitoUser {
   /**
    * This is used to list all devices for a user
    *
-   * @param limit the number of devices returned in a call
-   * @param paginationToken the pagination token in case any was returned before
-   * @param callback
-   * @returns error or device data and pagination token
+   * @param {int} limit the number of devices returned in a call
+   * @param {string} paginationToken the pagination token in case any was returned before
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {onSuccess<*>} callback.onSuccess Called on success with device list.
+   * @returns {void}
    */
-
   listDevices(limit, paginationToken, callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -1085,11 +1123,11 @@ export default class CognitoUser {
 
   /**
    * This is used to globally revoke all tokens issued to a user
-   *
-   * @param callback
-   * @returns error or SUCCESS
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {onSuccess<string>} callback.onSuccess Called on success.
+   * @returns {void}
    */
-
   globalSignOut(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
@@ -1109,9 +1147,8 @@ export default class CognitoUser {
 
   /**
    * This is used for the user to signOut of the application and clear the cached tokens.
-   *
+   * @returns {void}
    */
-
   signOut() {
     this.signInUserSession = null;
     this.clearCachedTokens();

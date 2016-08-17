@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -15,43 +15,39 @@
  * limitations under the License.
  */
 
+/** @class */
 export default class AuthenticationDetails {
   /**
    * Constructs a new AuthenticationDetails object
-   * @param ValidationData {Array=}
-   * @param Username {string}
-   * @param Password {string}
-   * @constructor
+   * @param {object=} data Creation options.
+   * @param {string} data.Username User being authenticated.
+   * @param {string} data.Password Plain-text password to authenticate with.
+   * @param {(AttributeArg[])?} data.ValidationData Application extra metadata.
    */
-  constructor({ ValidationData, Username, Password } = {}) {
+  constructor(data) {
+    const { ValidationData, Username, Password } = data || {};
     this.validationData = ValidationData || [];
     this.username = Username;
     this.password = Password;
   }
 
   /**
-   * Returns the record's username
-   * @returns {string}
+   * @returns {string} the record's username
    */
-
   getUsername() {
     return this.username;
   }
 
   /**
-   * Returns the record's password
-   * @returns {string}
+   * @returns {string} the record's password
    */
-
   getPassword() {
     return this.password;
   }
 
   /**
-   * Returns the record's validationData
-   * @returns {Array}
+   * @returns {Array} the record's validationData
    */
-
   getValidationData() {
     return this.validationData;
   }

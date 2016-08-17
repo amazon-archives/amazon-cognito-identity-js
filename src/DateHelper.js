@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -19,7 +19,11 @@ const monthNames =
   ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const weekNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+/** @class */
 export default class DateHelper {
+  /**
+   * @returns {string} The current time in "ddd MMM D HH:mm:ss UTC YYYY" format.
+   */
   getNowString() {
     const now = new Date();
 
@@ -44,7 +48,7 @@ export default class DateHelper {
 
     const year = now.getUTCFullYear();
 
-        // ddd MMM D HH:mm:ss UTC YYYY
+    // ddd MMM D HH:mm:ss UTC YYYY
     const dateNow = `${weekDay} ${month} ${day} ${hours}:${minutes}:${seconds} UTC ${year}`;
 
     return dateNow;
