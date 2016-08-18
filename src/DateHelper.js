@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -15,44 +15,42 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.DateHelper = (function() {
+const monthNames =
+  ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const weekNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    var DateHelper = function DateHelper() {};
+/** @class */
+export default class DateHelper {
+  /**
+   * @returns {string} The current time in "ddd MMM D HH:mm:ss UTC YYYY" format.
+   */
+  getNowString() {
+    const now = new Date();
 
-    DateHelper.prototype.getNowString = function getSmallAValue() {
-        var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        var weekNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const weekDay = weekNames[now.getUTCDay()];
+    const month = monthNames[now.getUTCMonth()];
+    const day = now.getUTCDate();
 
-        var now = new Date();
+    let hours = now.getUTCHours();
+    if (hours < 10) {
+      hours = `0${hours}`;
+    }
 
-        var weekDay = weekNames[now.getUTCDay()];
-        var month = monthNames[now.getUTCMonth()];
-        var day = now.getUTCDate();
+    let minutes = now.getUTCMinutes();
+    if (minutes < 10) {
+      minutes = `0${minutes}`;
+    }
 
-        var hours = now.getUTCHours();
-        if (hours < 10) {
-            hours = '0' + hours;
-        }
+    let seconds = now.getUTCSeconds();
+    if (seconds < 10) {
+      seconds = `0${seconds}`;
+    }
 
-        var minutes = now.getUTCMinutes();
-        if (minutes < 10) {
-            minutes = '0' + minutes;
-        }
+    const year = now.getUTCFullYear();
 
-        var seconds = now.getUTCSeconds();
-        if (seconds < 10) {
-            seconds = '0' + seconds;
-        }
+    // ddd MMM D HH:mm:ss UTC YYYY
+    const dateNow = `${weekDay} ${month} ${day} ${hours}:${minutes}:${seconds} UTC ${year}`;
 
-        var year = now.getUTCFullYear();
-
-        // ddd MMM D HH:mm:ss UTC YYYY
-        var dateNow = weekDay + ' ' + month + ' ' + day + ' ' + hours + ':' + minutes + ':' + seconds + ' UTC ' + year;
-
-
-        return dateNow;
-    };
-
-    return DateHelper;
-
-})();
+    return dateNow;
+  }
+}

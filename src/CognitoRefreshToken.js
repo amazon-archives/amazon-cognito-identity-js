@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -15,34 +15,21 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoRefreshToken = (function() {
+/** @class */
+export default class CognitoRefreshToken {
+  /**
+   * Constructs a new CognitoRefreshToken object
+   * @param {string=} RefreshToken The JWT refresh token.
+   */
+  constructor({ RefreshToken } = {}) {
+    // Assign object
+    this.token = RefreshToken || '';
+  }
 
-    /**
-     * Constructs a new CognitoRefreshToken object
-     * @param data - contains tokens
-     * @constructor
-     */
-
-    var CognitoRefreshToken = function CognitoRefreshToken(data) {
-        if (!(this instanceof CognitoRefreshToken)) {
-            throw new Error('CognitoRefreshToken constructor was not called with new.');
-        }
-
-        data = data || {};
-
-        // Assign object
-        this.token = data.RefreshToken || '';
-    };
-
-    /**
-     * Returns the record's token.
-     * @returns {string}
-     */
-
-    CognitoRefreshToken.prototype.getToken = function getToken() {
-        return this.token;
-    };
-
-    return CognitoRefreshToken;
-
-})();
+  /**
+   * @returns {string} the record's token.
+   */
+  getToken() {
+    return this.token;
+  }
+}

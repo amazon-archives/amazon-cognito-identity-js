@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -15,45 +15,33 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoIdToken = (function() {
+import * as sjcl from 'sjcl';
 
-    /**
-     * Constructs a new CognitoIdToken object
-     * @param data - contains tokens
-     * @constructor
-     */
+/** @class */
+export default class CognitoIdToken {
+  /**
+   * Constructs a new CognitoIdToken object
+   * @param {string=} IdToken The JWT Id token
+   */
+  constructor({ IdToken } = {}) {
+    // Assign object
+    this.jwtToken = IdToken || '';
+  }
 
-    var CognitoIdToken = function CognitoIdToken(data) {
-        if (!(this instanceof CognitoIdToken)) {
-            throw new Error('CognitoIdToken constructor was not called with new.');
-        }
+  /**
+   * @returns {string} the record's token.
+   */
+  getJwtToken() {
+    return this.jwtToken;
+  }
 
-        data = data || {};
-
-        // Assign object
-        this.jwtToken = data.IdToken || '';
-    };
-
-    /**
-     * Returns the record's token.
-     * @returns {string}
-     */
-
-    CognitoIdToken.prototype.getJwtToken = function getJwtToken() {
-        return this.jwtToken;
-    };
-
-    /**
-     * Returns the token's expiration
-     * @returns {integer}
-     */
-
-    CognitoIdToken.prototype.getExpiration = function getExpiration() {
-        var payload = this.jwtToken.split(".")[1];
-        var expiration = JSON.parse(sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
-        return expiration.exp;
-    };
-
-    return CognitoIdToken;
-
-})();
+  /**
+   * @returns {int} the token's expiration (exp member).
+   */
+  getExpiration() {
+    const payload = this.jwtToken.split('.')[1];
+    const expiration = JSON.parse(
+      sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
+    return expiration.exp;
+  }
+}

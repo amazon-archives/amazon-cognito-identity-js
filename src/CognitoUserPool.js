@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -15,129 +15,121 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool = (function() {
+import { CognitoIdentityServiceProvider } from 'aws-sdk';
+
+import CognitoUser from './CognitoUser';
+
+/** @class */
+export default class CognitoUserPool {
+  /**
+   * Constructs a new CognitoUserPool object
+   * @param {object} data Creation options.
+   * @param {string} data.UserPoolId Cognito user pool id.
+   * @param {string} data.ClientId User pool application client id.
+   * @param {int=} data.Paranoia Random number generation paranoia level.
+   */
+  constructor(data) {
+    if (data == null || data.UserPoolId == null || data.ClientId == null) {
+      throw new Error('Both user pool Id and client Id are required.');
+    }
+
+    this.userPoolId = data.UserPoolId;
+    this.clientId = data.ClientId;
+    this.paranoia = data.Paranoia || 0;
+
+    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19' });
+  }
+
+  /**
+   * @returns {string} the user pool id
+   */
+  getUserPoolId() {
+    return this.userPoolId;
+  }
+
+  /**
+   * @returns {string} the client id
+   */
+  getClientId() {
+    return this.clientId;
+  }
+
+  /**
+   * @returns {int} the paranoia level
+   */
+  getParanoia() {
+    return this.paranoia;
+  }
+
+  /**
+   * sets paranoia level
+   * @param {int} paranoia The new paranoia level.
+   * @returns {void}
+   */
+  setParanoia(paranoia) {
+    this.paranoia = paranoia;
+  }
+
+  /**
+   * @typedef {object} SignUpResult
+   * @property {CognitoUser} user New user.
+   * @property {bool} userConfirmed If the user is already confirmed.
+   */
+  /**
+   * method for signing up a user
+   * @param {string} username User's username.
+   * @param {string} password Plain-text initial password entered by user.
+   * @param {(AttributeArg[])=} userAttributes New user attributes.
+   * @param {(AttributeArg[])=} validationData Application metadata.
+   * @param {nodeCallback<SignUpResult>} callback Called on error or with the new user.
+   * @returns {void}
+   */
+  signUp(username, password, userAttributes, validationData, callback) {
+    this.client.makeUnauthenticatedRequest('signUp', {
+      ClientId: this.clientId,
+      Username: username,
+      Password: password,
+      UserAttributes: userAttributes,
+      ValidationData: validationData,
+    }, (err, data) => {
+      if (err) {
+        return callback(err, null);
+      }
+
+      const cognitoUser = {
+        Username: username,
+        Pool: this,
+      };
+
+      const returnData = {
+        user: new CognitoUser(cognitoUser),
+        userConfirmed: data.UserConfirmed,
+      };
+
+      return callback(null, returnData);
+    });
+  }
 
 
-    /**
-     * Constructs a new CognitoUserPool object
-     * @param data contains the client id and the user pool id
-     * @constructor
-     */
+  /**
+   * method for getting the current user of the application from the local storage
+   *
+   * @returns {CognitoUser} the user retrieved from storage
+   */
+  getCurrentUser() {
+    const lastUserKey = `CognitoIdentityServiceProvider.${this.clientId}.LastAuthUser`;
+    const storage = window.localStorage;
 
-    var CognitoUserPool = function CognitoUserPool(data) {
-        if (!(this instanceof CognitoUserPool)) {
-            throw new Error('CognitoUserPool constructor was not called with new.');
-        }
+    const lastAuthUser = storage.getItem(lastUserKey);
+    if (lastAuthUser) {
+      const cognitoUser = {
+        Username: lastAuthUser,
+        Pool: this,
+      };
 
-        if (data == null || data.UserPoolId == null || data.ClientId == null) {
-            throw new Error('Both user pool Id and client Id are required.');
-        }
+      return new CognitoUser(cognitoUser);
+    }
 
-        this.userPoolId = data.UserPoolId;
-        this.clientId = data.ClientId;
-        this.paranoia = data.Paranoia || 0;
-
-        this.client = new AWSCognito.CognitoIdentityServiceProvider({apiVersion: '2016-04-19'});
-    };
-
-    /**
-     * Returns the user pool id
-     * @returns {string}
-     */
-
-    CognitoUserPool.prototype.getUserPoolId = function getUserPoolId() {
-        return this.userPoolId;
-    };
-
-    /**
-     * Returns the client id
-     * @returns {string}
-     */
-
-    CognitoUserPool.prototype.getClientId = function getClientId() {
-        return this.clientId;
-    };
-
-    /**
-     * Returns the paranoia level
-     * @returns {int}
-     */
-
-    CognitoUserPool.prototype.getParanoia = function getParanoia() {
-        return this.paranoia;
-    };
-
-    /**
-     * sets paranoia level
-     * @param paranoia
-     */
-
-    CognitoUserPool.prototype.setParanoia = function setParanoia(paranoia) {
-        this.paranoia = paranoia;
-    };
-
-    /**
-     * method for signing up a user
-     * @param username
-     * @param password
-     * @param userAttributes
-     * @param validationData
-     * @param callback
-     *
-     * @returns object containing cognito user and if the user is confirmed or not
-     */
-
-    CognitoUserPool.prototype.signUp = function signUp(username, password, userAttributes, validationData, callback) {
-        var self = this;
-        this.client.makeUnauthenticatedRequest('signUp', {
-            ClientId : self.clientId,
-            Username : username,
-            Password : password,
-            UserAttributes : userAttributes,
-            ValidationData : validationData
-        }, function (err, data) {
-            if (err) {
-                return callback(err, null);
-            } else {
-                var cognitoUser = {
-                    Username : username,
-                    Pool : self
-                };
-
-                var returnData = {
-                    user : new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser),
-                    userConfirmed : data.UserConfirmed
-                };
-
-                return callback(null, returnData);
-            }
-        });
-    };
-
-
-     /**
-     * method for getting the current user of the application from the local storage
-     *
-     * @returns {CognitoUser} the user retrieved from storage
-     */
-
-    CognitoUserPool.prototype.getCurrentUser = function getCurrentUser() {
-        var lastUserKey = 'CognitoIdentityServiceProvider.' + this.clientId + '.LastAuthUser';
-        var storage = window.localStorage;
-
-        var lastAuthUser = storage.getItem(lastUserKey);
-        if (lastAuthUser) {
-            var cognitoUser = {
-                Username : lastAuthUser,
-                Pool : this
-            };
-
-            return new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(cognitoUser);
-        } else {
-            return null;
-        }
-    };
-
-    return CognitoUserPool;
-
-})();
+    return null;
+  }
+}

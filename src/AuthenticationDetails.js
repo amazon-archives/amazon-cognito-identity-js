@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -15,54 +15,40 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails =  (function() {
+/** @class */
+export default class AuthenticationDetails {
+  /**
+   * Constructs a new AuthenticationDetails object
+   * @param {object=} data Creation options.
+   * @param {string} data.Username User being authenticated.
+   * @param {string} data.Password Plain-text password to authenticate with.
+   * @param {(AttributeArg[])?} data.ValidationData Application extra metadata.
+   */
+  constructor(data) {
+    const { ValidationData, Username, Password } = data || {};
+    this.validationData = ValidationData || [];
+    this.username = Username;
+    this.password = Password;
+  }
 
-    /**
-     * Constructs a new AuthenticationDetails object
-     * @param data - contains username, password, and a map of validation data
-     * @constructor
-     */
+  /**
+   * @returns {string} the record's username
+   */
+  getUsername() {
+    return this.username;
+  }
 
-    var AuthenticationDetails = function AuthenticationDetails(data) {
-        if (!(this instanceof AuthenticationDetails)) {
-            throw new Error('AuthenticationDetails constructor was not called with new.');
-        }
+  /**
+   * @returns {string} the record's password
+   */
+  getPassword() {
+    return this.password;
+  }
 
-        data = data || {};
-
-        // Assign object data
-        this.validationData = data.ValidationData || [];
-        this.username = data.Username;
-        this.password = data.Password;
-    };
-
-    /**
-     * Returns the record's username
-     * @returns {string}
-     */
-
-    AuthenticationDetails.prototype.getUsername = function getUsername() {
-        return this.username;
-    };
-
-    /**
-     * Returns the record's password
-     * @returns {string}
-     */
-
-    AuthenticationDetails.prototype.getPassword = function getPassword() {
-        return this.password;
-    };
-
-    /**
-     * Returns the record's validationData
-     * @returns {Array}
-     */
-
-    AuthenticationDetails.prototype.getValidationData = function getValidationData() {
-        return this.validationData;
-    };
-
-    return AuthenticationDetails;
-
-})();
+  /**
+   * @returns {Array} the record's validationData
+   */
+  getValidationData() {
+    return this.validationData;
+  }
+}

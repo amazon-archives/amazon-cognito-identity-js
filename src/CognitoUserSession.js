@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2016 Amazon.com,
  * Inc. or its affiliates. All Rights Reserved.
  *
@@ -15,67 +15,53 @@
  * limitations under the License.
  */
 
-AWSCognito.CognitoIdentityServiceProvider.CognitoUserSession = (function() {
+/** @class */
+export default class CognitoUserSession {
+  /**
+   * Constructs a new CognitoUserSession object
+   * @param {string} IdToken The session's Id token.
+   * @param {string=} RefreshToken The session's refresh token.
+   * @param {string} AccessToken The session's access token.
+   */
+  constructor({ IdToken, RefreshToken, AccessToken } = {}) {
+    if (AccessToken == null || IdToken == null) {
+      throw new Error('Id token and Access Token must be present.');
+    }
 
-    /**
-     * Constructs a new CognitoUserSession object
-     * @param data - contains IdToken, RefreshToken, and an AccessToken
-     * @constructor
-     */
+    this.idToken = IdToken;
+    this.refreshToken = RefreshToken;
+    this.accessToken = AccessToken;
+  }
 
-    var CognitoUserSession = function CognitoUserSession(data) {
-        if (!(this instanceof CognitoUserSession)) {
-            throw new Error('CognitoUserSession constructor was not called with new.');
-        }
+  /**
+   * @returns {CognitoIdToken} the session's Id token
+   */
+  getIdToken() {
+    return this.idToken;
+  }
 
-        data = data || {};
-        if (data.AccessToken == null || data.IdToken == null) {
-            throw new Error('Id token and Access Token must be present.');
-        }
+  /**
+   * @returns {CognitoRefreshToken} the session's refresh token
+   */
+  getRefreshToken() {
+    return this.refreshToken;
+  }
 
-        this.idToken = data.IdToken;
-        this.refreshToken = data.RefreshToken;
-        this.accessToken = data.AccessToken;
-    };
+  /**
+   * @returns {CognitoAccessToken} the session's access token
+   */
+  getAccessToken() {
+    return this.accessToken;
+  }
 
-    /**
-     * Returns the session's Id token
-     * @returns {CognitoIdToken}
-     */
+  /**
+   * Checks to see if the session is still valid based on session expiry information found
+   * in tokens and the current time
+   * @returns {boolean} if the session is still valid
+   */
+  isValid() {
+    const now = Math.floor(new Date() / 1000);
 
-    CognitoUserSession.prototype.getIdToken = function getIdToken() {
-        return this.idToken;
-    };
-
-    /**
-     * Returns the session's refresh token
-     * @returns {CognitoRefreshToken}
-     */
-
-    CognitoUserSession.prototype.getRefreshToken = function getRefreshToken() {
-        return this.refreshToken;
-    };
-
-    /**
-     * Returns the session's access token
-     * @returns {CognitoAccessToken}
-     */
-
-    CognitoUserSession.prototype.getAccessToken = function getAccessToken() {
-        return this.accessToken;
-    };
-
-    /**
-     * Checks to see if the session is still valid
-     * @returns {boolean} if the session is still valid based on session expiry information found in tokens and the current time
-     */
-
-    CognitoUserSession.prototype.isValid = function isValid() {
-        var now = Math.floor(new Date() / 1000);
-
-        return now < this.accessToken.getExpiration() && now < this.idToken.getExpiration();
-    };
-
-    return CognitoUserSession;
-
-})();
+    return now < this.accessToken.getExpiration() && now < this.idToken.getExpiration();
+  }
+}
