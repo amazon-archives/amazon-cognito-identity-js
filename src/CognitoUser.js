@@ -232,9 +232,9 @@ export default class CognitoUser {
           return callback.onSuccess(this.signInUserSession);
         }
 
-        // const deviceStuff = authenticationHelper.generateHashDevice(
-        //   dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey,
-        //   dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
+        const deviceStuff = authenticationHelper.generateHashDevice(
+           dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey,
+           dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
         const deviceSecretVerifierConfig = {
           Salt: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
@@ -447,9 +447,9 @@ export default class CognitoUser {
       const authenticationHelper = new AuthenticationHelper(
         this.pool.getUserPoolId().split('_')[1],
         this.pool.getParanoia());
-      // const deviceStuff = authenticationHelper.generateHashDevice(
-      //   dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey,
-      //   dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
+        const deviceStuff = authenticationHelper.generateHashDevice(
+          dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey,
+          dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
       const deviceSecretVerifierConfig = {
         Salt: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
