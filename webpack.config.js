@@ -28,16 +28,22 @@ module.exports = {
   },
   devtool: 'source-map',
   externals: {
-    // Not in documentation, see: thttps://github.com/webpack/webpack/tree/master/examples/externals
+    // This umd context config isn't in configuration documentation, but see example:
+    // https://github.com/webpack/webpack/tree/master/examples/externals
     'aws-sdk': {
       root: 'AWSCognito',
-      commonjs2: 'aws-sdk',
-      commonjs: 'aws-sdk',
-      amd: 'aws-sdk'
+      commonjs2: true,
+      commonjs: true,
+      amd: true
     },
     // Exclude 3rd-party code from the bundle.
     sjcl: true,
-    jsbn: true
+    jsbn: {
+      root: 'window', // non-npm jsbn exports to global
+      commonjs2: true,
+      commonjs: true,
+      amd: true
+    }
   },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),

@@ -47,7 +47,7 @@
     "webpack": "^1.13.1"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "webpack -p",
     "doc": "jsdoc src -d docs",
     "lint": "eslint src"
   },
