@@ -43,6 +43,8 @@ The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applica
     
 </pre>
 
+Alternatively, you can use webpack to manage your dependencies.
+
 ## Usage
 
 **Use case 1.** Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
@@ -505,6 +507,7 @@ or by calling the object method:
 
 *  Whats new
 
+   * Webpack support.
    * Support for Custom authentication flows. Developes can implement custom authentication flows around Cognito Your User Pools. See developer documentation for details.
    * Devices support in User Pools. Users can remember devices and skip MFA verification for remebered devices. 
    * Scopes to control permissions for attributes in a User Pool.  
