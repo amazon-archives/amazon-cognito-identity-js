@@ -1,170 +1,49 @@
 # Amazon Cognito Identity SDK for JavaScript
 
-You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps.
-Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of
-millions of users, so you don't have to worry about building, securing, and scaling a solution to
-handle user management and authentication.
+You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps. Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of millions of users, so you don't have to worry about building, securing, and scaling a solution to handle user management and authentication.
 
-We welcome developer feedback on this project. You can reach us by creating an issue on the GitHub
-repository or posting to the Amazon Cognito Identity forums and the below blog post:
+**Developer Preview:** We welcome developer feedback on this project. You can reach us by creating an issue on the 
+GitHub repository or posting to the Amazon Cognito Identity forums and the below blog post:
 * https://github.com/aws/amazon-cognito-identity-js
 * https://forums.aws.amazon.com/forum.jspa?forumID=173
 * http://mobile.awsblog.com/post/Tx2O14ZY8A5LFHT/Accessing-Your-User-Pools-using-the-Amazon-Cognito-Identity-SDK-for-JavaScript
 
 Introduction
 ============
-The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applications to sign-up
-users, authenticate users, view, delete, and update user attributes within the Amazon Cognito
-Identity service. Other functionality includes password changes for authenticated users and
-initiating and completing forgot password flows for unauthenticated users.
+The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applications to sign-up users, authenticate users, view, delete, and update user attributes within the Amazon Cognito Identity service. Other functionality includes password changes for authenticated users and initiating and completing forgot password flows for unauthenticated users.
 
-Setup
-=====
+## Setup
 
-The Amazon Cognito Identity SDK for JavaScript depends on:
+1. Create an app for your user pool. Note that the generate client secret box must be **unchecked** because the JavaScript SDK doesn't support apps that have a client secret.
 
-1. The `CognitoIdentityServiceProvider` service from the [AWS SDK for JavaScript](https://github.com/aws/aws-sdk-js)
+2. Download and include the Amazon Cognito AWS SDK for JavaScript:
+  * [/dist/aws-cognito-sdk.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/aws-cognito-sdk.min.js)
+  
+   Note that the Amazon Cognito AWS SDK for JavaScript is just a slimmed down version of the AWS Javascript SDK namespaced as AWSCognito instead of AWS. It references only the Amazon Cognito Identity service.
 
-2. `BigInteger` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/)
+3. Download and include the Amazon Cognito Identity SDK for JavaScript:
+  * [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
 
-3. The [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
+4. Include the JavaScript BN library for BigInteger computations:
+  * [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/)
 
-There are two ways to install the Amazon Cognito Identity SDK for JavaScript and its dependencies,
-depending on your project setup and experience with modern JavaScript build tools:
+5. Include the Stanford Javascript Crypto Library:
+  * [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
 
-* Download each JavaScript library and include them in your HTML, or
+6. Optionally, download and include the AWS JavaScript SDK in order to use other AWS services.
+  * http://aws.amazon.com/sdk-for-browser/
 
-* Install the dependencies with npm and use a bundler like webpack.
+<pre class="prettyprint">
+    &lt;script src="/path/to/jsbn.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/jsbn2.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/sjcl.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/aws-cognito-sdk.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/amazon-cognito-identity.min.js"&gt;&lt;/script&gt;
+    &lt;script src="/path/to/aws-sdk-2.3.5.js"&gt;&lt;/script&gt;
+    
+</pre>
 
-## Install using seperate JavaScript files
-
-This method is simpler and does not require additional tools, but may have worse performance due to
-the browser having to download multiple files.
-
-Download each of the following JavaScript files for the required libraries and place them in your
-project:
-
-1. The Amazon Cognito AWS SDK for JavaScript, from
-   [/dist/aws-cognito-sdk.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/aws-cognito-sdk.min.js)
-
-   Note that the Amazon Cognito AWS SDK for JavaScript is just a slimmed down version of the AWS
-   Javascript SDK namespaced as `AWSCognito` instead of `AWS`. It references only the Amazon
-   Cognito Identity service.
- 
-3. The Amazon Cognito Identity SDK for JavaScript, from
-   [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
-
-4. `jsbn.js` and `jsbn2.js` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/)
-
-5. `sjcl.js` from the [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
-
-   Use the build from GitHub, rather than the one linked from the library's homepage, as the latter
-   file is out-of-date and is missing required methods.
-
-Optionally, to use other AWS services, include a build of the [AWS SDK for JavaScript](http://aws.amazon.com/sdk-for-browser/).
-
-Include all of the files in your HTML page before calling any Amazon Cognito Identity SDK APIs:
-
-```html
-    <script src="/path/to/jsbn.js"></script>
-    <script src="/path/to/jsbn2.js"></script>
-    <script src="/path/to/sjcl.js"></script>
-    <script src="/path/to/aws-cognito-sdk.min.js"></script>
-    <script src="/path/to/amazon-cognito-identity.min.js"></script>
-    <script src="/path/to/aws-sdk-2.3.5.js"></script>
-```
-
-## Using NPM and Webpack
-
-* Install [Node.js](https://nodejs.org) on your development machine (this will not be needed on
-  your server.)
-
-* In your project add a `package.json` with at least the following contents:
-
-  ```json
-  {
-    "private": true,
-    "scripts": {
-      "build": "webpack"
-    }
-  }
-  ```
-
-* Install `webpack` into your project with `npm` (Node Package Manager), which is installed with
-  Node.js: 
-
-  ```
-  > npm install --save-dev webpack
-  ```
-
-* Install the Amazon Cognito Identity SDK for JavaScript, and its dependencies:
-
-  ```
-  > npm install --save amazon-cognito-identity-js aws-sdk jsbn sjcl
-  ```
-
-* These will add a `node_modules` directory containing these tools and dependencies into your
-  project, you will probably want to exclude this directory from source control. Adding the `--save`
-  parameters will update the `package.json` file with instructions on what should be installed, so
-  you can simply call `npm install` without any parameters to recreate this folder later.
-
-* Create the configuration file for `webpack`, named `webpack.config.js`:
-
-  ```js
-  // If you wish to use a custom build of the AWS SDK for JavaScript, put the relative path to it
-  // here, starting with `./`, eg `./vendor/my-aws-sdk-build.js`.
-  // This build must include the Cognito Identity Service Provider service.
-  var AWS_SDK_BUNDLE = 'aws-sdk/dist/aws-sdk.min.js';
-
-  module.exports = {
-    // The entry module that requires or imports the rest of your project:
-    entry: 'src/entry.js',
-    output: {
-      // Place output files in `./dist/my-app.js`
-      path: 'dist'
-      filename: 'my-app.js'
-    },
-    // The current version of the AWS SDK for JavaScript does not work without extra configuration
-    // under webpack, see https://github.com/aws/aws-sdk-js/issues/603.
-    // This configuration uses the packaged output file as it is simple, see the issue for other
-    // options with different tradeoffs.
-    resolve: {
-      alias: {
-        'aws-sdk$': AWS_SDK_BUNDLE
-      }
-    },
-    module: {
-      noParse: /aws-sdk/,
-      loaders: [
-        {
-          test: require.resolve(AWS_SDK_BUNDLE),
-          loader: 'expose?AWS'
-        }
-      ]
-    }
-  };
-  ```
-
-  Webpack expects your source files to be structured as CommonJS modules, importing their
-  dependencies with `var module = require(module_name);`, and exporting their definitions with
-  `exports.export_name = some_value;` or `module.exports = some_module_value;`, and any other
-  definitions not otherwise made available (e.g. by adding to `window`) will not be visible to other
-  files.
-
-## Configuration
-
-The Amazon Cognito Identity SDK for JavaScript requires three configuration values from your AWS
-Account in order to access your Cognito User Pool:
-
-* The AWS region in which the User Pool was created, e.g. `us-east-1`
-* The User Pool Id, e.g. `us-east-1_aB12cDe34`
-* A User Pool App Client Id, e.g. `7ghr5379orhbo88d52vphda6s9`
-  * When creating the App, the generate client secret box must be **unchecked** because the
-    JavaScript SDK doesn't support apps that have a client secret.
-
-The [AWS Console for Cognito User Pools](https://console.aws.amazon.com/cognito/users/) can be used to get or create these values.
-
-If you will be using Cognito Federated Identity to provide access to your AWS resources or Cognito Sync you will also need the Id of a Cognito Identity Pool that will accept logins from the above Cognito User Pool and App, i.e. `us-east-1:85156295-afa8-482c-8933-1371f8b3b145`.
+Alternatively, you can use webpack to manage your dependencies.
 
 ## Usage
 
