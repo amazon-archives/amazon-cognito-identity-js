@@ -2,7 +2,7 @@
 
 You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps. Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of millions of users, so you don't have to worry about building, securing, and scaling a solution to handle user management and authentication.
 
-**Developer Preview:** We welcome developer feedback on this project. You can reach us by creating an issue on the 
+We welcome developer feedback on this project. You can reach us by creating an issue on the 
 GitHub repository or posting to the Amazon Cognito Identity forums and the below blog post:
 * https://github.com/aws/amazon-cognito-identity-js
 * https://forums.aws.amazon.com/forum.jspa?forumID=173
