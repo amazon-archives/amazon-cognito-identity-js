@@ -17,7 +17,6 @@
 
 import * as sjcl from 'sjcl';
 import { BigInteger } from 'jsbn';
-import { CognitoIdentityServiceProvider } from 'aws-sdk';
 
 import AuthenticationHelper from './AuthenticationHelper';
 import CognitoAccessToken from './CognitoAccessToken';
@@ -84,7 +83,7 @@ export default class CognitoUser {
     this.pool = data.Pool;
     this.Session = null;
 
-    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19' });
+    this.client = data.Pool.client;
 
     this.signInUserSession = null;
     this.authenticationFlowType = 'USER_SRP_AUTH';
