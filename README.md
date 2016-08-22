@@ -34,7 +34,7 @@ depending on your project setup and experience with modern JavaScript build tool
 
 * Download each JavaScript library and include them in your HTML, or
 
-* UnInstall the dependencies with npm and use a bundler like webpack.
+* Install the dependencies with npm and use a bundler like webpack.
 
 ## Install using seperate JavaScript files
 
@@ -125,9 +125,9 @@ Include all of the files in your HTML page before calling any Amazon Cognito Ide
       filename: 'my-app.js'
     },
     // The current version of the AWS SDK for JavaScript does not work without extra configuration
-    // under webpack, this configuration uses the packaged output file with some workarounds, but
-    // as it is simple, but there are there other options with different tradeoffs.
-    // See https://github.com/aws/aws-sdk-js/issues/603
+    // under webpack, see https://github.com/aws/aws-sdk-js/issues/603.
+    // This configuration uses the packaged output file as it is simple, see the issue for other
+    // options with different tradeoffs.
     resolve: {
       alias: {
         'aws-sdk$': AWS_SDK_BUNDLE
@@ -149,8 +149,7 @@ Include all of the files in your HTML page before calling any Amazon Cognito Ide
   dependencies with `var module = require(module_name);`, and exporting their definitions with
   `exports.export_name = some_value;` or `module.exports = some_module_value;`, and any other
   definitions not otherwise made available (e.g. by adding to `window`) will not be visible to other
-  files. You can use various configuration options of webpack to 
- 
+  files.
 
 ## Configuration
 
