@@ -32,17 +32,17 @@ module.exports = {
     // https://github.com/webpack/webpack/tree/master/examples/externals
     'aws-sdk': {
       root: 'AWSCognito',
-      commonjs2: true,
-      commonjs: true,
-      amd: true
+      commonjs2: 'aws-sdk',
+      commonjs: 'aws-sdk',
+      amd: 'aws-sdk'
     },
     // Exclude 3rd-party code from the bundle.
     sjcl: true,
     jsbn: {
       root: 'window', // non-npm jsbn exports to global
-      commonjs2: true,
-      commonjs: true,
-      amd: true
+      commonjs2: 'jsbn',
+      commonjs: 'jsbn',
+      amd: 'jsbn'
     }
   },
   plugins: [
