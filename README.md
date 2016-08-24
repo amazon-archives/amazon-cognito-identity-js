@@ -307,7 +307,7 @@ If you will be using Cognito Federated Identity to provide access to your AWS re
     var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: function (result) {
-            console.log('access token + ' + result.getAccessToken().getJwtToken());
+            console.log('access token + ' + result.getIdToken().getJwtToken());
 
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                 IdentityPoolId : '...' // your identity pool id here
