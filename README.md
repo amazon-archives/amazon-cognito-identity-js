@@ -670,7 +670,7 @@ or by calling the object method:
 **v1.1.0:**
 
 * What has changed
-   * Fixed a bug in base64 parsing.
+   * Fixed a bug in token parsing.
 
 **v1.0.0:**
 * GA release. In this GA service launch, the following new features have been added to Amazon Cognito Your User Pools. 
