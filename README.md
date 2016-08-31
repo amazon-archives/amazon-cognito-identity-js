@@ -197,10 +197,9 @@ migration.
 
 ## Configuration
 
-The Amazon Cognito Identity SDK for JavaScript requires three configuration values from your AWS
+The Amazon Cognito Identity SDK for JavaScript requires two configuration values from your AWS
 Account in order to access your Cognito User Pool:
 
-* The AWS region in which the User Pool was created, e.g. `us-east-1`
 * The User Pool Id, e.g. `us-east-1_aB12cDe34`
 * A User Pool App Client Id, e.g. `7ghr5379orhbo88d52vphda6s9`
   * When creating the App, the generate client secret box must be **unchecked** because the
@@ -216,8 +215,6 @@ If you will be using Cognito Federated Identity to provide access to your AWS re
 
 ```javascript
 
-    AWSCognito.config.region = 'us-east-1'; //This is required to derive the endpoint
-        
     var poolData = { 
         UserPoolId : '...', // Your user pool id here
         ClientId : '...' // Your client id here
