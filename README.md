@@ -654,20 +654,17 @@ or by calling the object method:
 
 ## Change Log
 
-**Next**
-
-* What's new
-
-  * Nothing yet
+**v1.2.0:**
 
 * What has changed
 
-  * Removed moment.js as a dependency.
+  * Derived the region from the user pool id so the region doesn't need to be configured anymore.
 
 **v1.1.0:**
 
 * What has changed
    * Fixed a bug in token parsing.
+   * Removed moment.js as a dependency.
 
 **v1.0.0:**
 * GA release. In this GA service launch, the following new features have been added to Amazon Cognito Your User Pools. 
