@@ -29,15 +29,20 @@ export default class CognitoUserPool {
    * @param {int=} data.Paranoia Random number generation paranoia level.
    */
   constructor(data) {
-    if (data == null || data.UserPoolId == null || data.ClientId == null) {
-      throw new Error('Both user pool Id and client Id are required.');
+    const { UserPoolId, ClientId, Paranoia } = data || {};
+    if (!UserPoolId || !ClientId) {
+      throw new Error('Both UserPoolId and ClientId are required.');
     }
+    if (!/^[\w-]+_.+$/.test(UserPoolId)) {
+      throw new Error('Invalid UserPoolId format.');
+    }
+    const region = UserPoolId.split('_')[0];
 
-    this.userPoolId = data.UserPoolId;
-    this.clientId = data.ClientId;
-    this.paranoia = data.Paranoia || 0;
+    this.userPoolId = UserPoolId;
+    this.clientId = ClientId;
+    this.paranoia = Paranoia || 0;
 
-    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19' });
+    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19', region });
   }
 
   /**
