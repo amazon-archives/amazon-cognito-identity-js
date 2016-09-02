@@ -211,6 +211,23 @@ If you will be using Cognito Federated Identity to provide access to your AWS re
 
 ## Usage
 
+The usage examples below use the unqualified names for types in the Amazon Cognito Identity SDK for JavaScript. Remember to import or qualify access to any of these types:
+
+    ```javascript
+    // When using loose Javascript files:
+    var CognitoUserPool = AmazonCognitoIdentity.CognitoUserPool;
+
+    // Wnder the original name:
+    var CognitoUserPool = AWSCognito.CognitoIndentityServiceProvider.CognitoUserPool;
+
+    // Modules, e.g. Webpack:
+    var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
+    var CognitoUserPool = AmazonCognitoIdentity.CognitoUserPool;
+
+    // ES Modules, e.g. transpiling with Babel
+    import { CognitoUserPool, CognitoUserAttribute, CognitoUser } from 'amazon-cognito-identity-js';
+    ```
+
 **Use case 1.** Registering a user with the application. One needs to create a CognitoUserPool object by providing a UserPoolId and a ClientId and signing up by using a username, password, attribute list, and validation data.
 
 ```javascript
