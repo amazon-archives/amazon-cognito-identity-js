@@ -217,7 +217,7 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
     // When using loose Javascript files:
     var CognitoUserPool = AmazonCognitoIdentity.CognitoUserPool;
 
-    // Wnder the original name:
+    // Under the original name:
     var CognitoUserPool = AWSCognito.CognitoIndentityServiceProvider.CognitoUserPool;
 
     // Modules, e.g. Webpack:
