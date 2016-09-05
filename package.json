@@ -59,6 +59,7 @@
   "ava": {
     "require": [
       "babel-register"
-    ]
+    ],
+    "timeout": "3s"
   }
 }
