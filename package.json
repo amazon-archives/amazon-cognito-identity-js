@@ -28,6 +28,17 @@
     "cognito",
     "identity"
   ],
+  "scripts": {
+    "build": "webpack -p",
+    "doc": "jsdoc src -d docs",
+    "lint": "eslint src"
+  },
+  "main": "dist/amazon-cognito-identity.min.js",
+  "dependencies": {
+    "aws-sdk": "^2.6.0",
+    "jsbn": "^0.1.0",
+    "sjcl": "^1.0.3"
+  },
   "devDependencies": {
     "babel-core": "^6.13.2",
     "babel-loader": "^6.2.4",
@@ -36,24 +47,7 @@
     "eslint-config-airbnb-base": "^5.0.2",
     "eslint-import-resolver-webpack": "^0.5.1",
     "eslint-plugin-import": "^1.13.0",
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-contrib-qunit": "^0.5.2",
-    "grunt-contrib-uglify": "^0.6.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-jsdoc": "^0.5.7",
     "jsdoc": "^3.4.0",
-    "qunitjs": "^1.15.0",
     "webpack": "^1.13.1"
-  },
-  "scripts": {
-    "build": "webpack -p",
-    "doc": "jsdoc src -d docs",
-    "lint": "eslint src"
-  },
-  "main": "dist/amazon-cognito-identity.min.js",
-  "peerDependencies": {
-    "jsbn": "^0.1.0",
-    "sjcl": "^1.0.3"
   }
 }

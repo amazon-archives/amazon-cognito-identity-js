@@ -30,16 +30,16 @@ module.exports = {
   externals: {
     // This umd context config isn't in configuration documentation, but see example:
     // https://github.com/webpack/webpack/tree/master/examples/externals
-    'aws-sdk': {
-      root: 'AWSCognito',
-      commonjs2: 'aws-sdk',
-      commonjs: 'aws-sdk',
-      amd: 'aws-sdk'
+    'aws-sdk/clients/cognitoidentityserviceprovider': {
+      root: ['AWSCognito', 'CognitoIdentityServiceProvider'],
+      commonjs2: 'aws-sdk/clients/cognitoidentityserviceprovider',
+      commonjs: 'aws-sdk/clients/cognitoidentityserviceprovider',
+      amd: 'aws-sdk/clients/cognitoidentityserviceprovider'
     },
     // Exclude 3rd-party code from the bundle.
     sjcl: true,
     jsbn: {
-      root: 'window', // non-npm jsbn exports to global
+      root: [], // non-npm jsbn exports to global
       commonjs2: 'jsbn',
       commonjs: 'jsbn',
       amd: 'jsbn'
