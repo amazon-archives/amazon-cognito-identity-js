@@ -53,7 +53,7 @@ project:
 5. `sjcl.js` from the [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
 
    Use the build from GitHub, rather than the one linked from the library's homepage, as the latter
-   file is out-of-date and is missing required methods.
+   file is out-of-date and is missing required methods. [This version](https://raw.githubusercontent.com/bitwiseshiftleft/sjcl/master/sjcl.js) contains all the necessary functions.
 
 Optionally, to use other AWS services, include a build of the [AWS SDK for JavaScript](http://aws.amazon.com/sdk-for-browser/).
 
