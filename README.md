@@ -461,7 +461,9 @@ you can make inputVerificationCode call a no-op
         onFailure: function(err) {
             alert(err);
         },
-        inputVerificationCode() {
+        //Optional automatic callback
+        inputVerificationCode: function(data) {
+            console.log('Code sent to: ' + data);
             var verificationCode = prompt('Please input verification code ' ,'');
             var newPassword = prompt('Enter new password ' ,'');
             cognitoUser.confirmPassword(verificationCode, newPassword, this);
