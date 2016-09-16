@@ -7,7 +7,7 @@ import {
   requireDefaultWithModuleMocks,
   requestFailsWith,
   requestSucceedsWith,
-} from './_testHelpers';
+} from './_helpers.test';
 
 class MockUserPool {
 }

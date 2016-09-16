@@ -2,3 +2,7 @@
 npm-debug.log
 
 /docs/
+
+/.nyc_output/
+/coverage/
+

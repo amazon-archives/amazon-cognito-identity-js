@@ -1,20 +1,18 @@
 /* eslint-disable require-jsdoc */
 
 import test from 'ava';
-import mockRequire from 'mock-require';
 
-import {
-  requireDefaultWithModuleMocks,
-  requestFailsWith,
-  requestSucceedsWith,
-  stubClient,
-} from './_testHelpers';
+import { MockClient, requireDefaultWithModuleMocks, stubClient } from './_helpers.test';
 
 const USERNAME = 'some-username';
 const CLIENT_ID = 'some-client-id';
 const ACCESS_TOKEN = 'some-access-token';
 
 class MockUserPool {
+  constructor() {
+    this.client = new MockClient();
+  }
+
   getClientId() { return CLIENT_ID; }
 }
 

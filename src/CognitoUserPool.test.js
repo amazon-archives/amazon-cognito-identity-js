@@ -9,7 +9,7 @@ import {
   stubClient,
   requestFailsWith,
   requestSucceedsWith,
-} from './_testHelpers';
+} from './_helpers.test';
 
 class MockCognitoUser {
   constructor({ Username, Pool }) {
@@ -24,11 +24,12 @@ function requireCognitoUserPool() {
   });
 }
 
-const POOL_DATA = { UserPoolId: '123', ClientId: 'abc' };
+const UserPoolId = 'xx-nowhere1_SomeUserPool'; // Constructor validates the format.
+const ClientId = 'some-client-id';
 
 function createPool(extraData = {}) {
   const CognitoUserPool = requireCognitoUserPool();
-  return new CognitoUserPool(Object.assign({}, POOL_DATA, extraData));
+  return new CognitoUserPool(Object.assign({}, { UserPoolId, ClientId }, extraData));
 }
 
 function createPoolWithClient(...requestConfigs) {
@@ -47,13 +48,13 @@ constructorThrowsRequired.title = (originalTitle, data) => (
 test(constructorThrowsRequired, null);
 test(constructorThrowsRequired, {});
 test(constructorThrowsRequired, { UserPoolId: null, ClientId: null });
-test(constructorThrowsRequired, { UserPoolId: '123', ClientId: null });
-test(constructorThrowsRequired, { UserPoolId: null, ClientId: 'abc' });
+test(constructorThrowsRequired, { UserPoolId, ClientId: null });
+test(constructorThrowsRequired, { UserPoolId: null, ClientId });
 test('constructor => creates instance with expected values', t => {
   const pool = createPool();
   t.truthy(pool);
-  t.is(pool.getUserPoolId(), POOL_DATA.UserPoolId);
-  t.is(pool.getClientId(), POOL_DATA.ClientId);
+  t.is(pool.getUserPoolId(), UserPoolId);
+  t.is(pool.getClientId(), ClientId);
   t.is(pool.getParanoia(), 0);
   t.true(pool.client instanceof MockClient);
 });
