@@ -50,6 +50,13 @@ test(constructorThrowsRequired, {});
 test(constructorThrowsRequired, { UserPoolId: null, ClientId: null });
 test(constructorThrowsRequired, { UserPoolId, ClientId: null });
 test(constructorThrowsRequired, { UserPoolId: null, ClientId });
+
+test('constructor :: invalid UserPoolId => throws with "Invalid UserPoolId"', t => {
+  const CognitoUserPool = requireCognitoUserPool();
+  const data = { UserPoolId: 'invalid-user-pool-id', ClientId };
+  t.throws(() => new CognitoUserPool(data), /Invalid UserPoolId/);
+});
+
 test('constructor => creates instance with expected values', t => {
   const pool = createPool();
   t.truthy(pool);
