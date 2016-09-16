@@ -33,8 +33,10 @@
     "build": "webpack -p",
     "doc": "jsdoc src -d docs",
     "lint": "eslint src",
-    "test": "cross-env BABEL_ENV=nyc nyc ava",
-    "coverage": "nyc report --reporter=lcov"
+    "test": "ava",
+    "coverage": "cross-env BABEL_ENV=nyc nyc --reporter=text-summary --reporter=text --reporter=lcov ava",
+    "coverage:test": "cross-env BABEL_ENV=nyc nyc ava",
+    "coverage:report": "nyc report --reporter=lcov"
   },
   "main": "dist/amazon-cognito-identity.min.js",
   "dependencies": {
