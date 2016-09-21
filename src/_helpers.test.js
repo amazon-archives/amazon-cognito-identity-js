@@ -4,18 +4,21 @@ import test from 'ava';
 import { stub } from 'sinon';
 import mockRequire from 'mock-require';
 
-export class MockClient {}
-
-export function stubClient(client, ...requestConfigs) {
-  if (!(client instanceof MockClient)) {
-    throw new Error(`'client' is not a MockClient: ${client}`)
+export class MockClient {
+  constructor(...requestConfigs) {
+    this.requestConfigs = requestConfigs;
+    this.nextRequestIndex = 0;
+    this.requestCallArgs = [];
   }
-  const requestStub = stub();
-  requestConfigs.forEach((requestConfig, i) => {
-    const expectation = requestStub.onCall(i);
-    expectation.yieldsAsync(...requestConfig);
-  });
-  client.makeUnauthenticatedRequest = requestStub; // eslint-disable-line no-param-reassign
+
+  makeUnauthenticatedRequest(name, args, cb) {
+    this.requestCallArgs.push([name, args, cb]);
+    if (this.nextRequestIndex >= this.requestConfigs.length) {
+      throw new Error(`No config for request ${this.nextRequestIndex}: '${name}'(${JSON.stringify(args)}).`);
+    }
+    const requestConfig = this.requestConfigs[this.nextRequestIndex++];
+    cb(...requestConfig);
+  }
 }
 
 export function requestFailsWith(err) {
@@ -26,7 +29,43 @@ export function requestSucceedsWith(result) {
   return [null, result];
 }
 
-test.afterEach.always(() => {
+export function requestCalledWithOnCall(t, client, call, expectedName, expectedArgs) {
+  const [name, args, cb] = client.requestCallArgs[call];
+  t.is(name, expectedName);
+  t.deepEqual(args, expectedArgs);
+  t.true(typeof cb === 'function');
+}
+
+export function requestCalledOnceWith(t, client, ...expectedArgs) {
+  t.true(client.requestCallArgs.length === 1);
+  requestCalledWithOnCall(t, client, 0, ...expectedArgs);
+}
+
+export function createCallback(t, done, callbackTests) {
+  const callback = {};
+  Object.keys(callbackTests).forEach(key => {
+    callback[key] = function testCallbackMethod(...args) {
+      t.is(this, callback);
+      callbackTests[key](...args);
+      done();
+    };
+  });
+  return callback;
+}
+
+export function createBasicCallback(t, succeeds, expectedError, done) {
+  return createCallback(t, done, {
+    onFailure(err) {
+      t.false(succeeds);
+      t.is(err, expectedError);
+    },
+    onSuccess() {
+      t.true(succeeds);
+    },
+  });
+}
+
+test.afterEach.always(t => {
   mockRequire.stopAll();
   delete global.window;
 });

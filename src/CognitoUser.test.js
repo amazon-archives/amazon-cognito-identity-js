@@ -2,7 +2,13 @@
 
 import test from 'ava';
 
-import { MockClient, requireDefaultWithModuleMocks, stubClient } from './_helpers.test';
+import {
+  MockClient,
+  requireDefaultWithModuleMocks,
+  requestCalledOnceWith,
+  createCallback,
+  createBasicCallback,
+} from './_helpers.test';
 
 // Valid property values: constructor, request props, etc...
 const Username = 'some-username';
@@ -50,12 +56,12 @@ class MockSession {
   }
 }
 
-function createUser({ pool = new MockUserPool(), session } = {}, ...requests) {
+function createUser({ pool = new MockUserPool(), session } = {}, ...requestConfigs) {
+  pool.client = new MockClient(...requestConfigs); // eslint-disable-line no-param-reassign
   const CognitoUser = requireDefaultWithModuleMocks('./CognitoUser', {
     // Nothing yet
   });
   const user = new CognitoUser({ Username, Pool: pool });
-  stubClient(user.client, ...requests);
   user.signInUserSession = session;
   return user;
 }
@@ -70,17 +76,6 @@ function createSignedInUserWithExpectedError(expectedError) {
 
 function createExpectedErrorFromSuccess(succeeds) {
   return succeeds ? null : { code: 'InternalServerException' };
-}
-
-function requestCalledWithOnCall(t, client, call, ...expectedArgs) {
-  const actualArgsExceptCallback = client.makeUnauthenticatedRequest.args[call].slice();
-  t.true(typeof actualArgsExceptCallback.pop() === 'function');
-  t.deepEqual(actualArgsExceptCallback, expectedArgs);
-}
-
-function requestCalledOnceWith(t, client, ...expectedArgs) {
-  t.true(client.makeUnauthenticatedRequest.callCount === 1);
-  requestCalledWithOnCall(t, client, 0, ...expectedArgs);
 }
 
 function titleMapString(value) {
@@ -307,30 +302,6 @@ addSimpleTitle(resendConfirmationCodeMacro);
 test.cb(resendConfirmationCodeMacro, false);
 test.cb(resendConfirmationCodeMacro, true);
 
-function createCallback(t, done, callbackTests) {
-  const callback = {};
-  Object.keys(callbackTests).forEach(key => {
-    callback[key] = function testCallbackMethod(...args) {
-      t.is(this, callback);
-      callbackTests[key](...args);
-      done();
-    };
-  });
-  return callback;
-}
-
-function createBasicCallback(t, succeeds, expectedError, done) {
-  return createCallback(t, done, {
-    onFailure(err) {
-      t.false(succeeds);
-      t.is(err, expectedError);
-    },
-    onSuccess() {
-      t.true(succeeds);
-    },
-  });
-}
-
 function forgotPasswordMacro(t, succeeds, usingInputVerificationCode) {
   const expectedError = createExpectedErrorFromSuccess(succeeds);
   const expectedData = !succeeds ? null : { CodeDeliveryDetails };
@@ -371,7 +342,6 @@ function confirmPasswordMacro(t, succeeds) {
   const expectedError = createExpectedErrorFromSuccess(succeeds);
   const user = createSignedInUserWithExpectedError(expectedError);
 
-  const confirmationCode = '123456';
   const newPassword = 'swordfish';
   const callback = createBasicCallback(t, succeeds, expectedError, () => {
     requestCalledOnceWith(t, user.client, 'confirmForgotPassword', {
@@ -393,7 +363,6 @@ function getAttributeVerificationCodeMacro(t, succeeds) {
   const expectedData = !succeeds ? null : { CodeDeliveryDetails };
   const user = createSignedInUser([expectedError, expectedData]);
 
-  const attributeName = 'some-attribute-name';
   function done() {
     requestCalledOnceWith(t, user.client, 'getUserAttributeVerificationCode', {
       AttributeName: attributeName,

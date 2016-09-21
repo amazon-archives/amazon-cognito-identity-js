@@ -6,7 +6,6 @@ import { stub } from 'sinon';
 import {
   MockClient,
   requireDefaultWithModuleMocks,
-  stubClient,
   requestFailsWith,
   requestSucceedsWith,
 } from './_helpers.test';
@@ -34,7 +33,7 @@ function createPool(extraData = {}) {
 
 function createPoolWithClient(...requestConfigs) {
   const pool = createPool();
-  stubClient(pool.client, ...requestConfigs);
+  pool.client = new MockClient(...requestConfigs);
   return pool;
 }
 
