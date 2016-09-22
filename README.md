@@ -620,6 +620,10 @@ or by calling the object method:
 ```
 
 ## Change Log
+**v1.5.0:**
+
+* What has changed
+  * Changed webpack support to follow AWS-SDK usage.
 
 **v1.2.0:**
 
