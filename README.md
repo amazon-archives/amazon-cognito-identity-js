@@ -30,7 +30,7 @@ depending on your project setup and experience with modern JavaScript build tool
 
 * Install the dependencies with npm and use a bundler like webpack.
 
-## Install using seperate JavaScript files
+## Install using separate JavaScript files
 
 This method is simpler and does not require additional tools, but may have worse performance due to
 the browser having to download multiple files.
