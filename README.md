@@ -272,7 +272,7 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
             console.log('access token + ' + result.getAccessToken().getJwtToken());
 
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                IdentityPoolId : '...' // your identity pool id here
+                IdentityPoolId : '...', // your identity pool id here
                 Logins : {
                     // Change the key below according to the specific region your user pool is in.
                     'cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>' : result.getIdToken().getJwtToken()
@@ -464,7 +464,7 @@ you can make inputVerificationCode call a no-op
             console.log('session validity: ' + session.isValid());
 
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                IdentityPoolId : '...' // your identity pool id here
+                IdentityPoolId : '...', // your identity pool id here
                 Logins : {
                     // Change the key below according to the specific region your user pool is in.
                     'cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>' : session.getIdToken().getJwtToken()
