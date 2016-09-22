@@ -9,6 +9,7 @@
   },
   "homepage": "http://aws.amazon.com/cognito",
   "contributors": [
+    "Simon Buchan",
     "Ionut Trestian <trestian@amazon.com>"
   ],
   "repository": {
