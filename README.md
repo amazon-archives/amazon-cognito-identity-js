@@ -621,18 +621,14 @@ or by calling the object method:
 
 ## Change Log
 **v1.5.0:**
-
 * What has changed
   * Changed webpack support to follow AWS-SDK usage.
 
 **v1.2.0:**
-
 * What has changed
-
   * Derived the region from the user pool id so the region doesn't need to be configured anymore.
 
 **v1.1.0:**
-
 * What has changed
    * Fixed a bug in token parsing.
    * Removed moment.js as a dependency.
@@ -641,7 +637,6 @@ or by calling the object method:
 * GA release. In this GA service launch, the following new features have been added to Amazon Cognito Your User Pools. 
 
 *  Whats new
-
    * Webpack support.
    * Support for Custom authentication flows. Developes can implement custom authentication flows around Cognito Your User Pools. See developer documentation for details.
    * Devices support in User Pools. Users can remember devices and skip MFA verification for remebered devices. 
@@ -653,7 +648,6 @@ or by calling the object method:
    * Removed dependency to sjcl bytes codec. 
 
 * What has changed
-
    * Authentication flow in Javascript SDK now uses Custom Authentication API
    * Two new exceptions added for the authentication APIs: These exceptions have been added to accurately represent the user state when the username is invalid and when the user is not confirmed. You will have to update your application to handle these exceptions.
        * UserNotFoundException: Returned when the username user does not exist.
