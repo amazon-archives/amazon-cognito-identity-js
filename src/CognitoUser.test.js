@@ -136,7 +136,7 @@ test('setAuthenticationFlowType() => sets authentication flow type', t => {
   t.is(user.getAuthenticationFlowType(), flowType);
 });
 
-// See CognitoUser_auth.test.js for authenticateUser() and the challenge responses
+// See CognitoUser.authenticateUser.test.js for authenticateUser() and the challenge responses
 
 function confirmRegistrationMacro(t, forceAliasCreation, succeeds) {
   const expectedError = createExpectedErrorFromSuccess(succeeds);

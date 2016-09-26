@@ -11,8 +11,19 @@ export class MockClient {
     this.requestCallArgs = [];
   }
 
+  get requestCallCount() {
+    return this.requestCallArgs.length;
+  }
+
+  getRequestCallArgs(call) {
+    return this.requestCallArgs[call];
+  }
+
   makeUnauthenticatedRequest(name, args, cb) {
-    this.requestCallArgs.push([name, args, cb]);
+    if (typeof cb !== 'function') {
+      throw new TypeError('MockClient requires cb arg.')
+    }
+    this.requestCallArgs.push({ name, args });
     if (this.nextRequestIndex >= this.requestConfigs.length) {
       throw new Error(`No config for request ${this.nextRequestIndex}: '${name}'(${JSON.stringify(args)}).`);
     }
@@ -29,16 +40,15 @@ export function requestSucceedsWith(result) {
   return [null, result];
 }
 
-export function requestCalledWithOnCall(t, client, call, expectedName, expectedArgs) {
-  const [name, args, cb] = client.requestCallArgs[call];
+export function requestCalledWithOnCall(t, client, callIndex, expectedName, expectedArgs) {
+  const { name, args } = client.getRequestCallArgs(callIndex);
   t.is(name, expectedName);
   t.deepEqual(args, expectedArgs);
-  t.true(typeof cb === 'function');
 }
 
-export function requestCalledOnceWith(t, client, ...expectedArgs) {
-  t.true(client.requestCallArgs.length === 1);
-  requestCalledWithOnCall(t, client, 0, ...expectedArgs);
+export function requestCalledOnceWith(t, client, expectedName, expectedArgs) {
+  t.true(client.requestCallCount === 1);
+  requestCalledWithOnCall(t, client, 0, expectedName, expectedArgs);
 }
 
 export function createCallback(t, done, callbackTests) {
