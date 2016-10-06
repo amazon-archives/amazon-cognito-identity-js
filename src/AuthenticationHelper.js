@@ -35,6 +35,8 @@ const initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
   + 'BBE117577A615D6C770988C0BAD946E208E24FA074E5AB31'
   + '43DB5BFCE0FD108E4B82D120A93AD2CAFFFFFFFFFFFFFFFF';
 
+const newPasswordRequiredChallengeUserAttributePrefix = 'userAttributes.';
+
 /** @class */
 export default class AuthenticationHelper {
   /**
@@ -307,5 +309,13 @@ export default class AuthenticationHelper {
       sjcl.codec.hex.toBits(UValueToHash));
 
     return hkdf;
+  }
+
+  /**
+  * Return constant newPasswordRequiredChallengeUserAttributePrefix
+  * @return {newPasswordRequiredChallengeUserAttributePrefix} constant prefix value
+  */
+  getNewPasswordRequiredChallengeUserAttributePrefix() {
+    return newPasswordRequiredChallengeUserAttributePrefix;
   }
 }

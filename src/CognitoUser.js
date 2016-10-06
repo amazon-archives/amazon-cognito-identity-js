@@ -125,9 +125,12 @@ export default class CognitoUser {
    * @param {AuthenticationDetails} authDetails Contains the authentication data
    * @param {object} callback Result callback map.
    * @param {onFailure} callback.onFailure Called on any error.
-   * @param {mfaRequired} callback.mfaRequired MFA code required to continue.
-   * @param {customChallenge} callback.customChallenge
-   *    Custom challenge response required to continue.
+   * @param {newPasswordRequired} callback.newPasswordRequired new
+   *        password and any required attributes are required to continue
+   * @param {mfaRequired} callback.mfaRequired MFA code
+   *        required to continue.
+   * @param {customChallenge} callback.customChallenge Custom challenge
+   *        response required to continue.
    * @param {authSuccess} callback.onSuccess Called on success with the new session.
    * @returns {void}
    */
@@ -207,68 +210,148 @@ export default class CognitoUser {
         }
 
         const challengeName = dataAuthenticate.ChallengeName;
-        if (challengeName === 'SMS_MFA') {
+        if (challengeName === 'NEW_PASSWORD_REQUIRED') {
           this.Session = dataAuthenticate.Session;
-          return callback.mfaRequired(challengeName);
-        }
+          let userAttributes = null;
+          let rawRequiredAttributes = null;
+          const requiredAttributes = [];
+          const userAttributesPrefix = authenticationHelper
+            .getNewPasswordRequiredChallengeUserAttributePrefix();
 
-        if (challengeName === 'CUSTOM_CHALLENGE') {
-          this.Session = dataAuthenticate.Session;
-          return callback.customChallenge(dataAuthenticate.ChallengeParameters);
-        }
-
-        if (challengeName === 'DEVICE_SRP_AUTH') {
-          this.getDeviceResponse(callback);
-          return undefined;
-        }
-
-        this.signInUserSession = this.getCognitoUserSession(
-          dataAuthenticate.AuthenticationResult);
-        this.cacheTokens();
-
-        const newDeviceMetadata = dataAuthenticate.AuthenticationResult.NewDeviceMetadata;
-        if (newDeviceMetadata == null) {
-          return callback.onSuccess(this.signInUserSession);
-        }
-
-        authenticationHelper.generateHashDevice(
-           dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey,
-           dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
-
-        const deviceSecretVerifierConfig = {
-          Salt: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
-            authenticationHelper.getSaltDevices().toString(16))),
-          PasswordVerifier: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
-            authenticationHelper.getVerifierDevices().toString(16))),
-        };
-
-        this.verifierDevices = sjcl.codec.base64.fromBits(
-          authenticationHelper.getVerifierDevices());
-        this.deviceGroupKey = newDeviceMetadata.DeviceGroupKey;
-        this.randomPassword = authenticationHelper.getRandomPassword();
-
-        this.client.makeUnauthenticatedRequest('confirmDevice', {
-          DeviceKey: newDeviceMetadata.DeviceKey,
-          AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
-          DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
-          DeviceName: navigator.userAgent,
-        }, (errConfirm, dataConfirm) => {
-          if (errConfirm) {
-            return callback.onFailure(errConfirm);
+          if (dataAuthenticate.ChallengeParameters) {
+            userAttributes = JSON.parse(
+              dataAuthenticate.ChallengeParameters.userAttributes);
+            rawRequiredAttributes = JSON.parse(
+              dataAuthenticate.ChallengeParameters.requiredAttributes);
           }
-          this.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
-          this.cacheDeviceKeyAndPassword();
-          if (dataConfirm.UserConfirmationNecessary === true) {
-            return callback.onSuccess(
-              this.signInUserSession,
-              dataConfirm.UserConfirmationNecessary);
+
+          if (rawRequiredAttributes) {
+            for (let i = 0; i < rawRequiredAttributes.length; i++) {
+              requiredAttributes[i] = rawRequiredAttributes[i].substr(userAttributesPrefix.length);
+            }
           }
-          return callback.onSuccess(this.signInUserSession);
-        });
-        return undefined;
+          return callback.newPasswordRequired(userAttributes, requiredAttributes);
+        }
+        return this.authenticateUserInternal(dataAuthenticate, authenticationHelper, callback);
       });
       return undefined;
     });
+  }
+
+  /**
+  * PRIVATE ONLY: This is an internal only method and should not
+  * be directly called by the consumers.
+  * @param {object} dataAuthenticate authentication data
+  * @param {object} authenticationHelper helper created
+  * @param {callback} callback passed on from caller
+  * @returns {void}
+  */
+  authenticateUserInternal(dataAuthenticate, authenticationHelper, callback) {
+    const challengeName = dataAuthenticate.ChallengeName;
+    if (challengeName === 'SMS_MFA') {
+      this.Session = dataAuthenticate.Session;
+      return callback.mfaRequired(challengeName);
+    }
+
+    if (challengeName === 'CUSTOM_CHALLENGE') {
+      this.Session = dataAuthenticate.Session;
+      return callback.customChallenge(dataAuthenticate.ChallengeParameters);
+    }
+
+    if (challengeName === 'DEVICE_SRP_AUTH') {
+      this.getDeviceResponse(callback);
+      return undefined;
+    }
+
+    this.signInUserSession = this.getCognitoUserSession(dataAuthenticate.AuthenticationResult);
+    this.cacheTokens();
+
+    const newDeviceMetadata = dataAuthenticate.AuthenticationResult.NewDeviceMetadata;
+    if (newDeviceMetadata == null) {
+      return callback.onSuccess(this.signInUserSession);
+    }
+
+    authenticationHelper.generateHashDevice(
+      dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey,
+      dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
+
+    const deviceSecretVerifierConfig = {
+      Salt: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
+              authenticationHelper.getSaltDevices().toString(16))),
+      PasswordVerifier: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
+              authenticationHelper.getVerifierDevices().toString(16))),
+    };
+
+    this.verifierDevices = sjcl.codec.base64.fromBits(
+      authenticationHelper.getVerifierDevices());
+    this.deviceGroupKey = newDeviceMetadata.DeviceGroupKey;
+    this.randomPassword = authenticationHelper.getRandomPassword();
+
+    this.client.makeUnauthenticatedRequest('confirmDevice', {
+      DeviceKey: newDeviceMetadata.DeviceKey,
+      AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
+      DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
+      DeviceName: navigator.userAgent,
+    }, (errConfirm, dataConfirm) => {
+      if (errConfirm) {
+        return callback.onFailure(errConfirm);
+      }
+
+      this.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
+      this.cacheDeviceKeyAndPassword();
+      if (dataConfirm.UserConfirmationNecessary === true) {
+        return callback.onSuccess(
+          this.signInUserSession, dataConfirm.UserConfirmationNecessary);
+      }
+      return callback.onSuccess(this.signInUserSession);
+    });
+    return undefined;
+  }
+
+  /**
+  * This method is user to complete the NEW_PASSWORD_REQUIRED challenge.
+  * Pass the new password with any new user attributes to be updated.
+  * User attribute keys must be of format userAttributes.<attribute_name>.
+  * @param {string} newPassword new password for this user
+  * @param {object} requiredAttributeData map with values for all required attributes
+  * @param {object} callback Result callback map.
+  * @param {onFailure} callback.onFailure Called on any error.
+  * @param {mfaRequired} callback.mfaRequired MFA code required to continue.
+  * @param {customChallenge} callback.customChallenge Custom challenge
+  *         response required to continue.
+  * @param {authSuccess} callback.onSuccess Called on success with the new session.
+  * @returns {void}
+  */
+  completeNewPasswordChallenge(newPassword, requiredAttributeData, callback) {
+    if (!newPassword) {
+      return callback.onFailure('New password is required.');
+    }
+    const authenticationHelper = new AuthenticationHelper(
+      this.pool.getUserPoolId().split('_')[1], this.pool.getParanoia());
+    const userAttributesPrefix = authenticationHelper
+      .getNewPasswordRequiredChallengeUserAttributePrefix();
+
+    const finalUserAttributes = {};
+    if (requiredAttributeData) {
+      Object.keys(requiredAttributeData).forEach((key) => {
+        finalUserAttributes[userAttributesPrefix + key] = requiredAttributeData[key];
+      });
+    }
+
+    finalUserAttributes.NEW_PASSWORD = newPassword;
+    finalUserAttributes.USERNAME = this.username;
+    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+      ChallengeName: 'NEW_PASSWORD_REQUIRED',
+      ClientId: this.pool.getClientId(),
+      ChallengeResponses: finalUserAttributes,
+      Session: this.Session,
+    }, (errAuthenticate, dataAuthenticate) => {
+      if (errAuthenticate) {
+        return callback.onFailure(errAuthenticate);
+      }
+      return this.authenticateUserInternal(dataAuthenticate, authenticationHelper, callback);
+    });
+    return undefined;
   }
 
   /**

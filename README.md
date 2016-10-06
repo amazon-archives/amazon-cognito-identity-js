@@ -581,6 +581,36 @@ you can make inputVerificationCode call a no-op
     });
 ```
 
+**Use case 23.** Authenticate a user and set new password for a user that was created using AdminCreateUser API
+
+```javascript
+
+    cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: function (result) {
+            // User authentication was successful
+        },
+
+        onFailure: function(err) {
+            // User authentication was not successful
+        },
+
+        mfaRequired: function(codeDeliveryDetails) {
+            // MFA is required to complete user authentication. 
+            // Get the code from user and call 
+            cognitoUser.sendMFACode(mfaCode, this)
+        },
+
+        newPasswordRequired: function(userAttributes, requiredAttributes) {
+            // User was signed up by an admin and must provide new 
+            // password and required attributes, if any, to complete 
+            // authentication.
+            
+            // Get these details and call 
+            cognitoUser.completeNewPasswordChallenge(newPassword, data, this)
+        }
+    });
+```
+
 
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
@@ -620,6 +650,10 @@ or by calling the object method:
 ```
 
 ## Change Log
+**v1.6.0:**
+* What has changed
+  * Support for Admin create user flow. Users being signend up by admins will be able to authenticate using their one time passwords.
+  
 **v1.5.0:**
 * What has changed
   * Changed webpack support to follow AWS-SDK usage.
