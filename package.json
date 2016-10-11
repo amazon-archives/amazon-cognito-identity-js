@@ -34,7 +34,7 @@
     "doc": "jsdoc src -d docs",
     "lint": "eslint src",
     "test": "ava",
-    "coverage": "cross-env BABEL_ENV=nyc nyc --reporter=text-summary --reporter=text --reporter=lcov ava",
+    "coverage": "cross-env BABEL_ENV=nyc nyc --reporter=text --reporter=lcov ava",
     "coverage:test": "cross-env BABEL_ENV=nyc nyc ava",
     "coverage:report": "nyc report --reporter=lcov"
   },
