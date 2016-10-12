@@ -56,14 +56,16 @@ class MockSession {
   }
 }
 
-function createUser({ pool = new MockUserPool(), session } = {}, ...requestConfigs) {
+function createUser({ pool = new MockUserPool(), session, mocks } = {}, ...requestConfigs) {
   pool.client = new MockClient(...requestConfigs); // eslint-disable-line no-param-reassign
-  const CognitoUser = requireDefaultWithModuleMocks('./CognitoUser', {
-    // Nothing yet
-  });
+  const CognitoUser = requireDefaultWithModuleMocks('./CognitoUser', mocks);
   const user = new CognitoUser({ Username, Pool: pool });
   user.signInUserSession = session;
   return user;
+}
+
+function createSignedInUserWithMocks(mocks, ...requests) {
+  return createUser({ session: new MockSession(), mocks }, ...requests);
 }
 
 function createSignedInUser(...requests) {
@@ -249,15 +251,26 @@ test.cb(updateAttributesMacro, false);
 test.cb(updateAttributesMacro, true);
 
 function getUserAttributesMacro(t, succeeds) {
+  class MockCognitoUserAttribute {
+    constructor(...params) {
+      this.params = params;
+    }
+  }
+
   const expectedError = createExpectedErrorFromSuccess(succeeds);
   const responseResult = succeeds ? { UserAttributes: attributes } : null;
-  const user = createSignedInUser([expectedError, responseResult]);
+
+  const user = createSignedInUserWithMocks(
+    {
+      './CognitoUserAttribute': MockCognitoUserAttribute,
+    },
+    [expectedError, responseResult]);
 
   user.getUserAttributes((err, result) => {
     t.is(err, expectedError);
     if (succeeds) {
-      // Only check for Name, Value properties, don't assert the results are CognitoUserAttributes.
-      t.deepEqual(result.map(({ Name, Value }) => ({ Name, Value })), attributes);
+      t.true(Array.isArray(result) && result.every(i => i instanceof MockCognitoUserAttribute));
+      t.deepEqual(result.map(i => i.params[0]), attributes);
     } else {
       t.falsy(result);
     }

@@ -183,10 +183,50 @@ function hexToBase64(hex) {
   return sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(hex));
 }
 
+class MockResultBase {
+  constructor(...params) {
+    this.params = params;
+  }
+}
+
+class MockCognitoTokenBase extends MockResultBase {}
+class MockCognitoAccessToken extends MockCognitoTokenBase {
+  getJwtToken() {
+    return this.params[0].AccessToken;
+  }
+}
+class MockCognitoIdToken extends MockCognitoTokenBase {
+  getJwtToken() {
+    return this.params[0].IdToken;
+  }
+}
+class MockCognitoRefreshToken extends MockCognitoTokenBase {
+  getToken() {
+    return this.params[0].RefreshToken;
+  }
+}
+class MockCognitoUserSession extends MockResultBase {
+  getAccessToken() {
+    return this.params[0].AccessToken;
+  }
+
+  getIdToken() {
+    return this.params[0].IdToken;
+  }
+
+  getRefreshToken() {
+    return this.params[0].RefreshToken;
+  }
+}
+
 function createUser({ pool = new MockUserPool() } = {}, ...requestConfigs) {
   pool.client = new MockClient(...requestConfigs); // eslint-disable-line no-param-reassign
   const CognitoUser = requireDefaultWithModuleMocks('./CognitoUser', {
     './AuthenticationHelper': MockAuthenticationHelper,
+    './CognitoAccessToken': MockCognitoAccessToken,
+    './CognitoIdToken': MockCognitoIdToken,
+    './CognitoRefreshToken': MockCognitoRefreshToken,
+    './CognitoUserSession': MockCognitoUserSession,
     './DateHelper': MockDateHelper,
   });
   return new CognitoUser({ Username: constructorUsername, Pool: pool });

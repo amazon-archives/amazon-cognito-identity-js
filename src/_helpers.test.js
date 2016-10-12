@@ -2,7 +2,7 @@
 
 import test from 'ava';
 import { stub } from 'sinon';
-import mockRequire from 'mock-require';
+import mockRequire, { reRequire } from 'mock-require';
 
 export class MockClient {
   constructor(...requestConfigs) {
@@ -80,42 +80,29 @@ test.afterEach.always(t => {
   delete global.window;
 });
 
-function shouldMock(path) {
-  return path.startsWith(__dirname) && !path.endsWith('.test.js');
-}
+const defaultMocks = {
+  'aws-sdk/clients/cognitoidentityserviceprovider': MockClient,
+  './AuthenticationDetails': null,
+  './AuthenticationHelper': null,
+  './CognitoAccessToken': null,
+  './CognitoIdToken': null,
+  './CognitoRefreshToken': null,
+  './CognitoUser': null,
+  './CognitoUserAttribute': null,
+  './CognitoUserPool': null,
+  './CognitoUserSession': null,
+  './DateHelper': null,
+};
 
 function requireWithModuleMocks(request, moduleMocks = {}) {
-  const unmockedCache = Object.create(null);
-
-  // Remove require.cache entries that may be using the unmocked modules
-  Object.keys(require.cache).forEach(path => {
-    if (shouldMock(path)) {
-      delete require.cache[path];
+  const allModuleMocks = Object.assign({}, defaultMocks, moduleMocks);
+  Object.keys(allModuleMocks).forEach(mockRequest => {
+    if (mockRequest !== request) {
+      mockRequire(mockRequest, allModuleMocks[mockRequest]);
     }
   });
 
-  // Always mock AWS SDK
-  mockRequire('aws-sdk/clients/cognitoidentityserviceprovider', MockClient);
-
-  // Mock other modules
-  Object.keys(moduleMocks).forEach(name => {
-    mockRequire(name, moduleMocks[name]);
-  });
-
-  const mockedModule = require(request);
-
-  // Restore require.cache to previous state
-  Object.keys(require.cache).forEach(path => {
-    if (shouldMock(path)) {
-      if (Object.prototype.hasOwnProperty.call(unmockedCache, path)) {
-        require.cache[path] = unmockedCache[path];
-      } else {
-        delete require.cache[path];
-      }
-    }
-  });
-
-  return mockedModule;
+  return reRequire(request);
 }
 
 export function requireDefaultWithModuleMocks(request, moduleMocks) {
