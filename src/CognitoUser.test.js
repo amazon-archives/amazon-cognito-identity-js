@@ -8,6 +8,8 @@ import {
   requestCalledOnceWith,
   createCallback,
   createBasicCallback,
+  title,
+  addSimpleTitle,
 } from './_helpers.test';
 
 // Valid property values: constructor, request props, etc...
@@ -78,29 +80,6 @@ function createSignedInUserWithExpectedError(expectedError) {
 
 function createExpectedErrorFromSuccess(succeeds) {
   return succeeds ? null : { code: 'InternalServerException' };
-}
-
-function titleMapString(value) {
-  return value && typeof value === 'object'
-    ? Object.keys(value).map(key => `${key}: ${JSON.stringify(value[key])}`).join(', ')
-    : value || '';
-}
-
-function title(fn, { args, context, succeeds, outcome = succeeds ? 'succeeds' : 'fails' }) {
-  const fnString = typeof fn === 'function' ? fn.name.replace(/Macro$/, '') : fn;
-  const contextString = context ? ` :: ${titleMapString(context)}` : '';
-  return `${fnString}(${titleMapString(args)})${contextString} => ${outcome}`;
-}
-
-function addSimpleTitle(macro, { args, context } = {}) {
-  // eslint-disable-next-line no-param-reassign
-  macro.title = (_, succeeds, ...values) => (
-    title(macro, {
-      succeeds,
-      args: args && args(...values),
-      context: context && context(...values),
-    })
-  );
 }
 
 

@@ -3,7 +3,7 @@
 import test from 'ava';
 import { stub } from 'sinon';
 import { BigInteger } from 'jsbn';
-import * as sjcl from 'sjcl';
+import { codec } from 'sjcl';
 
 import {
   MockClient,
@@ -11,7 +11,12 @@ import {
   requestSucceedsWith,
   requestFailsWith,
   createCallback,
+  title,
 } from './_helpers.test';
+
+function hexToBase64(hex) {
+  return codec.base64.fromBits(codec.hex.toBits(hex));
+}
 
 const UserPoolId = 'xx-nowhere1_SomeUserPool'; // Constructor validates the format.
 const ClientId = 'some-client-id';
@@ -23,7 +28,9 @@ const RefreshToken = 'some-refresh-token';
 const AccessToken = 'some-access-token';
 const SrpLargeAHex = '1a'.repeat(32);
 const SaltDevicesHex = '5d'.repeat(32);
+const SaltDevicesBase64 = hexToBase64(SaltDevicesHex);
 const VerifierDevicesHex = 'ed'.repeat(32);
+const VerifierDevicesBase64 = hexToBase64(VerifierDevicesHex);
 const RandomPasswordHex = 'a0'.repeat(32);
 const ValidationData = [
   { Name: 'some-name-1', Value: 'some-value-1' },
@@ -31,6 +38,25 @@ const ValidationData = [
 ];
 
 const dateNow = 'Wed Sep 21 07:36:54 UTC 2016';
+
+const keyPrefix = `CognitoIdentityServiceProvider.${ClientId}`;
+const idTokenKey = `${keyPrefix}.${aliasUsername}.idToken`;
+const accessTokenKey = `${keyPrefix}.${aliasUsername}.accessToken`;
+const refreshTokenKey = `${keyPrefix}.${aliasUsername}.refreshToken`;
+const lastAuthUserKey = `${keyPrefix}.LastAuthUser`;
+const deviceKeyKey = `${keyPrefix}.${aliasUsername}.deviceKey`;
+const randomPasswordKey = `${keyPrefix}.${aliasUsername}.randomPasswordKey`;
+const deviceGroupKeyKey = `${keyPrefix}.${aliasUsername}.deviceGroupKey`;
+
+const oldDeviceKey = 'old-deviceKey';
+
+const cachedDeviceKey = 'cached-deviceKey';
+const cachedRandomPassword = 'cached-randomPassword';
+const cachedDeviceGroupKey = 'cached-deviceGroup';
+
+const newDeviceKey = 'new-deviceKey';
+const newDeviceGroupKey = 'new-deviceGroup';
+const deviceName = 'some-device-name';
 
 function createExpectedInitiateAuthArgs({
   AuthFlow = 'USER_SRP_AUTH',
@@ -89,31 +115,96 @@ function createExpectedRespondToAuthChallengePasswordVerifierArgs(
   };
 }
 
-function createRespondToAuthChallengeCompleteResponse({ NewDeviceMetadata } = {}) {
+function createRespondToAuthChallengeResponseForSuccess({ hasNewDevice } = {}) {
+  const response = {
+    AuthenticationResult: { IdToken, AccessToken, RefreshToken },
+  };
+
+  if (hasNewDevice) {
+    response.AuthenticationResult.NewDeviceMetadata = {
+      DeviceGroupKey: newDeviceGroupKey,
+      DeviceKey: newDeviceKey,
+    };
+  }
+
+  return response;
+}
+
+function createRespondToAuthChallengeResponseForChallenge(challengeName) {
   return {
-    AuthenticationResult: { IdToken, AccessToken, RefreshToken, NewDeviceMetadata },
+    ChallengeName: challengeName,
+    Session: `respondToAuthChallenge-${challengeName}-session`,
   };
 }
 
-function createRespondToAuthChallengeChallengeResponse({
-  ChallengeName,
-  ChallengeParameters,
-} = {}) {
-  return {
-    ChallengeName,
-    Session: `respondToAuthChallenge-${ChallengeName}-session`,
-    ChallengeParameters,
-  };
+function createRespondToAuthChallengeResponseForCustomChallenge() {
+  return Object.assign(
+    createRespondToAuthChallengeResponseForChallenge('CUSTOM_CHALLENGE'),
+    {
+      ChallengeParameters: {
+        Name: 'some-custom-challenge-parameter',
+      },
+    }
+  );
 }
 
-const keyPrefix = `CognitoIdentityServiceProvider.${ClientId}`;
-const idTokenKey = `${keyPrefix}.${aliasUsername}.idToken`;
-const accessTokenKey = `${keyPrefix}.${aliasUsername}.accessToken`;
-const refreshTokenKey = `${keyPrefix}.${aliasUsername}.refreshToken`;
-const lastAuthUserKey = `${keyPrefix}.LastAuthUser`;
-const deviceKeyKey = `${keyPrefix}.${aliasUsername}.deviceKey`;
-const randomPasswordKey = `${keyPrefix}.${aliasUsername}.randomPasswordKey`;
-const deviceGroupKeyKey = `${keyPrefix}.${aliasUsername}.deviceGroupKey`;
+function assertHasSetSignInSession(t, user) {
+  const userSession = user.getSignInUserSession();
+  t.is(userSession.getIdToken().getJwtToken(), IdToken);
+  t.is(userSession.getAccessToken().getJwtToken(), AccessToken);
+  t.is(userSession.getRefreshToken().getToken(), RefreshToken);
+}
+
+function assertHasDeviceState(t, user, { hasOldDevice, hasCachedDevice, hasNewDevice }) {
+  let expectedDeviceKey;
+  let expectedRandomPassword;
+  let expectedDeviceGroupKey;
+
+  if (hasOldDevice) {
+    expectedDeviceKey = oldDeviceKey;
+  }
+
+  if (hasCachedDevice) {
+    expectedDeviceKey = cachedDeviceKey;
+    expectedRandomPassword = cachedRandomPassword;
+    expectedDeviceGroupKey = cachedDeviceGroupKey;
+  }
+
+  if (hasNewDevice) {
+    expectedDeviceKey = newDeviceKey;
+    expectedRandomPassword = RandomPasswordHex;
+    expectedDeviceGroupKey = newDeviceGroupKey;
+  }
+
+  // FIXME: AuthenticationHelper.getVerifierDevices() returns hex, but CognitoUser expects sjcl bits
+  t.skip.is(user.verifierDevices, VerifierDevicesBase64);
+  t.is(user.deviceGroupKey, expectedDeviceGroupKey);
+  t.is(user.randomPassword, expectedRandomPassword);
+  t.is(user.deviceKey, expectedDeviceKey);
+}
+
+function assertDidCacheTokens(t, localStorage) {
+  t.is(localStorage.setItem.withArgs(idTokenKey).callCount, 1);
+  t.is(localStorage.setItem.withArgs(accessTokenKey).callCount, 1);
+  t.is(localStorage.setItem.withArgs(refreshTokenKey).callCount, 1);
+  t.is(localStorage.setItem.withArgs(lastAuthUserKey).callCount, 1);
+  t.is(localStorage.setItem.withArgs(idTokenKey).args[0][1], IdToken);
+  t.is(localStorage.setItem.withArgs(accessTokenKey).args[0][1], AccessToken);
+  t.is(localStorage.setItem.withArgs(refreshTokenKey).args[0][1], RefreshToken);
+  t.is(localStorage.setItem.withArgs(lastAuthUserKey).args[0][1], aliasUsername);
+}
+
+function assertDidCacheDeviceKeyAndPassword(t, localStorage) {
+  t.is(localStorage.setItem.withArgs(deviceKeyKey, newDeviceKey).callCount, 1);
+  t.is(localStorage.setItem.withArgs(randomPasswordKey, RandomPasswordHex).callCount, 1);
+  t.is(localStorage.setItem.withArgs(deviceGroupKeyKey, newDeviceGroupKey).callCount, 1);
+}
+
+function assertDidNotCacheDeviceKeyAndPassword(t, localStorage) {
+  t.is(localStorage.setItem.withArgs(deviceKeyKey).callCount, 0);
+  t.is(localStorage.setItem.withArgs(randomPasswordKey).callCount, 0);
+  t.is(localStorage.setItem.withArgs(deviceGroupKeyKey).callCount, 0);
+}
 
 class MockUserPool {
   constructor() {
@@ -143,7 +234,7 @@ class MockAuthenticationHelper {
   }
 
   getPasswordAuthenticationKey() {
-    return sjcl.codec.hex.toBits('a4'.repeat(32));
+    return codec.hex.toBits('a4'.repeat(32));
   }
 
   generateHashDevice() {
@@ -177,10 +268,6 @@ class MockAuthenticationDetails {
   getValidationData() {
     return ValidationData;
   }
-}
-
-function hexToBase64(hex) {
-  return sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(hex));
 }
 
 class MockResultBase {
@@ -278,20 +365,14 @@ test.serial.cb('with new device state, fails on confirmDevice => raises onFailur
     setItem: stub(),
   };
   global.window = { localStorage };
-  global.navigator = { userAgent: 'some-device-name' };
+  global.navigator = { userAgent: deviceName };
   const expectedError = { code: 'InternalServerError' };
 
   const user = createUser(
     {},
     requestSucceedsWith(initiateAuthResponse),
-    requestSucceedsWith(createRespondToAuthChallengeCompleteResponse({
-      NewDeviceMetadata: {
-        DeviceGroupKey: 'new-deviceGroup',
-        DeviceKey: 'new-deviceKey',
-      },
-    })),
-    requestFailsWith(expectedError)
-  );
+    requestSucceedsWith(createRespondToAuthChallengeResponseForSuccess({ hasNewDevice: true })),
+    requestFailsWith(expectedError));
 
   user.authenticateUser(
     new MockAuthenticationDetails(),
@@ -304,61 +385,25 @@ test.serial.cb('with new device state, fails on confirmDevice => raises onFailur
     }));
 });
 
-function deviceStateSuccessMacroTitle(
-  t,
-  { hasOldDevice, hasCachedDevice, hasNewDevice, userConfirmationNecessary }
-) {
-  const context = [
-    `${hasOldDevice ? 'with' : 'no'} old`,
-    `${hasCachedDevice ? 'with' : 'no'} cached`,
-    `${hasNewDevice ? 'with' : 'no'} new device state`,
-  ];
-
-  if (userConfirmationNecessary) {
-    context.push('user confirmation necessary');
-  }
-
-  return `${context.join(', ')} => creates session`;
-}
-
 function deviceStateSuccessMacro(
   t,
   { hasOldDevice, hasCachedDevice, hasNewDevice, userConfirmationNecessary }
 ) {
-  const oldDeviceKey = 'old-deviceKey';
-
-  const cachedDeviceKey = 'cached-deviceKey';
-  const cachedRandomPassword = 'cached-randomPassword';
-  const cachedDeviceGroupKey = 'cached-deviceGroup';
-
-  const newDeviceKey = 'new-deviceKey';
-  const newDeviceGroupKey = 'new-deviceGroup';
-  const deviceName = 'some-device-name';
-
   const localStorage = {
     getItem: stub().returns(null),
     setItem: stub(),
   };
   global.window = { localStorage };
 
-  let expectedDeviceKey;
-  let expectedRandomPassword;
-  let expectedDeviceGroupKey;
   let extraExpectedChallengeResponses;
 
   if (hasOldDevice) {
-    expectedDeviceKey = oldDeviceKey;
-
     extraExpectedChallengeResponses = {
       DEVICE_KEY: oldDeviceKey,
     };
   }
 
   if (hasCachedDevice) {
-    expectedDeviceKey = cachedDeviceKey;
-    expectedRandomPassword = cachedRandomPassword;
-    expectedDeviceGroupKey = cachedDeviceGroupKey;
-
     localStorage.getItem.withArgs(deviceKeyKey).returns(cachedDeviceKey);
     localStorage.getItem.withArgs(randomPasswordKey).returns(cachedRandomPassword);
     localStorage.getItem.withArgs(deviceGroupKeyKey).returns(cachedDeviceGroupKey);
@@ -369,13 +414,7 @@ function deviceStateSuccessMacro(
   }
 
   if (hasNewDevice) {
-    expectedDeviceKey = newDeviceKey;
-    expectedRandomPassword = RandomPasswordHex;
-    expectedDeviceGroupKey = newDeviceGroupKey;
-
-    global.navigator = {
-      userAgent: deviceName,
-    };
+    global.navigator = { userAgent: deviceName };
   }
 
   const expectedInitiateAuthArgs = createExpectedInitiateAuthArgs({
@@ -391,34 +430,20 @@ function deviceStateSuccessMacro(
     DeviceKey: newDeviceKey,
     AccessToken,
     DeviceSecretVerifierConfig: {
-      Salt: hexToBase64(SaltDevicesHex),
-      PasswordVerifier: hexToBase64(VerifierDevicesHex),
+      Salt: SaltDevicesBase64,
+      PasswordVerifier: VerifierDevicesBase64,
     },
     DeviceName: deviceName,
   };
 
   const requests = [
     requestSucceedsWith(initiateAuthResponse),
+    requestSucceedsWith(createRespondToAuthChallengeResponseForSuccess({ hasNewDevice })),
   ];
 
-  if (!hasNewDevice) {
+  if (hasNewDevice) {
     requests.push(
-      requestSucceedsWith(createRespondToAuthChallengeCompleteResponse())
-    );
-  } else {
-    requests.push(
-      requestSucceedsWith(createRespondToAuthChallengeCompleteResponse({
-        NewDeviceMetadata: {
-          DeviceGroupKey: newDeviceGroupKey,
-          DeviceKey: newDeviceKey,
-        },
-      })),
       requestSucceedsWith({
-        AuthenticationResult: {
-          NewDeviceMetadata: {
-            DeviceKey: newDeviceKey,
-          },
-        },
         UserConfirmationNecessary: userConfirmationNecessary,
       })
     );
@@ -452,39 +477,25 @@ function deviceStateSuccessMacro(
           t.deepEqual(user.client.getRequestCallArgs(2).args, expectedConfirmDeviceArgs);
         }
 
-        // Check user state
         t.is(user.getUsername(), aliasUsername);
         t.is(user.Session, null);
-        t.is(user.deviceKey, expectedDeviceKey);
-        t.is(user.randomPassword, expectedRandomPassword);
-        t.is(user.deviceGroupKey, expectedDeviceGroupKey);
 
-        // Check sign-in session
-        const userSession = user.getSignInUserSession();
-        t.is(userSession.getIdToken().getJwtToken(), IdToken);
-        t.is(userSession.getAccessToken().getJwtToken(), AccessToken);
-        t.is(userSession.getRefreshToken().getToken(), RefreshToken);
+        assertHasDeviceState(t, user, { hasOldDevice, hasCachedDevice, hasNewDevice });
 
-        // check cacheTokens()
-        t.is(localStorage.setItem.withArgs(idTokenKey, IdToken).callCount, 1);
-        t.is(localStorage.setItem.withArgs(accessTokenKey, AccessToken).callCount, 1);
-        t.is(localStorage.setItem.withArgs(refreshTokenKey, RefreshToken).callCount, 1);
-        t.is(localStorage.setItem.withArgs(lastAuthUserKey, aliasUsername).callCount, 1);
+        assertHasSetSignInSession(t, user);
+        assertDidCacheTokens(t, localStorage);
 
-        // check cacheDeviceKeyAndPassword()
         if (hasNewDevice) {
-          t.is(localStorage.setItem.withArgs(deviceKeyKey, newDeviceKey).callCount, 1);
-          t.is(localStorage.setItem.withArgs(randomPasswordKey, RandomPasswordHex).callCount, 1);
-          t.is(localStorage.setItem.withArgs(deviceGroupKeyKey, newDeviceGroupKey).callCount, 1);
+          assertDidCacheDeviceKeyAndPassword(t, localStorage);
         } else {
-          t.is(localStorage.setItem.withArgs(deviceKeyKey).callCount, 0);
-          t.is(localStorage.setItem.withArgs(randomPasswordKey).callCount, 0);
-          t.is(localStorage.setItem.withArgs(deviceGroupKeyKey).callCount, 0);
+          assertDidNotCacheDeviceKeyAndPassword(t, localStorage);
         }
       },
     }));
 }
-deviceStateSuccessMacro.title = deviceStateSuccessMacroTitle;
+deviceStateSuccessMacro.title = (_, context) => (
+  title(null, { context, outcome: 'creates session' })
+);
 
 for (const hasOldDevice of [false, true]) {
   for (const hasCachedDevice of [false, true]) {
@@ -503,10 +514,6 @@ test.serial.cb('CUSTOM_AUTH flow, CUSTOM_CHALLENGE challenge => raises customCha
   };
   global.window = { localStorage };
 
-  const expectedChallengeParameters = {
-    Name: 'some-custom-challenge-parameter',
-  };
-
   const expectedInitiateAuthArgs = createExpectedInitiateAuthArgs({
     AuthFlow: 'CUSTOM_AUTH',
     extraAuthParameters: {
@@ -517,10 +524,8 @@ test.serial.cb('CUSTOM_AUTH flow, CUSTOM_CHALLENGE challenge => raises customCha
   const expectedRespondToAuthChallengeArgs =
     createExpectedRespondToAuthChallengePasswordVerifierArgs();
 
-  const respondToAuthChallengeResponse = createRespondToAuthChallengeChallengeResponse({
-    ChallengeName: 'CUSTOM_CHALLENGE',
-    ChallengeParameters: expectedChallengeParameters,
-  });
+  const respondToAuthChallengeResponse =
+    createRespondToAuthChallengeResponseForCustomChallenge();
 
   const user = createUser(
     {},
@@ -533,7 +538,7 @@ test.serial.cb('CUSTOM_AUTH flow, CUSTOM_CHALLENGE challenge => raises customCha
     new MockAuthenticationDetails(),
     createCallback(t, t.end, {
       customChallenge(parameters) {
-        t.deepEqual(parameters, expectedChallengeParameters);
+        t.deepEqual(parameters, respondToAuthChallengeResponse.ChallengeParameters);
 
         // check client requests (expanded due to assert string depth limit)
         t.is(user.client.requestCallCount, 2);
@@ -561,9 +566,8 @@ test.serial.cb('SMS_MFA challenge => raises mfaRequired', t => {
   const expectedRespondToAuthChallengeArgs =
     createExpectedRespondToAuthChallengePasswordVerifierArgs();
 
-  const respondToAuthChallengeResponse = createRespondToAuthChallengeChallengeResponse({
-    ChallengeName: 'SMS_MFA',
-  });
+  const respondToAuthChallengeResponse =
+    createRespondToAuthChallengeResponseForChallenge('SMS_MFA');
 
   const user = createUser(
     {},
@@ -600,9 +604,7 @@ test.serial.cb('DEVICE_SRP_AUTH challenge, fails on DEVICE_SRP_AUTH => raises on
   const user = createUser(
     {},
     requestSucceedsWith(initiateAuthResponse),
-    requestSucceedsWith(createRespondToAuthChallengeChallengeResponse({
-      ChallengeName: 'DEVICE_SRP_AUTH',
-    })),
+    requestSucceedsWith(createRespondToAuthChallengeResponseForChallenge('DEVICE_SRP_AUTH')),
     requestFailsWith(expectedError));
 
   user.authenticateUser(
@@ -632,9 +634,7 @@ test.serial.cb(
     const user = createUser(
       {},
       requestSucceedsWith(initiateAuthResponse),
-      requestSucceedsWith(createRespondToAuthChallengeChallengeResponse({
-        ChallengeName: 'DEVICE_SRP_AUTH',
-      })),
+      requestSucceedsWith(createRespondToAuthChallengeResponseForChallenge('DEVICE_SRP_AUTH')),
       requestSucceedsWith({
         ChallengeParameters: initiateAuthResponse.ChallengeParameters,
       }),
@@ -679,9 +679,7 @@ test.serial.cb('DEVICE_SRP_AUTH challenge, succeeds => creates session', t => {
     });
 
   const respondToAuthChallengePasswordVerifierResponse =
-    createRespondToAuthChallengeChallengeResponse({
-      ChallengeName: 'DEVICE_SRP_AUTH',
-    });
+    createRespondToAuthChallengeResponseForChallenge('DEVICE_SRP_AUTH');
 
   // FIXME: should be using a separate set of AuthenticationHelper mock results.
   const expectedRespondToAuthChallengeDeviceSrpAuthArgs = {
@@ -714,7 +712,7 @@ test.serial.cb('DEVICE_SRP_AUTH challenge, succeeds => creates session', t => {
     requestSucceedsWith(initiateAuthResponse),
     requestSucceedsWith(respondToAuthChallengePasswordVerifierResponse),
     requestSucceedsWith(respondToAuthChallengeDeviceSrpAuthResponse),
-    requestSucceedsWith(createRespondToAuthChallengeCompleteResponse())
+    requestSucceedsWith(createRespondToAuthChallengeResponseForSuccess())
   );
 
   user.authenticateUser(
@@ -748,29 +746,257 @@ test.serial.cb('DEVICE_SRP_AUTH challenge, succeeds => creates session', t => {
         t.is(user.randomPassword, randomPassword);
         t.is(user.deviceGroupKey, deviceGroupKey);
 
-        // Check sign-in session
-        const userSession = user.getSignInUserSession();
-        t.is(userSession.getIdToken().getJwtToken(), IdToken);
-        t.is(userSession.getAccessToken().getJwtToken(), AccessToken);
-        t.is(userSession.getRefreshToken().getToken(), RefreshToken);
-
-        // check cacheTokens()
-        t.is(localStorage.setItem.withArgs(idTokenKey, IdToken).callCount, 1);
-        t.is(localStorage.setItem.withArgs(accessTokenKey, AccessToken).callCount, 1);
-        t.is(localStorage.setItem.withArgs(refreshTokenKey, RefreshToken).callCount, 1);
-        t.is(localStorage.setItem.withArgs(lastAuthUserKey, aliasUsername).callCount, 1);
-
-        // check cacheDeviceKeyAndPassword()
-        t.is(localStorage.setItem.withArgs(deviceKeyKey).callCount, 0);
-        t.is(localStorage.setItem.withArgs(randomPasswordKey).callCount, 0);
-        t.is(localStorage.setItem.withArgs(deviceGroupKeyKey).callCount, 0);
+        assertHasSetSignInSession(t, user);
+        assertDidCacheTokens(t, localStorage);
+        assertDidNotCacheDeviceKeyAndPassword(t, localStorage);
       },
     }));
 });
 
-test.todo('sendCustomChallengeAnswer() :: fails => raises onFailure');
-test.todo('sendCustomChallengeAnswer() :: succeeds => raises onSuccess');
+test.cb('sendCustomChallengeAnswer() :: fails => raises onFailure', t => {
+  const expectedError = { code: 'InternalServerError' };
+  const previousChallengeSession = 'previous-challenge-session';
 
-test.todo('sendMFACode() :: fails => raises onFailure');
-test.todo('sendMFACode() :: succeeds => raises onSuccess');
+  const user = createUser({}, requestFailsWith(expectedError));
+  user.Session = previousChallengeSession;
 
+  const answerChallenge = 'some-answer-challenge';
+  user.sendCustomChallengeAnswer(answerChallenge, createCallback(t, t.end, {
+    onFailure(err) {
+      t.is(err, expectedError);
+
+      t.is(user.client.requestCallCount, 1);
+      t.is(user.client.getRequestCallArgs(0).name, 'respondToAuthChallenge');
+      t.deepEqual(user.client.getRequestCallArgs(0).args, {
+        ChallengeName: 'CUSTOM_CHALLENGE',
+        ChallengeResponses: {
+          USERNAME: constructorUsername,
+          ANSWER: answerChallenge,
+        },
+        ClientId,
+        Session: previousChallengeSession,
+      });
+
+      t.is(user.getUsername(), constructorUsername);
+      t.is(user.Session, previousChallengeSession);
+    },
+  }));
+});
+
+test.cb(
+  'sendCustomChallengeAnswer() :: CUSTOM_CHALLENGE challenge => raises customChallenge',
+  t => {
+    const respondToAuthChallengeResponse =
+      createRespondToAuthChallengeResponseForCustomChallenge();
+    const previousChallengeSession = 'previous-challenge-session';
+
+    const user = createUser({}, requestSucceedsWith(respondToAuthChallengeResponse));
+    user.Session = previousChallengeSession;
+
+    const answerChallenge = 'some-answer-challenge';
+    user.sendCustomChallengeAnswer(answerChallenge, createCallback(t, t.end, {
+      customChallenge(challengeParameters) {
+        // Looks like a bug: Uses response `challengeParameters` not `ChallengeParameters` like
+        // authenticateUser() does.
+        t.skip.is(challengeParameters, respondToAuthChallengeResponse.ChallengeParameters);
+
+        t.is(user.client.requestCallCount, 1);
+        t.is(user.client.getRequestCallArgs(0).name, 'respondToAuthChallenge');
+        t.deepEqual(user.client.getRequestCallArgs(0).args, {
+          ChallengeName: 'CUSTOM_CHALLENGE',
+          ChallengeResponses: {
+            USERNAME: constructorUsername,
+            ANSWER: answerChallenge,
+          },
+          ClientId,
+          Session: previousChallengeSession,
+        });
+
+        t.is(user.getUsername(), constructorUsername);
+        t.is(user.Session, respondToAuthChallengeResponse.Session);
+      },
+    }));
+  });
+
+test.serial.cb('sendCustomChallengeAnswer() :: succeeds => creates session', t => {
+  const localStorage = {
+    getItem: stub().returns(null),
+    setItem: stub(),
+  };
+  global.window = { localStorage };
+  const respondToAuthChallengeResponse =
+    createRespondToAuthChallengeResponseForSuccess();
+
+  const previousChallengeSession = 'previous-challenge-session';
+
+  const user = createUser({}, requestSucceedsWith(respondToAuthChallengeResponse));
+  user.username = aliasUsername; // assertDidCacheTokens() expects this
+  user.Session = previousChallengeSession;
+
+  const answerChallenge = 'some-answer-challenge';
+
+  user.sendCustomChallengeAnswer(answerChallenge, createCallback(t, t.end, {
+    onSuccess(signInSessionArg) {
+      t.is(signInSessionArg, user.getSignInUserSession());
+
+      // check client requests (expanded due to assert string depth limit)
+      t.is(user.client.requestCallCount, 1);
+      t.is(user.client.getRequestCallArgs(0).name, 'respondToAuthChallenge');
+      t.deepEqual(user.client.getRequestCallArgs(0).args, {
+        ChallengeName: 'CUSTOM_CHALLENGE',
+        ChallengeResponses: {
+          USERNAME: aliasUsername,
+          ANSWER: answerChallenge,
+        },
+        ClientId,
+        Session: previousChallengeSession,
+      });
+
+      // Check user state
+      t.is(user.getUsername(), aliasUsername);
+      t.skip.is(user.Session, null); // FIXME: should be clearing Session like authenticateUser()
+
+      assertHasSetSignInSession(t, user);
+      assertDidCacheTokens(t, localStorage);
+      assertDidNotCacheDeviceKeyAndPassword(t, localStorage);
+    },
+  }));
+});
+
+test.cb('sendMFACode() :: fails on respondToAuthChallenge => raises onFailure', t => {
+  const expectedError = { code: 'InternalServerError' };
+  const previousChallengeSession = 'previous-challenge-session';
+
+  const user = createUser({}, requestFailsWith(expectedError));
+  user.Session = previousChallengeSession;
+
+  const confirmationCode = 'some-confirmation-code';
+  user.sendMFACode(confirmationCode, createCallback(t, t.end, {
+    onFailure(err) {
+      t.is(err, expectedError);
+
+      t.is(user.getUsername(), constructorUsername);
+      t.is(user.Session, previousChallengeSession);
+    },
+  }));
+});
+
+test.serial.cb('sendMFACode() :: fails on confirmDevice => raises onFailure', t => {
+  const localStorage = {
+    getItem: stub().returns(null),
+    setItem: stub(),
+  };
+  global.window = { localStorage };
+
+  const expectedError = { code: 'InternalServerError' };
+
+  const respondToAuthChallengeResponse = createRespondToAuthChallengeResponseForSuccess({
+    hasNewDevice: true,
+  });
+
+  const previousChallengeSession = 'previous-challenge-session';
+
+  const user = createUser(
+    {},
+    requestSucceedsWith(respondToAuthChallengeResponse),
+    requestFailsWith(expectedError));
+  user.Session = previousChallengeSession;
+
+  const confirmationCode = 'some-confirmation-code';
+  user.sendMFACode(confirmationCode, createCallback(t, t.end, {
+    onFailure(err) {
+      t.is(err, expectedError);
+    },
+  }));
+});
+
+function sendMFACodeSucceedsMacro(t, { hasOldDevice, hasNewDevice, userConfirmationNecessary }) {
+  const localStorage = {
+    getItem: stub().returns(null),
+    setItem: stub(),
+  };
+  global.window = { localStorage };
+
+  const previousChallengeSession = 'previous-challenge-session';
+  const confirmationCode = 'some-confirmation-code';
+
+  const expectedRespondToAuthChallengeArgs = {
+    ChallengeName: 'SMS_MFA',
+    ChallengeResponses: {
+      USERNAME: aliasUsername,
+      SMS_MFA_CODE: confirmationCode,
+    },
+    ClientId,
+    Session: previousChallengeSession,
+  };
+
+  if (hasOldDevice) {
+    expectedRespondToAuthChallengeArgs.ChallengeResponses.DEVICE_KEY = oldDeviceKey;
+  }
+
+  const user = createUser(
+    {},
+    requestSucceedsWith(createRespondToAuthChallengeResponseForSuccess({ hasNewDevice })),
+    requestSucceedsWith({
+      UserConfirmationNecessary: userConfirmationNecessary,
+    }));
+
+  user.username = aliasUsername; // assertDidCacheTokens() expects this
+  user.Session = previousChallengeSession;
+
+  if (hasOldDevice) {
+    user.deviceKey = oldDeviceKey;
+  }
+
+  user.sendMFACode(confirmationCode, createCallback(t, t.end, {
+    onSuccess(signInUserSessionArg, userConfirmationNecessaryArg) {
+      t.is(signInUserSessionArg, user.getSignInUserSession());
+      if (userConfirmationNecessary) {
+        t.true(userConfirmationNecessaryArg);
+      } else {
+        t.falsy(userConfirmationNecessaryArg);
+      }
+
+      t.is(user.client.requestCallCount, hasNewDevice ? 2 : 1);
+      t.is(user.client.getRequestCallArgs(0).name, 'respondToAuthChallenge');
+      t.deepEqual(user.client.getRequestCallArgs(0).args, expectedRespondToAuthChallengeArgs);
+      if (hasNewDevice) {
+        t.is(user.client.getRequestCallArgs(1).name, 'confirmDevice');
+        t.deepEqual(user.client.getRequestCallArgs(1).args, {
+          DeviceKey: newDeviceKey,
+          AccessToken,
+          DeviceSecretVerifierConfig: {
+            Salt: SaltDevicesBase64,
+            PasswordVerifier: VerifierDevicesBase64,
+          },
+          DeviceName: deviceName,
+        });
+      }
+
+      t.is(user.getUsername(), aliasUsername);
+      t.is(user.Session, previousChallengeSession);
+
+      assertHasDeviceState(t, user, { hasOldDevice, hasNewDevice });
+
+      assertDidCacheTokens(t, localStorage);
+      if (hasNewDevice) {
+        assertDidCacheDeviceKeyAndPassword(t, localStorage);
+      } else {
+        assertDidNotCacheDeviceKeyAndPassword(t, localStorage);
+      }
+    },
+  }));
+}
+sendMFACodeSucceedsMacro.title = (_, context) => (
+  title('sendMFACode', { context, outcome: 'creates session' })
+);
+
+for (const hasOldDevice of [false, true]) {
+  for (const hasNewDevice of [false, true]) {
+    test.serial.cb(sendMFACodeSucceedsMacro, { hasOldDevice, hasNewDevice });
+  }
+}
+test.serial.cb(
+  sendMFACodeSucceedsMacro,
+  { hasNewDevice: true, userConfirmationNecessary: true }
+);

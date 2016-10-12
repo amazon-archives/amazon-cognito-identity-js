@@ -108,3 +108,33 @@ function requireWithModuleMocks(request, moduleMocks = {}) {
 export function requireDefaultWithModuleMocks(request, moduleMocks) {
   return requireWithModuleMocks(request, moduleMocks).default;
 }
+
+function titleMapString(value) {
+  return value && typeof value === 'object'
+    ? Object.keys(value).map(key => `${key}: ${JSON.stringify(value[key])}`).join(', ')
+    : value || '';
+}
+
+export function title(
+  fn,
+  { args, context, succeeds, outcome = succeeds ? 'succeeds' : 'fails' }
+) {
+  const fnString = typeof fn === 'function' ? fn.name.replace(/Macro$/, '') : fn;
+  const callString = fn || args ? `${fnString}(${titleMapString(args)})` : '';
+  const contextString = titleMapString(context);
+  const prefixString = callString && contextString
+    ? `${callString} :: ${contextString}`
+    : callString || contextString;
+  return `${prefixString} => ${outcome}`;
+}
+
+export function addSimpleTitle(macro, { args, context } = {}) {
+  // eslint-disable-next-line no-param-reassign
+  macro.title = (_, succeeds, ...values) => (
+    title(macro, {
+      succeeds,
+      args: args && args(...values),
+      context: context && context(...values),
+    })
+  );
+}
