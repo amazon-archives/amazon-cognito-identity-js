@@ -14,13 +14,13 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
-
+'use strict'
 const monthNames =
   ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const weekNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 /** @class */
-export default class DateHelper {
+module.exports = class DateHelper {
   /**
    * @returns {string} The current time in "ddd MMM D HH:mm:ss UTC YYYY" format.
    */

@@ -14,16 +14,16 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
-
+'use strict'
 /** @class */
-export default class CognitoRefreshToken {
+module.exports = class CognitoRefreshToken {
   /**
    * Constructs a new CognitoRefreshToken object
    * @param {string=} RefreshToken The JWT refresh token.
    */
-  constructor({ RefreshToken } = {}) {
+  constructor(data) {
     // Assign object
-    this.token = RefreshToken || '';
+    this.token = data.RefreshToken || '';
   }
 
   /**

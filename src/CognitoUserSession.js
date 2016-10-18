@@ -14,16 +14,21 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
-
+'use strict'
 /** @class */
-export default class CognitoUserSession {
+module.exports = class CognitoUserSession {
   /**
    * Constructs a new CognitoUserSession object
    * @param {string} IdToken The session's Id token.
    * @param {string=} RefreshToken The session's refresh token.
    * @param {string} AccessToken The session's access token.
    */
-  constructor({ IdToken, RefreshToken, AccessToken } = {}) {
+  constructor(sessionData) {
+
+    var IdToken = sessionData.IdToken;
+    var RefreshToken = sessionData.RefreshToken;
+    var AccessToken = sessionData.AccessToken;
+
     if (AccessToken == null || IdToken == null) {
       throw new Error('Id token and Access Token must be present.');
     }

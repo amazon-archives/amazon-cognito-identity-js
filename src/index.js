@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-export { default as AuthenticationDetails } from './AuthenticationDetails';
-export { default as AuthenticationHelper } from './AuthenticationHelper';
-export { default as CognitoAccessToken } from './CognitoAccessToken';
-export { default as CognitoIdToken } from './CognitoIdToken';
-export { default as CognitoRefreshToken } from './CognitoRefreshToken';
-export { default as CognitoUser } from './CognitoUser';
-export { default as CognitoUserAttribute } from './CognitoUserAttribute';
-export { default as CognitoUserPool } from './CognitoUserPool';
-export { default as CognitoUserSession } from './CognitoUserSession';
-export { default as DateHelper } from './DateHelper';
+module.exports = {
+  AuthenticationDetails : require('./AuthenticationDetails'),
+  AuthenticationHelper : require('./AuthenticationHelper'),
+  CognitoAccessToken : require('./CognitoAccessToken'),
+  CognitoIdToken : require('./CognitoIdToken'),
+  CognitoRefreshToken : require('./CognitoRefreshToken'),
+  CognitoUser : require('./CognitoUser'),
+  CognitoUserAttribute : require('./CognitoUserAttribute'),
+  CognitoUserPool : require('./CognitoUserPool'),
+  CognitoUserSession : require('./CognitoUserSession'),
+  DateHelper : require('./DateHelper'),
+}
