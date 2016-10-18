@@ -14,18 +14,18 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
-
-import * as sjcl from 'sjcl';
+'use strict'
+var sjcl = require('sjcl');
 
 /** @class */
-export default class CognitoAccessToken {
+module.exports = class CognitoAccessToken {
   /**
    * Constructs a new CognitoAccessToken object
    * @param {string=} AccessToken The JWT access token.
    */
-  constructor({ AccessToken } = {}) {
+  constructor(data) {
     // Assign object
-    this.jwtToken = AccessToken || '';
+    this.jwtToken = data.AccessToken || '';
   }
 
   /**
@@ -39,7 +39,7 @@ export default class CognitoAccessToken {
    * @returns {int} the token's expiration (exp member).
    */
   getExpiration() {
-    const payload = this.jwtToken.split('.')[1];
+    const payload = this.jwtToken.split('.')[1]; console.log(payload);
     const expiration = JSON.parse(
       sjcl.codec.utf8String.fromBits(sjcl.codec.base64url.toBits(payload)));
     return expiration.exp;

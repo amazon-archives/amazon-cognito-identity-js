@@ -14,18 +14,18 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
-
-import * as sjcl from 'sjcl';
+'use strict'
+var sjcl = require('sjcl');
 
 /** @class */
-export default class CognitoIdToken {
+module.exports = class CognitoIdToken {
   /**
    * Constructs a new CognitoIdToken object
    * @param {string=} IdToken The JWT Id token
    */
-  constructor({ IdToken } = {}) {
+  constructor(data) {
     // Assign object
-    this.jwtToken = IdToken || '';
+    this.jwtToken = data.IdToken || '';
   }
 
   /**

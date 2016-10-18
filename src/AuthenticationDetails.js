@@ -14,9 +14,9 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
-
+'use strict'
 /** @class */
-export default class AuthenticationDetails {
+module.exports = class AuthenticationDetails {
   /**
    * Constructs a new AuthenticationDetails object
    * @param {object=} data Creation options.
@@ -25,7 +25,9 @@ export default class AuthenticationDetails {
    * @param {(AttributeArg[])?} data.ValidationData Application extra metadata.
    */
   constructor(data) {
-    const { ValidationData, Username, Password } = data || {};
+    const ValidationData = data.ValidationData || '';
+    const Username = data.Username;
+    const Password = data.Password;
     this.validationData = ValidationData || [];
     this.username = Username;
     this.password = Password;
