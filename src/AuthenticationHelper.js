@@ -14,9 +14,9 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
-
-import * as sjcl from 'sjcl';
-import { BigInteger } from 'jsbn';
+"use strict";
+var sjcl = require('sjcl');
+var BigInteger = require('jsbn').BigInteger;
 
 const initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
   + '29024E088A67CC74020BBEA63B139B22514A08798E3404DD'
@@ -38,7 +38,7 @@ const initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
 const newPasswordRequiredChallengeUserAttributePrefix = 'userAttributes.';
 
 /** @class */
-export default class AuthenticationHelper {
+module.exports = class AuthenticationHelper {
   /**
    * Constructs a new AuthenticationHelper object
    * @param {string} PoolName Cognito user pool name.

@@ -14,17 +14,19 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict'
+var sjcl = require('sjcl');
+var BigInteger = require('jsbn').BigInteger;
 
-import * as sjcl from 'sjcl';
-import { BigInteger } from 'jsbn';
+var AuthenticationHelper= require('./AuthenticationHelper');
+var CognitoAccessToken= require('./CognitoAccessToken');
+var CognitoIdToken= require('./CognitoIdToken');
+var CognitoRefreshToken= require('./CognitoRefreshToken');
+var CognitoUserSession= require('./CognitoUserSession');
+var DateHelper = require('./DateHelper');
+var CognitoUserAttribute = require('./CognitoUserAttribute');
 
-import AuthenticationHelper from './AuthenticationHelper';
-import CognitoAccessToken from './CognitoAccessToken';
-import CognitoIdToken from './CognitoIdToken';
-import CognitoRefreshToken from './CognitoRefreshToken';
-import CognitoUserSession from './CognitoUserSession';
-import DateHelper from './DateHelper';
-import CognitoUserAttribute from './CognitoUserAttribute';
+var LocalStorage = require('node-localstorage').LocalStorage;
 
 /**
  * @callback nodeCallback
@@ -67,7 +69,7 @@ import CognitoUserAttribute from './CognitoUserAttribute';
 
 
 /** @class */
-export default class CognitoUser {
+module.exports = class CognitoUser {
   /**
    * Constructs a new CognitoUser object
    * @param {object} data Creation options
@@ -789,7 +791,8 @@ export default class CognitoUser {
     const accessTokenKey = `${keyPrefix}.accessToken`;
     const refreshTokenKey = `${keyPrefix}.refreshToken`;
 
-    const storage = window.localStorage;
+//    const storage = window.localStorage;
+    const storage = new LocalStorage('/tmp/storage');
 
     if (storage.getItem(idTokenKey)) {
       const idToken = new CognitoIdToken({
@@ -834,7 +837,8 @@ export default class CognitoUser {
     authParameters.REFRESH_TOKEN = refreshToken.getToken();
     const keyPrefix = `CognitoIdentityServiceProvider.${this.pool.getClientId()}`;
     const lastUserKey = `${keyPrefix}.LastAuthUser`;
-    const storage = window.localStorage;
+//    const storage = window.localStorage;
+    const storage = new LocalStorage('/tmp/storage');
 
     if (storage.getItem(lastUserKey)) {
       this.username = storage.getItem(lastUserKey);
@@ -875,7 +879,8 @@ export default class CognitoUser {
     const refreshTokenKey = `${keyPrefix}.${this.username}.refreshToken`;
     const lastUserKey = `${keyPrefix}.LastAuthUser`;
 
-    const storage = window.localStorage;
+//    const storage = window.localStorage;
+    const storage = new LocalStorage('/tmp/storage');
 
     storage.setItem(idTokenKey, this.signInUserSession.getIdToken().getJwtToken());
     storage.setItem(accessTokenKey, this.signInUserSession.getAccessToken().getJwtToken());
@@ -893,7 +898,8 @@ export default class CognitoUser {
     const randomPasswordKey = `${keyPrefix}.randomPasswordKey`;
     const deviceGroupKeyKey = `${keyPrefix}.deviceGroupKey`;
 
-    const storage = window.localStorage;
+//    const storage = window.localStorage;
+    const storage = new LocalStorage('/tmp/storage');
 
     storage.setItem(deviceKeyKey, this.deviceKey);
     storage.setItem(randomPasswordKey, this.randomPassword);
@@ -910,7 +916,8 @@ export default class CognitoUser {
     const randomPasswordKey = `${keyPrefix}.randomPasswordKey`;
     const deviceGroupKeyKey = `${keyPrefix}.deviceGroupKey`;
 
-    const storage = window.localStorage;
+//    const storage = window.localStorage;
+    const storage = new LocalStorage('/tmp/storage');
 
     if (storage.getItem(deviceKeyKey)) {
       this.deviceKey = storage.getItem(deviceKeyKey);
@@ -929,7 +936,8 @@ export default class CognitoUser {
     const randomPasswordKey = `${keyPrefix}.randomPasswordKey`;
     const deviceGroupKeyKey = `${keyPrefix}.deviceGroupKey`;
 
-    const storage = window.localStorage;
+//    const storage = window.localStorage;
+    const storage = new LocalStorage('/tmp/storage');
 
     storage.removeItem(deviceKeyKey);
     storage.removeItem(randomPasswordKey);
@@ -947,7 +955,8 @@ export default class CognitoUser {
     const refreshTokenKey = `${keyPrefix}.${this.username}.refreshToken`;
     const lastUserKey = `${keyPrefix}.LastAuthUser`;
 
-    const storage = window.localStorage;
+//    const storage = window.localStorage;
+    const storage = new LocalStorage('/tmp/storage');
 
     storage.removeItem(idTokenKey);
     storage.removeItem(accessTokenKey);

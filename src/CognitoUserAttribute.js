@@ -14,15 +14,15 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
-
+'use strict'
 /** @class */
-export default class CognitoUserAttribute {
+module.exports = class CognitoUserAttribute {
   /**
    * Constructs a new CognitoUserAttribute object
    * @param {string=} Name The record's name
    * @param {string=} Value The record's value
    */
-  constructor({ Name, Value } = {}) {
+  constructor(Name, Value) {
     this.Name = Name || '';
     this.Value = Value || '';
   }

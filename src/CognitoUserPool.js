@@ -14,13 +14,13 @@
  * for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict'
+var CognitoIdentityServiceProvider = require('aws-sdk/clients/cognitoidentityserviceprovider');
 
-import CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
-
-import CognitoUser from './CognitoUser';
+var CognitoUser = require('./CognitoUser');
 
 /** @class */
-export default class CognitoUserPool {
+module.exports = class CognitoUserPool {
   /**
    * Constructs a new CognitoUserPool object
    * @param {object} data Creation options.
@@ -29,7 +29,10 @@ export default class CognitoUserPool {
    * @param {int=} data.Paranoia Random number generation paranoia level.
    */
   constructor(data) {
-    const { UserPoolId, ClientId, Paranoia } = data || {};
+    const UserPoolId = data.UserPoolId || '';
+    const ClientId = data.ClientId || '';
+    const Paranoia = data.Paranoia || '';
+
     if (!UserPoolId || !ClientId) {
       throw new Error('Both UserPoolId and ClientId are required.');
     }
@@ -123,7 +126,8 @@ export default class CognitoUserPool {
    */
   getCurrentUser() {
     const lastUserKey = `CognitoIdentityServiceProvider.${this.clientId}.LastAuthUser`;
-    const storage = window.localStorage;
+//    const storage = window.localStorage;
+    const storage = new LocalStorage('/tmp/storage');
 
     const lastAuthUser = storage.getItem(lastUserKey);
     if (lastAuthUser) {
