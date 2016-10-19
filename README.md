@@ -159,7 +159,7 @@ If you will be using Cognito Federated Identity to provide access to your AWS re
 
 ## Relevant examples
 
-For an example using babel-webpack, see [Babel-webpack example](https://github.com/aws/amazon-cognito-identity-js/tree/master/examples/babel-webpack).
+For an example using babel-webpack, see [babel-webpack example](https://github.com/aws/amazon-cognito-identity-js/tree/master/examples/babel-webpack).
 
 ## Usage
 
