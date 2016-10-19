@@ -157,6 +157,10 @@ The [AWS Console for Cognito User Pools](https://console.aws.amazon.com/cognito/
 
 If you will be using Cognito Federated Identity to provide access to your AWS resources or Cognito Sync you will also need the Id of a Cognito Identity Pool that will accept logins from the above Cognito User Pool and App, i.e. `us-east-1:85156295-afa8-482c-8933-1371f8b3b145`.
 
+## Relevant examples
+
+For an example using babel-webpack, see [Babel-webpack example](https://github.com/aws/amazon-cognito-identity-js/tree/master/examples/babel-webpack).
+
 ## Usage
 
 The usage examples below use the unqualified names for types in the Amazon Cognito Identity SDK for JavaScript. Remember to import or qualify access to any of these types:
