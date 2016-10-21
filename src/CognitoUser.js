@@ -519,6 +519,13 @@ export default class CognitoUser {
         return callback.onFailure(err);
       }
 
+      const challengeName = dataAuthenticate.ChallengeName;
+
+      if (challengeName === 'DEVICE_SRP_AUTH') {
+        this.getDeviceResponse(callback);
+        return undefined;
+      }
+
       this.signInUserSession = this.getCognitoUserSession(dataAuthenticate.AuthenticationResult);
       this.cacheTokens();
 
