@@ -656,7 +656,7 @@ or by calling the object method:
 ## Change Log
 **v1.7.0:**
 * What has changed
-  * Fixed newDeviceMetadata is undefined bug.
+  * Fixed Cannot read property 'NewDeviceMetadata' of undefined bug.
 
 **v1.6.0:**
 * What has changed
