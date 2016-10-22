@@ -654,6 +654,10 @@ or by calling the object method:
 ```
 
 ## Change Log
+**v1.7.0:**
+* What has changed
+  * Fixed newDeviceMetadata is undefined bug.
+
 **v1.6.0:**
 * What has changed
   * Support for Admin create user flow. Users being signend up by admins will be able to authenticate using their one time passwords.
