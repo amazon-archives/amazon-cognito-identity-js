@@ -6,7 +6,10 @@ We welcome developer feedback on this project. You can reach us by creating an i
 GitHub repository or posting to the Amazon Cognito Identity forums and the below blog post:
 * https://github.com/aws/amazon-cognito-identity-js
 * https://forums.aws.amazon.com/forum.jspa?forumID=173
-* http://mobile.awsblog.com/post/Tx2O14ZY8A5LFHT/Accessing-Your-User-Pools-using-the-Amazon-Cognito-Identity-SDK-for-JavaScript
+* https://aws.amazon.com/blogs/mobile/accessing-your-user-pools-using-the-amazon-cognito-identity-sdk-for-javascript/
+
+For an overview of the Cognito authentication flow, refer to the following blog post:
+* https://aws.amazon.com/blogs/mobile/customizing-your-user-pool-authentication-flow/
 
 Introduction
 ============
