@@ -68,7 +68,7 @@ Include all of the files in your HTML page before calling any Amazon Cognito Ide
     <script src="/path/to/sjcl.js"></script>
     <script src="/path/to/aws-cognito-sdk.min.js"></script>
     <script src="/path/to/amazon-cognito-identity.min.js"></script>
-    <script src="/path/to/aws-sdk-2.3.5.js"></script>
+    <script src="/path/to/aws-sdk-2.6.10.js"></script>
 ```
 
 ## Using NPM and Webpack
