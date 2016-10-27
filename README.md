@@ -449,7 +449,7 @@ you can make inputVerificationCode call a no-op
 **Use case 15.** Global signout for an authenticated user(invalidates all issued tokens).
 
 ```javascript
-    cognitoUser.globalSignOut();
+    cognitoUser.globalSignOut(callback);
 ```
 
 **Use case 16.** Retrieving the current user from local storage.
