@@ -2,6 +2,9 @@
   "presets": [
     "es2015"
   ],
+  "only": [
+    "src"
+  ],
   "env": {
     "nyc": {
       "sourceMaps": "inline",
