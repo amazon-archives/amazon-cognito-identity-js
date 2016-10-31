@@ -164,6 +164,8 @@ If you will be using Cognito Federated Identity to provide access to your AWS re
 
 For an example using babel-webpack, see [babel-webpack example](https://github.com/aws/amazon-cognito-identity-js/tree/master/examples/babel-webpack).
 
+Note that the various errors returned by the service are valid JSON so one can access the different exception types (err.code) and status codes (err.statusCode).
+
 ## Usage
 
 The usage examples below use the unqualified names for types in the Amazon Cognito Identity SDK for JavaScript. Remember to import or qualify access to any of these types:
