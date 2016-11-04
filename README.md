@@ -517,7 +517,7 @@ you can make inputVerificationCode call a no-op
         });
 ```
 
-**Use case 18.** List all devices for an authenticated user. In this case, we need to pass a limit on the number of devices retrieved at a time and a pagination token is returned to make subsequent calls. The pagination token can be subsequently pasesed. When making the first call, the pagination token should be null.
+**Use case 18.** List all remembered devices for an authenticated user. In this case, we need to pass a limit on the number of devices retrieved at a time and a pagination token is returned to make subsequent calls. The pagination token can be subsequently pasesed. When making the first call, the pagination token should be null.
 
 ```javascript
 
