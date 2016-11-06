@@ -1039,7 +1039,7 @@ export default class CognitoUser {
    */
   getAttributeVerificationCode(attributeName, callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
-      return callback(new Error('User is not authenticated'), null);
+      return callback.onFailure(new Error('User is not authenticated'));
     }
 
     this.client.makeUnauthenticatedRequest('getUserAttributeVerificationCode', {
@@ -1065,7 +1065,7 @@ export default class CognitoUser {
    */
   verifyAttribute(attributeName, confirmationCode, callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
-      return callback(new Error('User is not authenticated'), null);
+      return callback.onFailure(new Error('User is not authenticated'));
     }
 
     this.client.makeUnauthenticatedRequest('verifyUserAttribute', {
@@ -1090,7 +1090,7 @@ export default class CognitoUser {
    */
   getDevice(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
-      return callback(new Error('User is not authenticated'), null);
+      return callback.onFailure(new Error('User is not authenticated'));
     }
 
     this.client.makeUnauthenticatedRequest('getDevice', {
@@ -1114,7 +1114,7 @@ export default class CognitoUser {
    */
   forgetDevice(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
-      return callback(new Error('User is not authenticated'), null);
+      return callback.onFailure(new Error('User is not authenticated'));
     }
 
     this.client.makeUnauthenticatedRequest('forgetDevice', {
@@ -1142,7 +1142,7 @@ export default class CognitoUser {
    */
   setDeviceStatusRemembered(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
-      return callback(new Error('User is not authenticated'), null);
+      return callback.onFailure(new Error('User is not authenticated'));
     }
 
     this.client.makeUnauthenticatedRequest('updateDeviceStatus', {
@@ -1167,7 +1167,7 @@ export default class CognitoUser {
    */
   setDeviceStatusNotRemembered(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
-      return callback(new Error('User is not authenticated'), null);
+      return callback.onFailure(new Error('User is not authenticated'));
     }
 
     this.client.makeUnauthenticatedRequest('updateDeviceStatus', {
@@ -1195,7 +1195,7 @@ export default class CognitoUser {
    */
   listDevices(limit, paginationToken, callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
-      return callback(new Error('User is not authenticated'), null);
+      return callback.onFailure(new Error('User is not authenticated'));
     }
 
     this.client.makeUnauthenticatedRequest('listDevices', {
@@ -1220,7 +1220,7 @@ export default class CognitoUser {
    */
   globalSignOut(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
-      return callback(new Error('User is not authenticated'), null);
+      return callback.onFailure(new Error('User is not authenticated'));
     }
 
     this.client.makeUnauthenticatedRequest('globalSignOut', {
