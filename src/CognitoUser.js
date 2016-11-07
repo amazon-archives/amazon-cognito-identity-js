@@ -199,7 +199,18 @@ export default class CognitoUser {
         challengeResponses.DEVICE_KEY = this.deviceKey;
       }
 
-      this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+      const respondToAuthChallenge = (challenge, challengeCallback) =>
+        this.client.makeUnauthenticatedRequest('respondToAuthChallenge',
+          challenge, (errChallenge, dataChallenge) => {
+            if (errChallenge && errChallenge.code === 'ResourceNotFoundException') {
+              challengeResponses.DEVICE_KEY = null;
+              this.clearCachedDeviceKeyAndPassword();
+              return respondToAuthChallenge(challenge, challengeCallback)
+            }
+            return challengeCallback(errChallenge, dataChallenge);
+        });
+
+      respondToAuthChallenge({
         ChallengeName: 'PASSWORD_VERIFIER',
         ClientId: this.pool.getClientId(),
         ChallengeResponses: challengeResponses,
@@ -941,6 +952,10 @@ export default class CognitoUser {
     storage.removeItem(deviceKeyKey);
     storage.removeItem(randomPasswordKey);
     storage.removeItem(deviceGroupKeyKey);
+
+    this.deviceKey = null;
+    this.randomPassword = null;
+    this.deviceGroupKey = null;
   }
 
   /**
