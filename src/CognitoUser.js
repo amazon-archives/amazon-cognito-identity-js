@@ -1125,7 +1125,7 @@ export default class CognitoUser {
         return callback.onFailure(err);
       }
       this.deviceKey = null;
-      this.deviceGroupkey = null;
+      this.deviceGroupKey = null;
       this.randomPassword = null;
       this.clearCachedDeviceKeyAndPassword();
       return callback.onSuccess('SUCCESS');
