@@ -580,7 +580,7 @@ you can make inputVerificationCode call a no-op
 
 ```javascript
 
-    cognitoUser.forgetCurrentDevice({
+    cognitoUser.forgetDevice({
         onSuccess: function (result) {
             console.log('call result: ' + result);
         },

@@ -1106,14 +1106,14 @@ export default class CognitoUser {
   }
 
   /**
-   * This is used to forget a device
+   * This is used to forget a specific device
    * @param {string} deviceKey Device key.
    * @param {object} callback Result callback map.
    * @param {onFailure} callback.onFailure Called on any error.
    * @param {onSuccess<string>} callback.onSuccess Called on success.
    * @returns {void}
    */
-  forgetDevice(deviceKey, callback) {
+  forgetSepcificDevice(deviceKey, callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
     }
@@ -1137,8 +1137,8 @@ export default class CognitoUser {
    * @param {onSuccess<string>} callback.onSuccess Called on success.
    * @returns {void}
    */
-  forgetCurrentDevice(callback) {
-    this.forgetDevice(this.deviceKey, {
+  forgetDevice(callback) {
+    this.forgetSepcificDevice(this.deviceKey, {
       onFailure: callback.onFailure,
       onSuccess: result => {
         this.deviceKey = null;
