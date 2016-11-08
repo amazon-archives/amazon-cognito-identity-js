@@ -202,7 +202,8 @@ export default class CognitoUser {
       const respondToAuthChallenge = (challenge, challengeCallback) =>
         this.client.makeUnauthenticatedRequest('respondToAuthChallenge', challenge,
           (errChallenge, dataChallenge) => {
-            if (errChallenge && errChallenge.code === 'ResourceNotFoundException') {
+            if (errChallenge && errChallenge.code === 'ResourceNotFoundException' &&
+                errChallenge.message.toLowerCase().indexOf('device') !== -1) {
               challengeResponses.DEVICE_KEY = null;
               this.deviceKey = null;
               this.randomPassword = null;
