@@ -1113,7 +1113,7 @@ export default class CognitoUser {
    * @param {onSuccess<string>} callback.onSuccess Called on success.
    * @returns {void}
    */
-  forgetSepcificDevice(deviceKey, callback) {
+  forgetSpecificDevice(deviceKey, callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
     }
@@ -1138,7 +1138,7 @@ export default class CognitoUser {
    * @returns {void}
    */
   forgetDevice(callback) {
-    this.forgetSepcificDevice(this.deviceKey, {
+    this.forgetSpecificDevice(this.deviceKey, {
       onFailure: callback.onFailure,
       onSuccess: result => {
         this.deviceKey = null;
