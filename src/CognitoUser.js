@@ -1121,6 +1121,31 @@ export default class CognitoUser {
   }
 
   /**
+   * This is used to forget a specific device
+   * @param {string} deviceKey Device key.
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {onSuccess<string>} callback.onSuccess Called on success.
+   * @returns {void}
+   */
+  forgetSpecificDevice(deviceKey, callback) {
+    if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
+      return callback(new Error('User is not authenticated'), null);
+    }
+
+    this.client.makeUnauthenticatedRequest('forgetDevice', {
+      AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
+      DeviceKey: deviceKey,
+    }, err => {
+      if (err) {
+        return callback.onFailure(err);
+      }
+      return callback.onSuccess('SUCCESS');
+    });
+    return undefined;
+  }
+
+  /**
    * This is used to forget the current device
    * @param {object} callback Result callback map.
    * @param {onFailure} callback.onFailure Called on any error.
@@ -1128,24 +1153,16 @@ export default class CognitoUser {
    * @returns {void}
    */
   forgetDevice(callback) {
-    if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
-      return callback(new Error('User is not authenticated'), null);
-    }
-
-    this.client.makeUnauthenticatedRequest('forgetDevice', {
-      AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
-      DeviceKey: this.deviceKey,
-    }, err => {
-      if (err) {
-        return callback.onFailure(err);
-      }
-      this.deviceKey = null;
-      this.deviceGroupKey = null;
-      this.randomPassword = null;
-      this.clearCachedDeviceKeyAndPassword();
-      return callback.onSuccess('SUCCESS');
+    this.forgetSpecificDevice(this.deviceKey, {
+      onFailure: callback.onFailure,
+      onSuccess: result => {
+        this.deviceKey = null;
+        this.deviceGroupKey = null;
+        this.randomPassword = null;
+        this.clearCachedDeviceKeyAndPassword();
+        return callback.onSuccess(result);
+      },
     });
-    return undefined;
   }
 
   /**
