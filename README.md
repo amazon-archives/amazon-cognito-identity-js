@@ -326,7 +326,7 @@ Note that if device tracking is enabled for the user pool with a setting that us
         onFailure: function(err) {
             alert(err);
         },
-        inputVerificationCode() {
+        inputVerificationCode: function() {
             var verificationCode = prompt('Please input verification code: ' ,'');
             cognitoUser.verifyAttribute('email', verificationCode, this);
         }
