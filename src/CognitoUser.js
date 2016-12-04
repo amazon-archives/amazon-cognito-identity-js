@@ -339,7 +339,7 @@ export default class CognitoUser {
   */
   completeNewPasswordChallenge(newPassword, requiredAttributeData, callback) {
     if (!newPassword) {
-      return callback.onFailure('New password is required.');
+      return callback.onFailure(new Error('New password is required.'));
     }
     const authenticationHelper = new AuthenticationHelper(
       this.pool.getUserPoolId().split('_')[1], this.pool.getParanoia());
