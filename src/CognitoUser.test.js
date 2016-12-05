@@ -1,6 +1,7 @@
 /* eslint-disable require-jsdoc */
 
 import test from 'ava';
+import { stub } from 'sinon';
 
 import {
   MockClient,
@@ -199,6 +200,11 @@ test.cb(disableMFAMacro, false);
 test.cb(disableMFAMacro, true);
 
 function deleteUserMacro(t, succeeds) {
+  const localStorage = {
+    removeItem: stub(),
+  };
+  global.window = { localStorage };
+
   const expectedError = createExpectedErrorFromSuccess(succeeds);
   const user = createSignedInUserWithExpectedError(expectedError);
 
@@ -209,8 +215,8 @@ function deleteUserMacro(t, succeeds) {
   });
 }
 addSimpleTitle(deleteUserMacro);
-test.cb(deleteUserMacro, false);
-test.cb(deleteUserMacro, true);
+test.serial.cb(deleteUserMacro, false);
+test.serial.cb(deleteUserMacro, true);
 
 function updateAttributesMacro(t, succeeds) {
   const expectedError = createExpectedErrorFromSuccess(succeeds);
