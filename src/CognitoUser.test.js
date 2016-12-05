@@ -10,7 +10,6 @@ import {
   createCallback,
   createBasicCallback,
   title,
-  addSimpleTitle,
 } from './_helpers.test';
 
 // Valid property values: constructor, request props, etc...
@@ -84,18 +83,62 @@ function createExpectedErrorFromSuccess(succeeds) {
 }
 
 
-function constructorRequiredParamsMacro(t, data) {
-  const CognitoUser = requireDefaultWithModuleMocks('./CognitoUser');
-  t.throws(() => new CognitoUser(data), /required/);
+function testSpec({
+  title: macroTitle,
+  cb = true,
+  serial = false,
+  macro,
+  cases = [
+    [false],
+    [true],
+  ],
+}) {
+  if (typeof macroTitle === 'string') {
+    // eslint-disable-next-line no-param-reassign
+    macro.title = (_, succeeds) => title(macroTitle, { succeeds });
+  } else if (typeof macroTitle === 'function') {
+    // eslint-disable-next-line no-param-reassign
+    macro.title = (_, ...args) => macroTitle(...args);
+  } else {
+    // eslint-disable-next-line no-param-reassign
+    macro.title = (_, succeeds, ...values) => (
+      title(macroTitle.name, {
+        succeeds,
+        args: macroTitle.args && macroTitle.args(...values),
+        context: macroTitle.context && macroTitle.context(...values),
+      })
+    );
+  }
+  let testMethod = test;
+  if (cb) {
+    testMethod = testMethod.cb;
+  }
+  if (serial) {
+    testMethod = testMethod.serial;
+  }
+  for (const testCase of cases) {
+    testMethod(macro, ...testCase);
+  }
 }
-constructorRequiredParamsMacro.title = (_, data) => (
-  title('constructor', { args: data, outcome: 'throws "required"' })
-);
-test(constructorRequiredParamsMacro, null);
-test(constructorRequiredParamsMacro, {});
-test(constructorRequiredParamsMacro, { Username: null, Pool: null });
-test(constructorRequiredParamsMacro, { Username: null, Pool: new MockUserPool() });
-test(constructorRequiredParamsMacro, { Username, Pool: null });
+
+
+testSpec({
+  title(data) {
+    return title('constructor', { args: data, outcome: 'throws "required"' });
+  },
+  cb: false,
+  macro(t, data) {
+    const CognitoUser = requireDefaultWithModuleMocks('./CognitoUser');
+    t.throws(() => new CognitoUser(data), /required/);
+  },
+  cases: [
+    [null],
+    [{}],
+    [{ Username: null, Pool: null }],
+    [{ Username: null, Pool: new MockUserPool() }],
+    [{ Username, Pool: null }],
+  ],
+});
 
 test('constructor() :: valid => creates expected instance', t => {
   const CognitoUser = requireDefaultWithModuleMocks('./CognitoUser');
@@ -120,304 +163,315 @@ test('setAuthenticationFlowType() => sets authentication flow type', t => {
 
 // See CognitoUser.authenticateUser.test.js for authenticateUser() and the challenge responses
 
-function confirmRegistrationMacro(t, forceAliasCreation, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createUser({}, [expectedError]);
+testSpec({
+  title(forceAliasCreation, succeeds) {
+    return title('confirmRegistration', { succeeds, args: { forceAliasCreation } });
+  },
+  macro(t, forceAliasCreation, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createUser({}, [expectedError]);
 
-  user.confirmRegistration(confirmationCode, forceAliasCreation, err => {
-    t.is(err, expectedError);
-    requestCalledOnceWith(t, user.client, 'confirmSignUp', {
-      ClientId,
-      ConfirmationCode: confirmationCode,
-      Username,
-      ForceAliasCreation: forceAliasCreation,
+    user.confirmRegistration(confirmationCode, forceAliasCreation, err => {
+      t.is(err, expectedError);
+      requestCalledOnceWith(t, user.client, 'confirmSignUp', {
+        ClientId,
+        ConfirmationCode: confirmationCode,
+        Username,
+        ForceAliasCreation: forceAliasCreation,
+      });
+      t.end();
     });
-    t.end();
-  });
-}
-confirmRegistrationMacro.title = (_, forceAliasCreation, succeeds) => (
-  title(confirmRegistrationMacro, { succeeds, args: { forceAliasCreation } })
-);
-test.cb(confirmRegistrationMacro, false, false);
-test.cb(confirmRegistrationMacro, true, false);
-test.cb(confirmRegistrationMacro, false, true);
-test.cb(confirmRegistrationMacro, true, true);
+  },
+  cases: [
+    [false, false],
+    [true, false],
+    [false, true],
+    [true, true],
+  ],
+});
 
-function changePasswordMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
+testSpec({
+  title: 'changePassword',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
 
-  const oldUserPassword = 'swordfish';
-  const newUserPassword = 'slaughterfish';
-  user.changePassword(oldUserPassword, newUserPassword, err => {
-    t.is(err, expectedError);
-    requestCalledOnceWith(t, user.client, 'changePassword', {
-      PreviousPassword: oldUserPassword,
-      ProposedPassword: newUserPassword,
-      AccessToken,
+    const oldUserPassword = 'swordfish';
+    const newUserPassword = 'slaughterfish';
+    user.changePassword(oldUserPassword, newUserPassword, err => {
+      t.is(err, expectedError);
+      requestCalledOnceWith(t, user.client, 'changePassword', {
+        PreviousPassword: oldUserPassword,
+        ProposedPassword: newUserPassword,
+        AccessToken,
+      });
+      t.end();
     });
-    t.end();
-  });
-}
-addSimpleTitle(changePasswordMacro);
-test.cb(changePasswordMacro, false);
-test.cb(changePasswordMacro, true);
-
-function enableMFAMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
-
-  user.enableMFA(err => {
-    t.is(err, expectedError);
-    requestCalledOnceWith(t, user.client, 'setUserSettings', {
-      MFAOptions: [
-        { DeliveryMedium: 'SMS', AttributeName: 'phone_number' },
-      ],
-      AccessToken,
-    });
-    t.end();
-  });
-}
-addSimpleTitle(enableMFAMacro);
-test.cb(enableMFAMacro, false);
-test.cb(enableMFAMacro, true);
-
-function disableMFAMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
-
-  user.disableMFA(err => {
-    t.is(err, expectedError);
-    requestCalledOnceWith(t, user.client, 'setUserSettings', {
-      MFAOptions: [],
-      AccessToken,
-    });
-    t.end();
-  });
-}
-addSimpleTitle(disableMFAMacro);
-test.cb(disableMFAMacro, false);
-test.cb(disableMFAMacro, true);
-
-function deleteUserMacro(t, succeeds) {
-  const localStorage = {
-    removeItem: stub(),
-  };
-  global.window = { localStorage };
-
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
-
-  user.deleteUser(err => {
-    t.is(err, expectedError);
-    requestCalledOnceWith(t, user.client, 'deleteUser', { AccessToken });
-    t.end();
-  });
-}
-addSimpleTitle(deleteUserMacro);
-test.serial.cb(deleteUserMacro, false);
-test.serial.cb(deleteUserMacro, true);
-
-function updateAttributesMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
-
-  user.updateAttributes(attributes, err => {
-    t.is(err, expectedError);
-    requestCalledOnceWith(t, user.client, 'updateUserAttributes', {
-      UserAttributes: attributes,
-      AccessToken,
-    });
-    t.end();
-  });
-}
-addSimpleTitle(updateAttributesMacro);
-test.cb(updateAttributesMacro, false);
-test.cb(updateAttributesMacro, true);
-
-function getUserAttributesMacro(t, succeeds) {
-  class MockCognitoUserAttribute {
-    constructor(...params) {
-      this.params = params;
-    }
-  }
-
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const responseResult = succeeds ? { UserAttributes: attributes } : null;
-
-  const user = createSignedInUserWithMocks(
-    {
-      './CognitoUserAttribute': MockCognitoUserAttribute,
-    },
-    [expectedError, responseResult]);
-
-  user.getUserAttributes((err, result) => {
-    t.is(err, expectedError);
-    if (succeeds) {
-      t.true(Array.isArray(result) && result.every(i => i instanceof MockCognitoUserAttribute));
-      t.deepEqual(result.map(i => i.params[0]), attributes);
-    } else {
-      t.falsy(result);
-    }
-    requestCalledOnceWith(t, user.client, 'getUser', { AccessToken });
-    t.end();
-  });
-}
-addSimpleTitle(getUserAttributesMacro);
-test.cb(getUserAttributesMacro, false);
-test.cb(getUserAttributesMacro, true);
-
-function deleteAttributesMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
-
-  const attributeList = attributes.map(a => a.Name);
-
-  user.deleteAttributes(attributeList, err => {
-    t.is(err, expectedError);
-    requestCalledOnceWith(t, user.client, 'deleteUserAttributes', {
-      UserAttributeNames: attributeList,
-      AccessToken,
-    });
-    t.end();
-  });
-}
-addSimpleTitle(deleteAttributesMacro);
-test.cb(deleteAttributesMacro, false);
-test.cb(deleteAttributesMacro, true);
-
-function resendConfirmationCodeMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
-
-  user.resendConfirmationCode(err => {
-    t.is(err, expectedError);
-    requestCalledOnceWith(t, user.client, 'resendConfirmationCode', { ClientId, Username });
-    t.end();
-  });
-}
-addSimpleTitle(resendConfirmationCodeMacro);
-test.cb(resendConfirmationCodeMacro, false);
-test.cb(resendConfirmationCodeMacro, true);
-
-function forgotPasswordMacro(t, succeeds, usingInputVerificationCode) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const expectedData = !succeeds ? null : { CodeDeliveryDetails };
-  const request = [expectedError, expectedData];
-  const user = createSignedInUser(request);
-
-  function done() {
-    requestCalledOnceWith(t, user.client, 'forgotPassword', { ClientId, Username });
-    t.end();
-  }
-
-  const callback = !usingInputVerificationCode ?
-    createBasicCallback(t, succeeds, expectedError, done) :
-    createCallback(t, done, {
-      onFailure(err) {
-        t.false(succeeds);
-        t.is(err, expectedError);
-      },
-      inputVerificationCode(data) {
-        t.true(succeeds);
-        t.is(data, expectedData);
-      },
-    });
-
-  user.forgotPassword(callback);
-}
-addSimpleTitle(forgotPasswordMacro, {
-  context(usingInputVerificationCode) {
-    return { usingInputVerificationCode };
   },
 });
-test.cb(forgotPasswordMacro, false, false);
-test.cb(forgotPasswordMacro, true, false);
-test.cb(forgotPasswordMacro, false, true);
-test.cb(forgotPasswordMacro, true, true);
 
-function confirmPasswordMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
+testSpec({
+  title: 'enableMFA',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
 
-  const newPassword = 'swordfish';
-  const callback = createBasicCallback(t, succeeds, expectedError, () => {
-    requestCalledOnceWith(t, user.client, 'confirmForgotPassword', {
-      ClientId,
-      Username,
-      ConfirmationCode: confirmationCode,
-      Password: newPassword,
+    user.enableMFA(err => {
+      t.is(err, expectedError);
+      requestCalledOnceWith(t, user.client, 'setUserSettings', {
+        MFAOptions: [
+          { DeliveryMedium: 'SMS', AttributeName: 'phone_number' },
+        ],
+        AccessToken,
+      });
+      t.end();
     });
-    t.end();
-  });
-  user.confirmPassword(confirmationCode, newPassword, callback);
-}
-addSimpleTitle(confirmPasswordMacro);
-test.cb(confirmPasswordMacro, false);
-test.cb(confirmPasswordMacro, true);
+  },
+});
 
-function getAttributeVerificationCodeMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const expectedData = !succeeds ? null : { CodeDeliveryDetails };
-  const user = createSignedInUser([expectedError, expectedData]);
+testSpec({
+  title: 'disableMFA',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
 
-  function done() {
-    requestCalledOnceWith(t, user.client, 'getUserAttributeVerificationCode', {
-      AttributeName: attributeName,
-      AccessToken,
+    user.disableMFA(err => {
+      t.is(err, expectedError);
+      requestCalledOnceWith(t, user.client, 'setUserSettings', {
+        MFAOptions: [],
+        AccessToken,
+      });
+      t.end();
     });
-    t.end();
-  }
-  user.getAttributeVerificationCode(
-    attributeName,
-    createCallback(t, done, {
-      onFailure(err) {
-        t.false(succeeds);
-        t.is(err, expectedError);
+  },
+});
+
+
+testSpec({
+  title: 'deleteUser',
+  serial: true,
+  macro(t, succeeds) {
+    const localStorage = {
+      removeItem: stub(),
+    };
+    global.window = { localStorage };
+
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
+
+    user.deleteUser(err => {
+      t.is(err, expectedError);
+      requestCalledOnceWith(t, user.client, 'deleteUser', { AccessToken });
+      t.end();
+    });
+  },
+});
+
+testSpec({
+  title: 'updateAttributes',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
+
+    user.updateAttributes(attributes, err => {
+      t.is(err, expectedError);
+      requestCalledOnceWith(t, user.client, 'updateUserAttributes', {
+        UserAttributes: attributes,
+        AccessToken,
+      });
+      t.end();
+    });
+  },
+});
+
+testSpec({
+  title: 'getUserAttributes',
+  macro(t, succeeds) {
+    class MockCognitoUserAttribute {
+      constructor(...params) {
+        this.params = params;
+      }
+    }
+
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const responseResult = succeeds ? { UserAttributes: attributes } : null;
+
+    const user = createSignedInUserWithMocks(
+      {
+        './CognitoUserAttribute': MockCognitoUserAttribute,
       },
-      inputVerificationCode(data) {
-        t.true(succeeds);
-        t.is(data, expectedData);
-      },
-    }));
-}
-addSimpleTitle(getAttributeVerificationCodeMacro);
-test.cb(getAttributeVerificationCodeMacro, false);
-test.cb(getAttributeVerificationCodeMacro, true);
+      [expectedError, responseResult]);
 
-function verifyAttributeMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
-
-  const callback = createBasicCallback(t, succeeds, expectedError, () => {
-    requestCalledOnceWith(t, user.client, 'verifyUserAttribute', {
-      AttributeName: attributeName,
-      Code: confirmationCode,
-      AccessToken,
+    user.getUserAttributes((err, result) => {
+      t.is(err, expectedError);
+      if (succeeds) {
+        t.true(Array.isArray(result) && result.every(i => i instanceof MockCognitoUserAttribute));
+        t.deepEqual(result.map(i => i.params[0]), attributes);
+      } else {
+        t.falsy(result);
+      }
+      requestCalledOnceWith(t, user.client, 'getUser', { AccessToken });
+      t.end();
     });
-    t.end();
-  });
-  user.verifyAttribute(attributeName, confirmationCode, callback);
-}
-addSimpleTitle(verifyAttributeMacro);
-test.cb(verifyAttributeMacro, false);
-test.cb(verifyAttributeMacro, true);
+  },
+});
 
-function getDeviceMacro(t, succeeds) {
-  const expectedError = createExpectedErrorFromSuccess(succeeds);
-  const user = createSignedInUserWithExpectedError(expectedError);
-  const expectedDeviceKey = 'some-device-key';
-  user.deviceKey = expectedDeviceKey;
+testSpec({
+  title: 'deleteUserAttributes',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
 
-  const callback = createBasicCallback(t, succeeds, expectedError, () => {
-    requestCalledOnceWith(t, user.client, 'getDevice', {
-      AccessToken,
-      DeviceKey: expectedDeviceKey,
+    const attributeList = attributes.map(a => a.Name);
+
+    user.deleteAttributes(attributeList, err => {
+      t.is(err, expectedError);
+      requestCalledOnceWith(t, user.client, 'deleteUserAttributes', {
+        UserAttributeNames: attributeList,
+        AccessToken,
+      });
+      t.end();
     });
-    t.end();
-  });
-  user.getDevice(callback);
-}
-addSimpleTitle(getDeviceMacro);
-test.cb(getDeviceMacro, false);
-test.cb(getDeviceMacro, true);
+  },
+});
+
+testSpec({
+  title: 'resendConfirmationCode',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
+
+    user.resendConfirmationCode(err => {
+      t.is(err, expectedError);
+      requestCalledOnceWith(t, user.client, 'resendConfirmationCode', { ClientId, Username });
+      t.end();
+    });
+  },
+});
+
+testSpec({
+  title: {
+    name: 'forgotPassword',
+    context(usingInputVerificationCode) {
+      return { usingInputVerificationCode };
+    },
+  },
+  macro(t, succeeds, usingInputVerificationCode) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const expectedData = !succeeds ? null : { CodeDeliveryDetails };
+    const request = [expectedError, expectedData];
+    const user = createSignedInUser(request);
+
+    function done() {
+      requestCalledOnceWith(t, user.client, 'forgotPassword', { ClientId, Username });
+      t.end();
+    }
+
+    const callback = !usingInputVerificationCode ?
+      createBasicCallback(t, succeeds, expectedError, done) :
+      createCallback(t, done, {
+        onFailure(err) {
+          t.false(succeeds);
+          t.is(err, expectedError);
+        },
+        inputVerificationCode(data) {
+          t.true(succeeds);
+          t.is(data, expectedData);
+        },
+      });
+
+    user.forgotPassword(callback);
+  },
+  cases: [
+    [false, false],
+    [true, false],
+    [false, true],
+    [true, true],
+  ],
+});
+
+testSpec({
+  title: 'confirmPassword',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
+
+    const newPassword = 'swordfish';
+    const callback = createBasicCallback(t, succeeds, expectedError, () => {
+      requestCalledOnceWith(t, user.client, 'confirmForgotPassword', {
+        ClientId,
+        Username,
+        ConfirmationCode: confirmationCode,
+        Password: newPassword,
+      });
+      t.end();
+    });
+    user.confirmPassword(confirmationCode, newPassword, callback);
+  },
+});
+
+testSpec({
+  title: 'getAttributeVerificationCode',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const expectedData = !succeeds ? null : { CodeDeliveryDetails };
+    const user = createSignedInUser([expectedError, expectedData]);
+
+    function done() {
+      requestCalledOnceWith(t, user.client, 'getUserAttributeVerificationCode', {
+        AttributeName: attributeName,
+        AccessToken,
+      });
+      t.end();
+    }
+    user.getAttributeVerificationCode(
+      attributeName,
+      createCallback(t, done, {
+        onFailure(err) {
+          t.false(succeeds);
+          t.is(err, expectedError);
+        },
+        inputVerificationCode(data) {
+          t.true(succeeds);
+          t.is(data, expectedData);
+        },
+      }));
+  },
+});
+
+testSpec({
+  title: 'verifyAttribute',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
+
+    const callback = createBasicCallback(t, succeeds, expectedError, () => {
+      requestCalledOnceWith(t, user.client, 'verifyUserAttribute', {
+        AttributeName: attributeName,
+        Code: confirmationCode,
+        AccessToken,
+      });
+      t.end();
+    });
+    user.verifyAttribute(attributeName, confirmationCode, callback);
+  },
+});
+
+testSpec({
+  title: 'getDevice',
+  macro(t, succeeds) {
+    const expectedError = createExpectedErrorFromSuccess(succeeds);
+    const user = createSignedInUserWithExpectedError(expectedError);
+    const expectedDeviceKey = 'some-device-key';
+    user.deviceKey = expectedDeviceKey;
+
+    const callback = createBasicCallback(t, succeeds, expectedError, () => {
+      requestCalledOnceWith(t, user.client, 'getDevice', {
+        AccessToken,
+        DeviceKey: expectedDeviceKey,
+      });
+      t.end();
+    });
+    user.getDevice(callback);
+  },
+});
