@@ -3443,8 +3443,10 @@ AWS.CognitoIdentityCredentials = AWS.util.inherit(AWS.Credentials, {
 
   storage: (function() {
     try {
-      return AWS.util.isBrowser() && window.localStorage !== null && typeof window.localStorage === 'object' ?
-             window.localStorage : {};
+      window.localStorage.setItem('aws.test-storage', 'foobar');
+      window.localStorage.removeItem('aws.test-storage');
+
+      return AWS.util.isBrowser() ? window.localStorage : {};
     } catch (_) {
       return {};
     }

@@ -18,6 +18,7 @@
 import CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
 
 import CognitoUser from './CognitoUser';
+import StorageHelper from './StorageHelper';
 
 /** @class */
 export default class CognitoUserPool {
@@ -123,7 +124,7 @@ export default class CognitoUserPool {
    */
   getCurrentUser() {
     const lastUserKey = `CognitoIdentityServiceProvider.${this.clientId}.LastAuthUser`;
-    const storage = window.localStorage;
+    const storage = new StorageHelper().getStorage();
 
     const lastAuthUser = storage.getItem(lastUserKey);
     if (lastAuthUser) {
