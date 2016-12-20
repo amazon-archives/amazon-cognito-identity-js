@@ -10,6 +10,10 @@
   "homepage": "http://aws.amazon.com/cognito",
   "contributors": [
     "Simon Buchan with Skilitics",
+    "Jonathan Goldwasser",
+    "Matt Durant",
+    "John Ferlito",
+    "Chetan Mehta <chetam@amazon.com>",
     "Ionut Trestian <trestian@amazon.com>"
   ],
   "repository": {
