@@ -16,7 +16,6 @@
  */
 
 let dataMemory = {};
-let storageWindow = window.localStorage;
 
 /** @class */
 class MemoryStorage {
@@ -70,10 +69,11 @@ export default class StorageHelper {
    */
   constructor() {
     try {
-      storageWindow.setItem('aws.cognito.test-ls', 1);
-      storageWindow.removeItem('aws.cognito.test-ls');
+      this.storageWindow = window.localStorage;
+      this.storageWindow.setItem('aws.cognito.test-ls', 1);
+      this.storageWindow.removeItem('aws.cognito.test-ls');
     } catch (exception) {
-      storageWindow = MemoryStorage;
+      this.storageWindow = MemoryStorage;
     }
   }
 
@@ -82,6 +82,6 @@ export default class StorageHelper {
    * @returns {object} the storage
    */
   getStorage() {
-    return storageWindow;
+    return this.storageWindow;
   }
 }
