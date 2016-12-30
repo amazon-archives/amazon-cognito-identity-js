@@ -613,9 +613,12 @@ you can make inputVerificationCode call a no-op
             // User was signed up by an admin and must provide new 
             // password and required attributes, if any, to complete 
             // authentication.
+	    
+            // the api doesn't accept this field back
+            delete userAttributes.email_verified;
             
             // Get these details and call 
-            cognitoUser.completeNewPasswordChallenge(newPassword, poolData, this)
+            cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, this);
         }
     });
 ```
