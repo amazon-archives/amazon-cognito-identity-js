@@ -659,6 +659,14 @@ or by calling the object method:
 ```
 
 ## Change Log
+**v1.10.0:**
+* What has changed
+  * Clearing tokens when they have been revoked and adding retrieval for MFAOptions.
+
+**v1.9.0:**
+* What has changed
+  * Fixed dependency on local storage. Reverting to memory use when local storage is not available.
+
 **v1.7.0:**
 * What has changed
   * Fixed Cannot read property 'NewDeviceMetadata' of undefined bug.
