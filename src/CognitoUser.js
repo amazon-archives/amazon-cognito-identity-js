@@ -753,6 +753,28 @@ export default class CognitoUser {
   }
 
   /**
+   * This is used by an authenticated user to get the MFAOptions
+   * @param {nodeCallback<MFAOptions>} callback Called on success or error.
+   * @returns {void}
+   */
+  getMFAOptions(callback) {
+    if (!(this.signInUserSession != null && this.signInUserSession.isValid())) {
+      return callback(new Error('User is not authenticated'), null);
+    }
+
+    this.client.makeUnauthenticatedRequest('getUser', {
+      AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
+    }, (err, userData) => {
+      if (err) {
+        return callback(err, null);
+      }
+
+      return callback(null, userData.MFAOptions);
+    });
+    return undefined;
+  }
+
+  /**
    * This is used by an authenticated user to delete a list of attributes
    * @param {string[]} attributeList Names of the attributes to delete.
    * @param {nodeCallback<string>} callback Called on success or error.
@@ -873,6 +895,9 @@ export default class CognitoUser {
       AuthParameters: authParameters,
     }, (err, authResult) => {
       if (err) {
+        if (err.code === 'NotAuthorizedException') {
+          this.clearCachedTokens();
+        }
         return callback(err, null);
       }
       if (authResult) {
