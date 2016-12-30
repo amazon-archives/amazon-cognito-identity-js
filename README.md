@@ -622,6 +622,13 @@ you can make inputVerificationCode call a no-op
 **Use case 24.** Retrieve the MFA Options for the user in case MFA is optional
 
 ```javascript
+    cognitoUser.getMFAOptions(function(err, mfaOptions) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('MFA options for user ' + mfaOptions);
+    });
 ```
 
 ## Network Configuration
