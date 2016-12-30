@@ -614,8 +614,8 @@ you can make inputVerificationCode call a no-op
             // password and required attributes, if any, to complete 
             // authentication.
             
-            // Get these details and call 
-            cognitoUser.completeNewPasswordChallenge(newPassword, poolData, this)
+            // Get these details, populate newPassword and requiredAttributesData and call 
+            cognitoUser.completeNewPasswordChallenge(newPassword, requiredAttributesData, this)
         }
     });
 ```
