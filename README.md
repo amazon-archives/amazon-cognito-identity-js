@@ -457,11 +457,11 @@ you can make inputVerificationCode call a no-op
 **Use case 16.** Retrieving the current user from local storage.
 
 ```javascript
-    var data = {
+    var poolData = {
         UserPoolId : '...', // Your user pool id here
         ClientId : '...' // Your client id here
     };
-    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
     var cognitoUser = userPool.getCurrentUser();
 
     if (cognitoUser != null) {
@@ -615,7 +615,7 @@ you can make inputVerificationCode call a no-op
             // authentication.
             
             // Get these details and call 
-            cognitoUser.completeNewPasswordChallenge(newPassword, data, this)
+            cognitoUser.completeNewPasswordChallenge(newPassword, poolData, this)
         }
     });
 ```
