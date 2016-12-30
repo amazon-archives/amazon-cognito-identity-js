@@ -619,7 +619,10 @@ you can make inputVerificationCode call a no-op
         }
     });
 ```
+**Use case 24.** Retrieve the MFA Options for the user in case MFA is optional
 
+```javascript
+```
 
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
