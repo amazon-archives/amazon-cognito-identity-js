@@ -164,7 +164,7 @@ Note that the various errors returned by the service are valid JSON so one can a
 
 ## Relevant examples
 
-For an example using babel-webpack, see [babel-webpack example](https://github.com/aws/amazon-cognito-identity-js/tree/master/examples/babel-webpack).
+For an example using babel-webpack of a React setup, see [babel-webpack example](https://github.com/aws/amazon-cognito-identity-js/tree/master/examples/babel-webpack).
 
 For a working example using angular, see [cognito-angular2-quickstart](https://github.com/awslabs/aws-cognito-angular2-quickstart).
 
