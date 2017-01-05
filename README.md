@@ -676,6 +676,10 @@ or by calling the object method:
 ```
 
 ## Change Log
+**v1.11.0:**
+* What has changed
+  * Added challenge parameters to the mfaRequired function of the return object.
+
 **v1.10.0:**
 * What has changed
   * Clearing tokens when they have been revoked and adding retrieval for MFAOptions.
