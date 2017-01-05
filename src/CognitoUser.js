@@ -264,14 +264,16 @@ export default class CognitoUser {
   */
   authenticateUserInternal(dataAuthenticate, authenticationHelper, callback) {
     const challengeName = dataAuthenticate.ChallengeName;
+    const challengeParameters = dataAuthenticate.ChallengeParameters;
+
     if (challengeName === 'SMS_MFA') {
       this.Session = dataAuthenticate.Session;
-      return callback.mfaRequired(challengeName);
+      return callback.mfaRequired(challengeName, challengeParameters);
     }
 
     if (challengeName === 'CUSTOM_CHALLENGE') {
       this.Session = dataAuthenticate.Session;
-      return callback.customChallenge(dataAuthenticate.ChallengeParameters);
+      return callback.customChallenge(challengeParameters);
     }
 
     if (challengeName === 'DEVICE_SRP_AUTH') {
