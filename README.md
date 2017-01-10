@@ -306,6 +306,8 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
 
 Note that if device tracking is enabled for the user pool with a setting that user opt-in is required, you need to implement an onSuccess(result, userConfirmationNecessary) callback, collect user input and call either setDeviceStatusRemembered to remember the device or setDeviceStatusNotRemembered to not remember the device.
 
+Note also that if CognitoUser.authenticateUser throws ReferenceError: navigator is not defined when running on Node.js, follow the instructions on the following [Stack Overflow post](http://stackoverflow.com/questions/40219518/aws-cognito-unauthenticated-login-error-window-is-not-defined-js).
+
 **Use case 5.** Retrieve user attributes for an authenticated user.
 
 ```javascript
