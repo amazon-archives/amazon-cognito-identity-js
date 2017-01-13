@@ -501,7 +501,7 @@ export default class CognitoUser {
 
       if (challengeName === 'CUSTOM_CHALLENGE') {
         this.Session = data.Session;
-        return callback.customChallenge(data.challengeParameters);
+        return callback.customChallenge(data.ChallengeParameters);
       }
 
       this.signInUserSession = this.getCognitoUserSession(data.AuthenticationResult);
