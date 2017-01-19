@@ -678,6 +678,10 @@ or by calling the object method:
 ```
 
 ## Change Log
+**v1.12.0:**
+* What has changed
+  * Added typescript typings.
+
 **v1.11.0:**
 * What has changed
   * Added challenge parameters to the mfaRequired function of the return object.
