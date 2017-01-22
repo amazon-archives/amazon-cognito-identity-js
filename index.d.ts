@@ -1,7 +1,5 @@
 declare module "amazon-cognito-identity-js" {
 
-    import { ClientConfig } from "aws-sdk";
-
     export interface IAuthenticationDetailsData {
         Username: string;
         Password: string;
@@ -87,10 +85,6 @@ declare module "amazon-cognito-identity-js" {
         public getRefreshToken(): CognitoRefreshToken;
         public getAccessToken(): CognitoAccessToken;
         public isValid(): boolean;
-    }
-
-    export class CognitoIdentityServiceProvider {
-        public config: ClientConfig;
     }
 
     export class CognitoAccessToken {
