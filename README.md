@@ -26,8 +26,6 @@ The Amazon Cognito Identity SDK for JavaScript depends on:
 
 2. `BigInteger` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/) developed by Tom Wu, the inventor of the Secure Remote Password protocol. This implementation uses Montgomery multiplication to rapidly perform the computations needed by the Secure Remote Password protocol.
 
-3. The [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
-
 There are two ways to install the Amazon Cognito Identity SDK for JavaScript and its dependencies,
 depending on your project setup and experience with modern JavaScript build tools:
 
@@ -55,11 +53,6 @@ project:
 
 4. `jsbn.js` and `jsbn2.js` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/) developed by Tom Wu, the inventor of the Secure Remote Password protocol.
 
-5. `sjcl.js` from the [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
-
-   Use the build from GitHub, rather than the one linked from the library's homepage, as the latter
-   file is out-of-date and is missing required methods. [This version](https://raw.githubusercontent.com/bitwiseshiftleft/sjcl/master/sjcl.js) contains all the necessary functions.
-
 Optionally, to use other AWS services, include a build of the [AWS SDK for JavaScript](http://aws.amazon.com/sdk-for-browser/).
 
 Include all of the files in your HTML page before calling any Amazon Cognito Identity SDK APIs:
@@ -67,9 +60,9 @@ Include all of the files in your HTML page before calling any Amazon Cognito Ide
 ```html
     <script src="/path/to/jsbn.js"></script>
     <script src="/path/to/jsbn2.js"></script>
-    <script src="/path/to/sjcl.js"></script>
     <script src="/path/to/aws-cognito-sdk.min.js"></script>
     <script src="/path/to/amazon-cognito-identity.min.js"></script>
+    <!-- optional: only if you use other AWS services -->
     <script src="/path/to/aws-sdk-2.6.10.js"></script>
 ```
 
@@ -651,33 +644,7 @@ For most frameworks you can whitelist the domain by whitelisting all AWS endpoin
 
 ## Random numbers
 
-In order to authenticate with the Amazon Cognito Identity Service, the client needs to generate a random number as part of the SRP protocol. Note that in some web browsers such as Internet Explorer 8, Internet Explorer 9, or versions 4.2 and 4.3 of the Android Browser, a default paranoia of 0 passed to the Stanford Javascript Crypto Library generates weak random numbers that might compromise client data. Developers should be careful when using the library in such an environment and call the sjcl.random.startCollectors() function before starting the Cognito authentication flow in order to collect entropy required for random number generation. Paranoia level should also be increased.
-See discussion below:
-* https://github.com/bitwiseshiftleft/sjcl/issues/77
-
-Paranoia levels can be set through the constructor:
-
-```javascript
-    var poolData = {
-        UserPoolId : '...', // Your user pool id here
-        ClientId : '...', // Your client id here
-        Paranoia : 7
-    };
-
-    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
-    var userData = {
-        Username : 'username',
-        Pool : userPool
-    };
-
-    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
-```
-
-or by calling the object method:
-
-```javascript
-    userPool.setParanoia(7);
-```
+In order to authenticate with the Amazon Cognito Identity Service, the client needs to generate a random number as part of the SRP protocol. The AWS SDK is only compatible with modern browsers, and these include support for cryptographically strong random values. If you do need to support older browsers then you should be aware that this is less secure, and if possible include a strong polyfill for `window.crypto.getRandomValues()` before including this library.
 
 ## Change Log
 **v1.12.0:**
