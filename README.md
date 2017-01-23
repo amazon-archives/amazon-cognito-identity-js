@@ -210,11 +210,9 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
         Name : 'phone_number',
         Value : '+15555555555'
     };
-    var attributeEmail = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
-    var attributePhoneNumber = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataPhoneNumber);
 
-    attributeList.push(attributeEmail);
-    attributeList.push(attributePhoneNumber);
+    attributeList.push(dataEmail);
+    attributeList.push(dataPhoneNumber);
 
     userPool.signUp('username', 'password', attributeList, null, function(err, result){
         if (err) {
