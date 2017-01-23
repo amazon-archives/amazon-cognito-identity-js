@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
+import { CognitoIdentityServiceProvider } from 'aws-sdk';
 
 import CognitoUser from './CognitoUser';
 import StorageHelper from './StorageHelper';
@@ -27,10 +27,9 @@ export default class CognitoUserPool {
    * @param {object} data Creation options.
    * @param {string} data.UserPoolId Cognito user pool id.
    * @param {string} data.ClientId User pool application client id.
-   * @param {int=} data.Paranoia Random number generation paranoia level.
    */
   constructor(data) {
-    const { UserPoolId, ClientId, Paranoia } = data || {};
+    const { UserPoolId, ClientId } = data || {};
     if (!UserPoolId || !ClientId) {
       throw new Error('Both UserPoolId and ClientId are required.');
     }
@@ -41,7 +40,6 @@ export default class CognitoUserPool {
 
     this.userPoolId = UserPoolId;
     this.clientId = ClientId;
-    this.paranoia = Paranoia || 0;
 
     this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19', region });
   }
@@ -58,22 +56,6 @@ export default class CognitoUserPool {
    */
   getClientId() {
     return this.clientId;
-  }
-
-  /**
-   * @returns {int} the paranoia level
-   */
-  getParanoia() {
-    return this.paranoia;
-  }
-
-  /**
-   * sets paranoia level
-   * @param {int} paranoia The new paranoia level.
-   * @returns {void}
-   */
-  setParanoia(paranoia) {
-    this.paranoia = paranoia;
   }
 
   /**

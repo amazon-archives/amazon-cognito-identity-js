@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import * as sjcl from 'sjcl';
+import { util } from 'aws-sdk';
 import { BigInteger } from 'jsbn';
 
 const initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
@@ -42,19 +42,16 @@ export default class AuthenticationHelper {
   /**
    * Constructs a new AuthenticationHelper object
    * @param {string} PoolName Cognito user pool name.
-   * @param {int} paranoia Random number generation paranoia level.
    */
-  constructor(PoolName, paranoia) {
+  constructor(PoolName) {
     this.N = new BigInteger(initN, 16);
     this.g = new BigInteger('2');
     this.k = new BigInteger(this.hexHash(`00${this.N.toString(16)}0${this.g.toString(16)}`), 16);
 
-    this.paranoia = paranoia;
-
     this.smallAValue = this.generateRandomSmallA();
     this.largeAValue = this.calculateA(this.smallAValue);
 
-    this.infoBits = sjcl.codec.utf8String.toBits('Caldera Derived Key');
+    this.infoBits = new util.Buffer('Caldera Derived Key', 'utf8');
 
     this.poolName = PoolName;
   }
@@ -79,8 +76,7 @@ export default class AuthenticationHelper {
    * @private
    */
   generateRandomSmallA() {
-    const words = sjcl.random.randomWords(32, this.paranoia);
-    const hexRandom = sjcl.codec.hex.fromBits(words);
+    const hexRandom = util.crypto.lib.randomBytes(128).toString('hex');
 
     const randomBigInt = new BigInteger(hexRandom, 16);
     const smallABigInt = randomBigInt.mod(this.N);
@@ -94,10 +90,7 @@ export default class AuthenticationHelper {
    * @private
    */
   generateRandomString() {
-    const words = sjcl.random.randomWords(10, this.paranoia);
-    const stringRandom = sjcl.codec.base64.fromBits(words);
-
-    return stringRandom;
+    return util.crypto.lib.randomBytes(40).toString('base64');
   }
 
   /**
@@ -132,8 +125,7 @@ export default class AuthenticationHelper {
     const combinedString = `${deviceGroupKey}${username}:${this.randomPassword}`;
     const hashedString = this.hash(combinedString);
 
-    const words = sjcl.random.randomWords(4, this.paranoia);
-    const hexRandom = sjcl.codec.hex.fromBits(words);
+    const hexRandom = util.crypto.lib.randomBytes(16).toString('hex');
     const saltDevices = new BigInteger(hexRandom, 16);
     const firstCharSalt = saltDevices.toString(16)[0];
     this.SaltToHashDevices = saltDevices.toString(16);
@@ -206,12 +198,12 @@ export default class AuthenticationHelper {
 
   /**
    * Calculate a hash from a bitArray
-   * @param {sjcl.bitArray} bitArray Value to hash.
+   * @param {Buffer} buf Value to hash.
    * @returns {String} Hex-encoded hash.
    * @private
    */
-  hash(bitArray) {
-    const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(bitArray));
+  hash(buf) {
+    const hashHex = util.crypto.sha256(buf, 'hex');
     return (new Array(64 - hashHex.length).join('0')) + hashHex;
   }
 
@@ -222,28 +214,25 @@ export default class AuthenticationHelper {
    * @private
    */
   hexHash(hexStr) {
-    const hashHex = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(sjcl.codec.hex.toBits(hexStr)));
+    const hashHex = util.crypto.sha256(new util.Buffer(hexStr, 'hex'), 'hex');
     return (new Array(64 - hashHex.length).join('0')) + hashHex;
   }
 
   /**
    * Standard hkdf algorithm
-   * @param {sjcl.bitArray} ikm Input key material.
-   * @param {sjcl.bitArray} salt Salt value.
-   * @returns {sjcl.bitArray} Strong key material.
+   * @param {Buffer} ikm Input key material.
+   * @param {Buffer} salt Salt value.
+   * @returns {Buffer} Strong key material.
    * @private
    */
   computehkdf(ikm, salt) {
-    const mac = new sjcl.misc.hmac(salt, sjcl.hash.sha256);
-    mac.update(ikm);
-    const prk = mac.digest();
-    const hmac = new sjcl.misc.hmac(prk, sjcl.hash.sha256);
-    const infoBitsUpdate = sjcl.bitArray.concat(
+    const prk = util.crypto.hmac(salt, ikm, 'buffer', 'sha256');
+    const infoBitsUpdate = util.buffer.concat([
       this.infoBits,
-      sjcl.codec.utf8String.toBits(String.fromCharCode(1)));
-    hmac.update(infoBitsUpdate);
-
-    return sjcl.bitArray.clamp(hmac.digest(), 128);
+      new util.Buffer(String.fromCharCode(1), 'utf8'),
+    ]);
+    const hmac = util.crypto.hmac(prk, infoBitsUpdate, 'buffer', 'sha256');
+    return hmac.slice(0, 16);
   }
 
   /**
@@ -252,7 +241,7 @@ export default class AuthenticationHelper {
    * @param {String} password Password.
    * @param {BigInteger} serverBValue Server B value.
    * @param {BigInteger} salt Generated salt.
-   * @returns {sjcl.bitArray} Computed HKDF value.
+   * @returns {Buffer} Computed HKDF value.
    */
   getPasswordAuthenticationKey(username, password, serverBValue, salt) {
     if (serverBValue.mod(this.N).equals(new BigInteger('0', 16))) {
@@ -305,8 +294,8 @@ export default class AuthenticationHelper {
     }
 
     const hkdf = this.computehkdf(
-      sjcl.codec.hex.toBits(SToHash),
-      sjcl.codec.hex.toBits(UValueToHash));
+      new util.Buffer(SToHash, 'hex'),
+      new util.Buffer(UValueToHash, 'hex'));
 
     return hkdf;
   }
