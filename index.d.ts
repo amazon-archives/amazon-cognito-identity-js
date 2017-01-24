@@ -1,6 +1,6 @@
 declare module "amazon-cognito-identity-js" {
 
-    import { ClientConfig } from "aws-sdk";
+    import * as AWS from "aws-sdk";
 
     export interface IAuthenticationDetailsData {
         Username: string;
@@ -90,7 +90,7 @@ declare module "amazon-cognito-identity-js" {
     }
 
     export class CognitoIdentityServiceProvider {
-        public config: ClientConfig;
+        public config: AWS.CognitoIdentityServiceProvider.Types.ClientConfiguration;
     }
 
     export class CognitoAccessToken {
