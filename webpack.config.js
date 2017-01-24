@@ -36,13 +36,6 @@ module.exports = {
       commonjs: 'aws-sdk',
       amd: 'aws-sdk'
     },
-    // Exclude 3rd-party code from the bundle.
-    jsbn: {
-      root: [], // non-npm jsbn exports to global
-      commonjs2: 'jsbn',
-      commonjs: 'jsbn',
-      amd: 'jsbn'
-    }
   },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),

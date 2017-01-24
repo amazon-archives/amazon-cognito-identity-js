@@ -24,8 +24,6 @@ The Amazon Cognito Identity SDK for JavaScript depends on:
 
 1. The `CognitoIdentityServiceProvider` service from the [AWS SDK for JavaScript](https://github.com/aws/aws-sdk-js)
 
-2. `BigInteger` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/) developed by Tom Wu, the inventor of the Secure Remote Password protocol. This implementation uses Montgomery multiplication to rapidly perform the computations needed by the Secure Remote Password protocol.
-
 There are two ways to install the Amazon Cognito Identity SDK for JavaScript and its dependencies,
 depending on your project setup and experience with modern JavaScript build tools:
 
@@ -48,18 +46,14 @@ project:
    Javascript SDK namespaced as `AWSCognito` instead of `AWS`. It references only the Amazon
    Cognito Identity service.
  
-3. The Amazon Cognito Identity SDK for JavaScript, from
+2. The Amazon Cognito Identity SDK for JavaScript, from
    [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
-
-4. `jsbn.js` and `jsbn2.js` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/) developed by Tom Wu, the inventor of the Secure Remote Password protocol.
 
 Optionally, to use other AWS services, include a build of the [AWS SDK for JavaScript](http://aws.amazon.com/sdk-for-browser/).
 
 Include all of the files in your HTML page before calling any Amazon Cognito Identity SDK APIs:
 
 ```html
-    <script src="/path/to/jsbn.js"></script>
-    <script src="/path/to/jsbn2.js"></script>
     <script src="/path/to/aws-cognito-sdk.min.js"></script>
     <script src="/path/to/amazon-cognito-identity.min.js"></script>
     <!-- optional: only if you use other AWS services -->
