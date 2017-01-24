@@ -16,8 +16,8 @@
  */
 
 import { util } from 'aws-sdk/global';
-import { BigInteger } from 'jsbn';
 
+import BigInteger from './BigInteger';
 import AuthenticationHelper from './AuthenticationHelper';
 import CognitoAccessToken from './CognitoAccessToken';
 import CognitoIdToken from './CognitoIdToken';

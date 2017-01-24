@@ -16,7 +16,8 @@
  */
 
 import { util } from 'aws-sdk/global';
-import { BigInteger } from 'jsbn';
+
+import BigInteger from './BigInteger';
 
 const initN = 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'
   + '29024E088A67CC74020BBEA63B139B22514A08798E3404DD'
@@ -45,7 +46,7 @@ export default class AuthenticationHelper {
    */
   constructor(PoolName) {
     this.N = new BigInteger(initN, 16);
-    this.g = new BigInteger('2');
+    this.g = new BigInteger('2', 16);
     this.k = new BigInteger(this.hexHash(`00${this.N.toString(16)}0${this.g.toString(16)}`), 16);
 
     this.smallAValue = this.generateRandomSmallA();
@@ -145,7 +146,7 @@ export default class AuthenticationHelper {
   calculateA(a) {
     const A = this.g.modPow(a, this.N);
 
-    if (A.mod(this.N).toString() === '0') {
+    if (A.mod(this.N).equals(BigInteger.ZERO)) {
       throw new Error('Illegal paramater. A mod N cannot be 0.');
     }
     return A;
@@ -212,13 +213,13 @@ export default class AuthenticationHelper {
    * @returns {Buffer} Computed HKDF value.
    */
   getPasswordAuthenticationKey(username, password, serverBValue, salt) {
-    if (serverBValue.mod(this.N).equals(new BigInteger('0', 16))) {
+    if (serverBValue.mod(this.N).equals(BigInteger.ZERO)) {
       throw new Error('B cannot be zero.');
     }
 
     this.UValue = this.calculateU(this.largeAValue, serverBValue);
 
-    if (this.UValue.equals(new BigInteger('0', 16))) {
+    if (this.UValue.equals(BigInteger.ZERO)) {
       throw new Error('U cannot be zero.');
     }
 
