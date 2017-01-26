@@ -126,27 +126,13 @@ export default class AuthenticationHelper {
     const hashedString = this.hash(combinedString);
 
     const hexRandom = util.crypto.lib.randomBytes(16).toString('hex');
-    const saltDevices = new BigInteger(hexRandom, 16);
-    const firstCharSalt = saltDevices.toString(16)[0];
-    this.SaltToHashDevices = saltDevices.toString(16);
+    this.SaltToHashDevices = this.padHex(new BigInteger(hexRandom, 16));
 
-    if (saltDevices.toString(16).length % 2 === 1) {
-      this.SaltToHashDevices = `0${this.SaltToHashDevices}`;
-    } else if ('89ABCDEFabcdef'.indexOf(firstCharSalt) !== -1) {
-      this.SaltToHashDevices = `00${this.SaltToHashDevices}`;
-    }
     const verifierDevicesNotPadded = this.g.modPow(
       new BigInteger(this.hexHash(this.SaltToHashDevices + hashedString), 16),
       this.N);
 
-    const firstCharVerifierDevices = verifierDevicesNotPadded.toString(16)[0];
-    this.verifierDevices = verifierDevicesNotPadded.toString(16);
-
-    if (verifierDevicesNotPadded.toString(16).length % 2 === 1) {
-      this.verifierDevices = `0${this.verifierDevices}`;
-    } else if ('89ABCDEFabcdef'.indexOf(firstCharVerifierDevices) !== -1) {
-      this.verifierDevices = `00${this.verifierDevices}`;
-    }
+    this.verifierDevices = this.padHex(verifierDevicesNotPadded);
   }
 
   /**
@@ -173,24 +159,7 @@ export default class AuthenticationHelper {
    * @private
    */
   calculateU(A, B) {
-    const firstCharA = A.toString(16)[0];
-    const firstCharB = B.toString(16)[0];
-    let AToHash = A.toString(16);
-    let BToHash = B.toString(16);
-
-    if (A.toString(16).length % 2 === 1) {
-      AToHash = `0${AToHash}`;
-    } else if ('89ABCDEFabcdef'.indexOf(firstCharA) !== -1) {
-      AToHash = `00${AToHash}`;
-    }
-
-    if (B.toString(16).length % 2 === 1) {
-      BToHash = `0${BToHash}`;
-    } else if ('89ABCDEFabcdef'.indexOf(firstCharB) !== -1) {
-      BToHash = `00${BToHash}`;
-    }
-
-    this.UHexHash = this.hexHash(AToHash + BToHash);
+    this.UHexHash = this.hexHash(this.padHex(A) + this.padHex(B));
     const finalU = new BigInteger(this.UHexHash, 16);
 
     return finalU;
@@ -257,16 +226,7 @@ export default class AuthenticationHelper {
     const usernamePassword = `${this.poolName}${username}:${password}`;
     const usernamePasswordHash = this.hash(usernamePassword);
 
-    const firstCharSalt = salt.toString(16)[0];
-    let SaltToHash = salt.toString(16);
-
-    if (salt.toString(16).length % 2 === 1) {
-      SaltToHash = `0${SaltToHash}`;
-    } else if ('89ABCDEFabcdef'.indexOf(firstCharSalt) !== -1) {
-      SaltToHash = `00${SaltToHash}`;
-    }
-
-    const xValue = new BigInteger(this.hexHash(SaltToHash + usernamePasswordHash), 16);
+    const xValue = new BigInteger(this.hexHash(this.padHex(salt) + usernamePasswordHash), 16);
 
     const gModPowXN = this.g.modPow(xValue, this.N);
     const intValue2 = serverBValue.subtract(this.k.multiply(gModPowXN));
@@ -275,27 +235,9 @@ export default class AuthenticationHelper {
       this.N
     ).mod(this.N);
 
-    let SToHash = sValue.toString(16);
-    const firstCharS = sValue.toString(16)[0];
-
-    if (sValue.toString(16).length % 2 === 1) {
-      SToHash = `0${SToHash}`;
-    } else if ('89ABCDEFabcdef'.indexOf(firstCharS) !== -1) {
-      SToHash = `00${SToHash}`;
-    }
-
-    let UValueToHash = this.UHexHash;
-    const firstCharU = this.UHexHash[0];
-
-    if (this.UHexHash.length % 2 === 1) {
-      UValueToHash = `0${UValueToHash}`;
-    } else if (this.UHexHash.length % 2 === 0 && '89ABCDEFabcdef'.indexOf(firstCharU) !== -1) {
-      UValueToHash = `00${UValueToHash}`;
-    }
-
     const hkdf = this.computehkdf(
-      new util.Buffer(SToHash, 'hex'),
-      new util.Buffer(UValueToHash, 'hex'));
+      new util.Buffer(this.padHex(sValue), 'hex'),
+      new util.Buffer(this.padHex(this.UHexHash), 'hex'));
 
     return hkdf;
   }
@@ -306,5 +248,20 @@ export default class AuthenticationHelper {
   */
   getNewPasswordRequiredChallengeUserAttributePrefix() {
     return newPasswordRequiredChallengeUserAttributePrefix;
+  }
+
+  /**
+   * Converts a BigInteger (or hex string) to hex format padded with zeroes for hashing
+   * @param {BigInteger|String} Number or string to pad.
+   * @returns {String} Padded hex string.
+   */
+  padHex(bigInt) {
+    let hashStr = bigInt.toString(16);
+    if (hashStr.length % 2 === 1) {
+      hashStr = `0${hashStr}`;
+    } else if ('89ABCDEFabcdef'.indexOf(hashStr[0]) !== -1) {
+      hashStr = `00${hashStr}`;
+    }
+    return hashStr;
   }
 }
