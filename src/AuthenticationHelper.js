@@ -183,8 +183,7 @@ export default class AuthenticationHelper {
    * @private
    */
   hexHash(hexStr) {
-    const hashHex = util.crypto.sha256(new util.Buffer(hexStr, 'hex'), 'hex');
-    return (new Array(64 - hashHex.length).join('0')) + hashHex;
+    return this.hash(new util.Buffer(hexStr, 'hex'));
   }
 
   /**
