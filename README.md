@@ -24,7 +24,7 @@ The Amazon Cognito Identity SDK for JavaScript depends on:
 
 1. The `CognitoIdentityServiceProvider` service from the [AWS SDK for JavaScript](https://github.com/aws/aws-sdk-js)
 
-2. `BigInteger` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/) developed by Tom Wu, the inventor of the Secure Remote Password protocol, at Stanford University.
+2. `BigInteger` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/) developed by Tom Wu, the inventor of the Secure Remote Password protocol, at Stanford University. This implementation uses Montgomery multiplication to rapidly perform the computations needed by the Secure Remote Password protocol.
 
 3. The [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
 
