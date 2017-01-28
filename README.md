@@ -15,6 +15,8 @@ Introduction
 ============
 The Amazon Cognito Identity SDK for JavaScript allows JavaScript enabled applications to sign-up users, authenticate users, view, delete, and update user attributes within the Amazon Cognito Identity service. Other functionality includes password changes for authenticated users and initiating and completing forgot password flows for unauthenticated users.
 
+Your users will benefit from a number of security features including SMS-based Multi-Factor Authentication (MFA) and account verification via phone or email. The password features use the Secure Remote Password (SRP) protocol to avoid sending cleartext passwords over the wire.
+
 Setup
 =====
 
@@ -22,7 +24,7 @@ The Amazon Cognito Identity SDK for JavaScript depends on:
 
 1. The `CognitoIdentityServiceProvider` service from the [AWS SDK for JavaScript](https://github.com/aws/aws-sdk-js)
 
-2. `BigInteger` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/)
+2. `BigInteger` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/) developed by Tom Wu, the inventor of the Secure Remote Password protocol, at Stanford University.
 
 3. The [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
 
@@ -51,7 +53,7 @@ project:
 3. The Amazon Cognito Identity SDK for JavaScript, from
    [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
 
-4. `jsbn.js` and `jsbn2.js` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/)
+4. `jsbn.js` and `jsbn2.js` from the [JavaScript BN library](http://www-cs-students.stanford.edu/~tjw/jsbn/) developed by Tom Wu, the inventor of the Secure Remote Password protocol, at Stanford University.
 
 5. `sjcl.js` from the [Stanford JavaScript Crypto Library](https://github.com/bitwiseshiftleft/sjcl)
 
