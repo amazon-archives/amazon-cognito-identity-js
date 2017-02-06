@@ -38,6 +38,9 @@ declare module "amazon-cognito-identity-js" {
         public confirmPassword(verificationCode: string, newPassword: string, callbacks: {onSuccess: () => void, onFailure: (err: Error) => void}): void;
         public sendMFACode(confirmationCode: string, callbacks: {onSuccess: (session: CognitoUserSession) => void, onFailure: (err: any) => void}): void;
         public completeNewPasswordChallenge(newPassword: string, requiredAttributeData: any, callbacks: {onSuccess: (session: CognitoUserSession) => void, onFailure: (err: any) => void, mfaRequired: (challengeName: any, challengeParameters: any) => void, customChallenge: (challengeParameters: any) => void}): void;
+
+        public signOut(): void;
+        public globalSignOut(callbacks: {onSuccess: (msg: string) => void, onFailure: (err: Error) => void}): void;
     }
 
     export interface ICognitoUserAttribute {
