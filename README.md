@@ -479,7 +479,16 @@ you can make inputVerificationCode call a no-op
                 return;
             }
             console.log('session validity: ' + session.isValid());
-
+	    
+	    // NOTE: getSession must be called to authenticate user before calling getUserAttributes
+	    cognitoUser.getUserAttributes(function(err, attributes) {
+	      if (err) {
+  	        // Handle error
+	      } else {
+	        // Do something with attributes
+	      }
+	    });
+	    
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                 IdentityPoolId : '...', // your identity pool id here
                 Logins : {
