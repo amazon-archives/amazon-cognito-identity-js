@@ -36,8 +36,8 @@ declare module "amazon-cognito-identity-js" {
         public changePassword(oldPassword: string, newPassword: string, callback: (err: Error, result: any) => void): void;
         public forgotPassword(callbacks: {onSuccess: (result: any) => void, onFailure: (err: Error) => void, inputVerificationCode: (data: any) => void}): void;
         public confirmPassword(verificationCode: string, newPassword: string, callbacks: {onSuccess: () => void, onFailure: (err: Error) => void}): void;
-        public setDeviceStatusRemembered({onSuccess: (success: string) => void, onFailure: (err: any) => void}): void;
-        public setDeviceStatusNotRemembered({onSuccess: (success: string) => void, onFailure: (err: any) => void}): void;
+        public setDeviceStatusRemembered(callbacks: {onSuccess: (success: string) => void, onFailure: (err: any) => void}): void;
+        public setDeviceStatusNotRemembered(callbacks: {onSuccess: (success: string) => void, onFailure: (err: any) => void}): void;
         public sendMFACode(confirmationCode: string, callbacks: {onSuccess: (session: CognitoUserSession) => void, onFailure: (err: any) => void}): void;
         public completeNewPasswordChallenge(newPassword: string, requiredAttributeData: any, callbacks: {onSuccess: (session: CognitoUserSession) => void, onFailure: (err: any) => void, mfaRequired: (challengeName: any, challengeParameters: any) => void, customChallenge: (challengeParameters: any) => void}): void;
 
