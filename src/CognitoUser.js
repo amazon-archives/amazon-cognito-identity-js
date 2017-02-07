@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import * as sjcl from 'sjcl';
-import { BigInteger } from 'jsbn';
+import { util } from 'aws-sdk';
 
+import BigInteger from './BigInteger';
 import AuthenticationHelper from './AuthenticationHelper';
 import CognitoAccessToken from './CognitoAccessToken';
 import CognitoIdToken from './CognitoIdToken';
@@ -137,8 +137,7 @@ export default class CognitoUser {
    */
   authenticateUser(authDetails, callback) {
     const authenticationHelper = new AuthenticationHelper(
-      this.pool.getUserPoolId().split('_')[1],
-      this.pool.getParanoia());
+      this.pool.getUserPoolId().split('_')[1]);
     const dateHelper = new DateHelper();
 
     let serverBValue;
@@ -178,16 +177,15 @@ export default class CognitoUser {
         authDetails.getPassword(),
         serverBValue,
         salt);
-      const secretBlockBits = sjcl.codec.base64.toBits(challengeParameters.SECRET_BLOCK);
 
-      const mac = new sjcl.misc.hmac(hkdf, sjcl.hash.sha256);
-      mac.update(sjcl.codec.utf8String.toBits(this.pool.getUserPoolId().split('_')[1]));
-      mac.update(sjcl.codec.utf8String.toBits(this.username));
-      mac.update(secretBlockBits);
       const dateNow = dateHelper.getNowString();
-      mac.update(sjcl.codec.utf8String.toBits(dateNow));
-      const signature = mac.digest();
-      const signatureString = sjcl.codec.base64.fromBits(signature);
+
+      const signatureString = util.crypto.hmac(hkdf, util.buffer.concat([
+        new util.Buffer(this.pool.getUserPoolId().split('_')[1], 'utf8'),
+        new util.Buffer(this.username, 'utf8'),
+        new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
+        new util.Buffer(dateNow, 'utf8')
+      ]), 'base64', 'sha256')
 
       const challengeResponses = {};
 
@@ -294,14 +292,11 @@ export default class CognitoUser {
       dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
     const deviceSecretVerifierConfig = {
-      Salt: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
-              authenticationHelper.getSaltDevices().toString(16))),
-      PasswordVerifier: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
-              authenticationHelper.getVerifierDevices().toString(16))),
+      Salt: new util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
+      PasswordVerifier: new util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64'),
     };
 
-    this.verifierDevices = sjcl.codec.base64.fromBits(
-      authenticationHelper.getVerifierDevices());
+    this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
     this.deviceGroupKey = newDeviceMetadata.DeviceGroupKey;
     this.randomPassword = authenticationHelper.getRandomPassword();
 
@@ -345,7 +340,7 @@ export default class CognitoUser {
       return callback.onFailure(new Error('New password is required.'));
     }
     const authenticationHelper = new AuthenticationHelper(
-      this.pool.getUserPoolId().split('_')[1], this.pool.getParanoia());
+      this.pool.getUserPoolId().split('_')[1]);
     const userAttributesPrefix = authenticationHelper
       .getNewPasswordRequiredChallengeUserAttributePrefix();
 
@@ -384,8 +379,7 @@ export default class CognitoUser {
    */
   getDeviceResponse(callback) {
     const authenticationHelper = new AuthenticationHelper(
-      this.deviceGroupKey,
-      this.pool.getParanoia());
+      this.deviceGroupKey);
     const dateHelper = new DateHelper();
 
     const authParameters = {};
@@ -413,16 +407,15 @@ export default class CognitoUser {
         this.randomPassword,
         serverBValue,
         salt);
-      const secretBlockBits = sjcl.codec.base64.toBits(challengeParameters.SECRET_BLOCK);
 
-      const mac = new sjcl.misc.hmac(hkdf, sjcl.hash.sha256);
-      mac.update(sjcl.codec.utf8String.toBits(this.deviceGroupKey));
-      mac.update(sjcl.codec.utf8String.toBits(this.deviceKey));
-      mac.update(secretBlockBits);
       const dateNow = dateHelper.getNowString();
-      mac.update(sjcl.codec.utf8String.toBits(dateNow));
-      const signature = mac.digest();
-      const signatureString = sjcl.codec.base64.fromBits(signature);
+
+      const signatureString = util.crypto.hmac(hkdf, util.buffer.concat([
+        new util.Buffer(this.deviceGroupKey, 'utf8'),
+        new util.Buffer(this.deviceKey, 'utf8'),
+        new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
+        new util.Buffer(dateNow, 'utf8')
+      ]), 'base64', 'sha256')
 
       const challengeResponses = {};
 
@@ -552,21 +545,17 @@ export default class CognitoUser {
       }
 
       const authenticationHelper = new AuthenticationHelper(
-        this.pool.getUserPoolId().split('_')[1],
-        this.pool.getParanoia());
+        this.pool.getUserPoolId().split('_')[1]);
       authenticationHelper.generateHashDevice(
         dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey,
         dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
       const deviceSecretVerifierConfig = {
-        Salt: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
-          authenticationHelper.getSaltDevices().toString(16))),
-        PasswordVerifier: sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(
-          authenticationHelper.getVerifierDevices().toString(16))),
+        Salt: new util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
+        PasswordVerifier: new util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64'),
       };
 
-      this.verifierDevices = sjcl.codec.base64.fromBits(
-        authenticationHelper.getVerifierDevices());
+      this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
       this.deviceGroupKey = dataAuthenticate.AuthenticationResult
         .NewDeviceMetadata.DeviceGroupKey;
       this.randomPassword = authenticationHelper.getRandomPassword();
