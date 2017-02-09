@@ -62,7 +62,6 @@ declare module "amazon-cognito-identity-js" {
     export interface ICognitoUserPool {
         UserPoolId: string;
         ClientId: string;
-        Paranoia?: number;
     }
 
     export class CognitoUserPool {
@@ -70,9 +69,6 @@ declare module "amazon-cognito-identity-js" {
 
         public getUserPoolId(): string;
         public getClientId(): string;
-        public getParanoia(): number
-
-        public setParanoia(paranoia: number): void;
 
         public signUp(username: string, password: string, userAttributes: any[], validationData: any[], callback: (err: any, result: any) => void): void;
 
