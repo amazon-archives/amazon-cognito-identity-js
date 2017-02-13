@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
 
 import CognitoUser from './CognitoUser';
 import StorageHelper from './StorageHelper';

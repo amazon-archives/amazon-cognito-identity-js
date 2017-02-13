@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { util } from 'aws-sdk';
+import { util } from 'aws-sdk/global';
 import { BigInteger } from 'jsbn';
 
 import AuthenticationHelper from './AuthenticationHelper';
