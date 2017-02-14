@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { util } from 'aws-sdk';
+import { util } from 'aws-sdk/global';
 
 /** @class */
 export default class CognitoIdToken {
