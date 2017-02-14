@@ -656,6 +656,10 @@ For most frameworks you can whitelist the domain by whitelisting all AWS endpoin
 In order to authenticate with the Amazon Cognito Identity Service, the client needs to generate a random number as part of the SRP protocol. The AWS SDK is only compatible with modern browsers, and these include support for cryptographically strong random values. If you do need to support older browsers then you should be aware that this is less secure, and if possible include a strong polyfill for `window.crypto.getRandomValues()` before including this library.
 
 ## Change Log
+**v1.14.0:**
+* What has changed
+  * Importing only the CognitoIdentityServiceProvider client and util from the AWS SDK.
+
 **v1.13.0:**
 * What has changed
   * Removed SJCL as a dependency and fixed typescript typings.
