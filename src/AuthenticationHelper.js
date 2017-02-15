@@ -253,7 +253,7 @@ export default class AuthenticationHelper {
 
   /**
    * Converts a BigInteger (or hex string) to hex format padded with zeroes for hashing
-   * @param {BigInteger|String} Number or string to pad.
+   * @param {BigInteger|String} bigInt Number or string to pad.
    * @returns {String} Padded hex string.
    */
   padHex(bigInt) {

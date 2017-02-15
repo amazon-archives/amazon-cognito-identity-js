@@ -88,6 +88,8 @@ export default class CognitoUser {
 
     this.signInUserSession = null;
     this.authenticationFlowType = 'USER_SRP_AUTH';
+
+    this.storage = new StorageHelper().getStorage();
   }
 
   /**
@@ -184,8 +186,8 @@ export default class CognitoUser {
         new util.Buffer(this.pool.getUserPoolId().split('_')[1], 'utf8'),
         new util.Buffer(this.username, 'utf8'),
         new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
-        new util.Buffer(dateNow, 'utf8')
-      ]), 'base64', 'sha256')
+        new util.Buffer(dateNow, 'utf8'),
+      ]), 'base64', 'sha256');
 
       const challengeResponses = {};
 
@@ -292,8 +294,12 @@ export default class CognitoUser {
       dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
     const deviceSecretVerifierConfig = {
-      Salt: new util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
-      PasswordVerifier: new util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64'),
+      Salt: new util.Buffer(
+          authenticationHelper.getSaltDevices(), 'hex'
+        ).toString('base64'),
+      PasswordVerifier: new util.Buffer(
+          authenticationHelper.getVerifierDevices(), 'hex'
+        ).toString('base64'),
     };
 
     this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
@@ -414,8 +420,8 @@ export default class CognitoUser {
         new util.Buffer(this.deviceGroupKey, 'utf8'),
         new util.Buffer(this.deviceKey, 'utf8'),
         new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
-        new util.Buffer(dateNow, 'utf8')
-      ]), 'base64', 'sha256')
+        new util.Buffer(dateNow, 'utf8'),
+      ]), 'base64', 'sha256');
 
       const challengeResponses = {};
 
@@ -551,8 +557,12 @@ export default class CognitoUser {
         dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
       const deviceSecretVerifierConfig = {
-        Salt: new util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
-        PasswordVerifier: new util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64'),
+        Salt: new util.Buffer(
+            authenticationHelper.getSaltDevices(), 'hex'
+          ).toString('base64'),
+        PasswordVerifier: new util.Buffer(
+            authenticationHelper.getVerifierDevices(), 'hex'
+          ).toString('base64'),
       };
 
       this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
@@ -826,17 +836,15 @@ export default class CognitoUser {
     const accessTokenKey = `${keyPrefix}.accessToken`;
     const refreshTokenKey = `${keyPrefix}.refreshToken`;
 
-    const storage = new StorageHelper().getStorage();
-
-    if (storage.getItem(idTokenKey)) {
+    if (this.storage.getItem(idTokenKey)) {
       const idToken = new CognitoIdToken({
-        IdToken: storage.getItem(idTokenKey),
+        IdToken: this.storage.getItem(idTokenKey),
       });
       const accessToken = new CognitoAccessToken({
-        AccessToken: storage.getItem(accessTokenKey),
+        AccessToken: this.storage.getItem(accessTokenKey),
       });
       const refreshToken = new CognitoRefreshToken({
-        RefreshToken: storage.getItem(refreshTokenKey),
+        RefreshToken: this.storage.getItem(refreshTokenKey),
       });
 
       const sessionData = {
@@ -871,12 +879,11 @@ export default class CognitoUser {
     authParameters.REFRESH_TOKEN = refreshToken.getToken();
     const keyPrefix = `CognitoIdentityServiceProvider.${this.pool.getClientId()}`;
     const lastUserKey = `${keyPrefix}.LastAuthUser`;
-    const storage = new StorageHelper().getStorage();
 
-    if (storage.getItem(lastUserKey)) {
-      this.username = storage.getItem(lastUserKey);
+    if (this.storage.getItem(lastUserKey)) {
+      this.username = this.storage.getItem(lastUserKey);
       const deviceKeyKey = `${keyPrefix}.${this.username}.deviceKey`;
-      this.deviceKey = storage.getItem(deviceKeyKey);
+      this.deviceKey = this.storage.getItem(deviceKeyKey);
       authParameters.DEVICE_KEY = this.deviceKey;
     }
 
@@ -915,12 +922,10 @@ export default class CognitoUser {
     const refreshTokenKey = `${keyPrefix}.${this.username}.refreshToken`;
     const lastUserKey = `${keyPrefix}.LastAuthUser`;
 
-    const storage = new StorageHelper().getStorage();
-
-    storage.setItem(idTokenKey, this.signInUserSession.getIdToken().getJwtToken());
-    storage.setItem(accessTokenKey, this.signInUserSession.getAccessToken().getJwtToken());
-    storage.setItem(refreshTokenKey, this.signInUserSession.getRefreshToken().getToken());
-    storage.setItem(lastUserKey, this.username);
+    this.storage.setItem(idTokenKey, this.signInUserSession.getIdToken().getJwtToken());
+    this.storage.setItem(accessTokenKey, this.signInUserSession.getAccessToken().getJwtToken());
+    this.storage.setItem(refreshTokenKey, this.signInUserSession.getRefreshToken().getToken());
+    this.storage.setItem(lastUserKey, this.username);
   }
 
   /**
@@ -933,11 +938,9 @@ export default class CognitoUser {
     const randomPasswordKey = `${keyPrefix}.randomPasswordKey`;
     const deviceGroupKeyKey = `${keyPrefix}.deviceGroupKey`;
 
-    const storage = new StorageHelper().getStorage();
-
-    storage.setItem(deviceKeyKey, this.deviceKey);
-    storage.setItem(randomPasswordKey, this.randomPassword);
-    storage.setItem(deviceGroupKeyKey, this.deviceGroupKey);
+    this.storage.setItem(deviceKeyKey, this.deviceKey);
+    this.storage.setItem(randomPasswordKey, this.randomPassword);
+    this.storage.setItem(deviceGroupKeyKey, this.deviceGroupKey);
   }
 
   /**
@@ -950,12 +953,10 @@ export default class CognitoUser {
     const randomPasswordKey = `${keyPrefix}.randomPasswordKey`;
     const deviceGroupKeyKey = `${keyPrefix}.deviceGroupKey`;
 
-    const storage = new StorageHelper().getStorage();
-
-    if (storage.getItem(deviceKeyKey)) {
-      this.deviceKey = storage.getItem(deviceKeyKey);
-      this.randomPassword = storage.getItem(randomPasswordKey);
-      this.deviceGroupKey = storage.getItem(deviceGroupKeyKey);
+    if (this.storage.getItem(deviceKeyKey)) {
+      this.deviceKey = this.storage.getItem(deviceKeyKey);
+      this.randomPassword = this.storage.getItem(randomPasswordKey);
+      this.deviceGroupKey = this.storage.getItem(deviceGroupKeyKey);
     }
   }
 
@@ -969,11 +970,9 @@ export default class CognitoUser {
     const randomPasswordKey = `${keyPrefix}.randomPasswordKey`;
     const deviceGroupKeyKey = `${keyPrefix}.deviceGroupKey`;
 
-    const storage = new StorageHelper().getStorage();
-
-    storage.removeItem(deviceKeyKey);
-    storage.removeItem(randomPasswordKey);
-    storage.removeItem(deviceGroupKeyKey);
+    this.storage.removeItem(deviceKeyKey);
+    this.storage.removeItem(randomPasswordKey);
+    this.storage.removeItem(deviceGroupKeyKey);
   }
 
   /**
@@ -987,12 +986,10 @@ export default class CognitoUser {
     const refreshTokenKey = `${keyPrefix}.${this.username}.refreshToken`;
     const lastUserKey = `${keyPrefix}.LastAuthUser`;
 
-    const storage = new StorageHelper().getStorage();
-
-    storage.removeItem(idTokenKey);
-    storage.removeItem(accessTokenKey);
-    storage.removeItem(refreshTokenKey);
-    storage.removeItem(lastUserKey);
+    this.storage.removeItem(idTokenKey);
+    this.storage.removeItem(accessTokenKey);
+    this.storage.removeItem(refreshTokenKey);
+    this.storage.removeItem(lastUserKey);
   }
 
   /**
