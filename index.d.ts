@@ -33,15 +33,15 @@ declare module "amazon-cognito-identity-js" {
         public authenticateUser(params: any, callbacks: {onSuccess: (session: CognitoUserSession) => void, onFailure: (err: any) => void, newPasswordRequired: (userAttributes: any, requiredAttributes: any) => void, mfaRequired: (challengeName: any, challengeParameters: any) => void, customChallenge: (challengeParameters: any) => void}): void;
         public refreshSession(refreshToken: CognitoRefreshToken, callback: (err: any, result: any) => void): void;
         public confirmRegistration(code: string, forceAliasCreation: boolean, callback: (err: any, result: any) => void): void;
-        public resendConfirmationCode(callback: (err: any, result: any) => void): void;
-        public changePassword(oldPassword: string, newPassword: string, callback: (err: Error, result: any) => void): void;
-        public forgotPassword(callbacks: {onSuccess: (result: any) => void, onFailure: (err: Error) => void, inputVerificationCode: (data: any) => void}): void;
         public confirmPassword(verificationCode: string, newPassword: string, callbacks: {onSuccess: () => void, onFailure: (err: Error) => void}): void;
         public setDeviceStatusRemembered(callbacks: {onSuccess: (success: string) => void, onFailure: (err: any) => void}): void;
         public setDeviceStatusNotRemembered(callbacks: {onSuccess: (success: string) => void, onFailure: (err: any) => void}): void;
         public sendMFACode(confirmationCode: string, callbacks: {onSuccess: (session: CognitoUserSession) => void, onFailure: (err: any) => void}): void;
         public completeNewPasswordChallenge(newPassword: string, requiredAttributeData: any, callbacks: {onSuccess: (session: CognitoUserSession) => void, onFailure: (err: any) => void, mfaRequired: (challengeName: any, challengeParameters: any) => void, customChallenge: (challengeParameters: any) => void}): void;
 
+        public resendConfirmationCode(callback: (err: Error, result: "SUCCESS") => void): void;
+        public changePassword(oldPassword: string, newPassword: string, callback: (err: Error, result: "SUCCESS") => void): void;
+        public forgotPassword(callbacks: { onSuccess: () => void, onFailure: (err: Error) => void, inputVerificationCode: (data: any) => void }): void;
         public signOut(): void;
         public globalSignOut(callbacks: {onSuccess: (msg: string) => void, onFailure: (err: Error) => void}): void;
     }
