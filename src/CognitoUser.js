@@ -184,8 +184,8 @@ export default class CognitoUser {
         new util.Buffer(this.pool.getUserPoolId().split('_')[1], 'utf8'),
         new util.Buffer(this.username, 'utf8'),
         new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
-        new util.Buffer(dateNow, 'utf8')
-      ]), 'base64', 'sha256')
+        new util.Buffer(dateNow, 'utf8'),
+      ]), 'base64', 'sha256');
 
       const challengeResponses = {};
 
@@ -292,8 +292,12 @@ export default class CognitoUser {
       dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
     const deviceSecretVerifierConfig = {
-      Salt: new util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
-      PasswordVerifier: new util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64'),
+      Salt: new util.Buffer(
+          authenticationHelper.getSaltDevices(), 'hex'
+        ).toString('base64'),
+      PasswordVerifier: new util.Buffer(
+          authenticationHelper.getVerifierDevices(), 'hex'
+        ).toString('base64'),
     };
 
     this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
@@ -414,8 +418,8 @@ export default class CognitoUser {
         new util.Buffer(this.deviceGroupKey, 'utf8'),
         new util.Buffer(this.deviceKey, 'utf8'),
         new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
-        new util.Buffer(dateNow, 'utf8')
-      ]), 'base64', 'sha256')
+        new util.Buffer(dateNow, 'utf8'),
+      ]), 'base64', 'sha256');
 
       const challengeResponses = {};
 
@@ -551,8 +555,12 @@ export default class CognitoUser {
         dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
 
       const deviceSecretVerifierConfig = {
-        Salt: new util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
-        PasswordVerifier: new util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64'),
+        Salt: new util.Buffer(
+            authenticationHelper.getSaltDevices(), 'hex'
+          ).toString('base64'),
+        PasswordVerifier: new util.Buffer(
+            authenticationHelper.getVerifierDevices(), 'hex'
+          ).toString('base64'),
       };
 
       this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
