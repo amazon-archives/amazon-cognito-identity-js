@@ -30,8 +30,8 @@ declare module "amazon-cognito-identity-js" {
         public setAuthenticationFlowType(authenticationFlowType: string): string;
 
         public getSession(callback: Function): any;
-        public refreshSession(refreshToken: CognitoRefreshToken, callback: (err: any, result: any) => void);
         public authenticateUser(params: any, callbacks: {onSuccess: (session: CognitoUserSession) => void, onFailure: (err: any) => void, newPasswordRequired: (userAttributes: any, requiredAttributes: any) => void, mfaRequired: (challengeName: any, challengeParameters: any) => void, customChallenge: (challengeParameters: any) => void}): void;
+        public refreshSession(refreshToken: CognitoRefreshToken, callback: (err: any, result: any) => void): void;
         public confirmRegistration(code: string, forceAliasCreation: boolean, callback: (err: any, result: any) => void): void;
         public resendConfirmationCode(callback: (err: any, result: any) => void): void;
         public changePassword(oldPassword: string, newPassword: string, callback: (err: Error, result: any) => void): void;
