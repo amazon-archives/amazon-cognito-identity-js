@@ -42,6 +42,8 @@ export default class CognitoUserPool {
     this.clientId = ClientId;
 
     this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19', region });
+
+    this.storage = new StorageHelper().getStorage();
   }
 
   /**
@@ -106,9 +108,8 @@ export default class CognitoUserPool {
    */
   getCurrentUser() {
     const lastUserKey = `CognitoIdentityServiceProvider.${this.clientId}.LastAuthUser`;
-    const storage = new StorageHelper().getStorage();
 
-    const lastAuthUser = storage.getItem(lastUserKey);
+    const lastAuthUser = this.storage.getItem(lastUserKey);
     if (lastAuthUser) {
       const cognitoUser = {
         Username: lastAuthUser,
