@@ -228,9 +228,7 @@ export default class AuthenticationHelper {
     const xValue = new BigInteger(this.hexHash(this.padHex(salt) + usernamePasswordHash), 16);
 
     const gModPowXN = this.g.modPow(xValue, this.N);
-
     const intValue2 = serverBValue.subtract(this.k.multiply(gModPowXN));
-
     const sValue = intValue2.modPow(
       this.smallAValue.add(this.UValue.multiply(xValue)),
       this.N
