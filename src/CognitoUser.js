@@ -863,7 +863,10 @@ export default class CognitoUser {
       }
 
       this.refreshSession(refreshToken, callback);
+    } else {
+      callback(new Error('Local storage is missing an ID Token, Please authenticate'), null);
     }
+
     return undefined;
   }
 
