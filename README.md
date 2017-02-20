@@ -341,7 +341,7 @@ Note also that if CognitoUser.authenticateUser throws ReferenceError: navigator 
     attributeList.push('nickname');
 
     cognitoUser.deleteAttributes(attributeList, function(err, result) {
-     	if (err) {
+        if (err) {
             alert(err);
             return;
         }
@@ -436,7 +436,7 @@ you can make inputVerificationCode call a no-op
 ```javascript
     cognitoUser.deleteUser(function(err, result) {
         if (err) {
-           	alert(err);
+            alert(err);
             return;
         }
         console.log('call result: ' + result);
@@ -468,20 +468,20 @@ you can make inputVerificationCode call a no-op
     if (cognitoUser != null) {
         cognitoUser.getSession(function(err, session) {
             if (err) {
-           	   alert(err);
+                alert(err);
                 return;
             }
             console.log('session validity: ' + session.isValid());
-	    
-	    // NOTE: getSession must be called to authenticate user before calling getUserAttributes
-	    cognitoUser.getUserAttributes(function(err, attributes) {
-	      if (err) {
-  	        // Handle error
-	      } else {
-	        // Do something with attributes
-	      }
-	    });
-	    
+
+            // NOTE: getSession must be called to authenticate user before calling getUserAttributes
+            cognitoUser.getUserAttributes(function(err, attributes) {
+                if (err) {
+                    // Handle error
+                } else {
+                    // Do something with attributes
+                }
+            });
+
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                 IdentityPoolId : '...', // your identity pool id here
                 Logins : {
@@ -524,10 +524,10 @@ you can make inputVerificationCode call a no-op
         } else {
             console.log('Successfully logged!');
         }
-        });
+    });
 ```
 
-**Use case 18.** List all remembered devices for an authenticated user. In this case, we need to pass a limit on the number of devices retrieved at a time and a pagination token is returned to make subsequent calls. The pagination token can be subsequently pasesed. When making the first call, the pagination token should be null.
+**Use case 18.** List all remembered devices for an authenticated user. In this case, we need to pass a limit on the number of devices retrieved at a time and a pagination token is returned to make subsequent calls. The pagination token can be subsequently passed. When making the first call, the pagination token should be null.
 
 ```javascript
 
@@ -579,7 +579,7 @@ you can make inputVerificationCode call a no-op
         onSuccess: function (result) {
             console.log('call result: ' + result);
         },
-	onFailure: function(err) {
+        onFailure: function(err) {
             alert(err);
         }
     });
@@ -690,8 +690,8 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 **v1.6.0:**
 * What has changed
-  * Support for Admin create user flow. Users being signend up by admins will be able to authenticate using their one time passwords.
-  
+  * Support for Admin create user flow. Users being signed up by admins will be able to authenticate using their one time passwords.
+
 **v1.5.0:**
 * What has changed
   * Changed webpack support to follow AWS-SDK usage.
@@ -710,8 +710,8 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 *  Whats new
    * Webpack support.
-   * Support for Custom authentication flows. Developes can implement custom authentication flows around Cognito Your User Pools. See developer documentation for details.
-   * Devices support in User Pools. Users can remember devices and skip MFA verification for remebered devices. 
+   * Support for Custom authentication flows. Developers can implement custom authentication flows around Cognito Your User Pools. See developer documentation for details.
+   * Devices support in User Pools. Users can remember devices and skip MFA verification for remembered devices.
    * Scopes to control permissions for attributes in a User Pool.  
    * Configurable expiration time for refresh tokens.
    * Set custom FROM and REPLY-TO for email verification messages.
@@ -724,7 +724,7 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
    * Two new exceptions added for the authentication APIs: These exceptions have been added to accurately represent the user state when the username is invalid and when the user is not confirmed. You will have to update your application to handle these exceptions.
        * UserNotFoundException: Returned when the username user does not exist.
        * UserNotConfirmedException: Returned when the user has not been confirmed.
-       * PasswordResetRequiredException: When administator has requested for a password reset for the user.
+       * PasswordResetRequiredException: When administrator has requested for a password reset for the user.
 
 **v0.9.0:**
 * Initial release. Developer preview.
