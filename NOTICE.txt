@@ -1,2 +1,8 @@
 Amazon Cognito Identity Provider SDK for JavaScript
 Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+=========================================================================
+==                 JavaScript BN library Notice                        ==
+=========================================================================
+
+Portions of this software were developed by Tom Wu at Stanford University.
