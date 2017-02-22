@@ -5,4 +5,5 @@ Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 ==                 JavaScript BN library Notice                        ==
 =========================================================================
 
-Portions of this software were developed by Tom Wu at Stanford University.
+This product includes software developed by Tom Wu at Stanford University.
+http://www-cs-students.stanford.edu/%7Etjw/jsbn/jsbn.js
