@@ -42,8 +42,7 @@
   "main": "dist/amazon-cognito-identity.min.js",
   "types": "./index.d.ts",
   "dependencies": {
-    "aws-sdk": "^2.6.0",
-    "jsbn": "^0.1.0"
+    "aws-sdk": "^2.6.0"
   },
   "devDependencies": {
     "babel-core": "^6.13.2",

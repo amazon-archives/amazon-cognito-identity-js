@@ -42,13 +42,6 @@ module.exports = {
       commonjs: 'aws-sdk/clients/cognitoidentityserviceprovider',
       amd: 'aws-sdk/clients/cognitoidentityserviceprovider'
     },
-    // Exclude 3rd-party code from the bundle.
-    jsbn: {
-      root: [], // non-npm jsbn exports to global
-      commonjs2: 'jsbn',
-      commonjs: 'jsbn',
-      amd: 'jsbn'
-    }
   },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
