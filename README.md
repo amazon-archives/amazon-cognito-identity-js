@@ -2,7 +2,7 @@
 
 You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps. Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of millions of users, so you don't have to worry about building, securing, and scaling a solution to handle user management and authentication.
 
-We welcome developer feedback on this project. You can reach us by creating an issue on the 
+We welcome developer feedback on this project. You can reach us by creating an issue on the
 GitHub repository or posting to the Amazon Cognito Identity forums and the below blog post:
 * https://github.com/aws/amazon-cognito-identity-js
 * https://forums.aws.amazon.com/forum.jspa?forumID=173
@@ -45,7 +45,7 @@ project:
    Note that the Amazon Cognito AWS SDK for JavaScript is just a slimmed down version of the AWS
    Javascript SDK namespaced as `AWSCognito` instead of `AWS`. It references only the Amazon
    Cognito Identity service.
- 
+
 3. The Amazon Cognito Identity SDK for JavaScript, from
    [/dist/amazon-cognito-identity.min.js](https://raw.githubusercontent.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js)
 
@@ -121,7 +121,7 @@ migration.
     }
   };
   ```
- 
+
 * Add the following into your `package.json`
 
   ```json
@@ -182,14 +182,14 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
 
 ```javascript
 
-    var poolData = { 
+    var poolData = {
         UserPoolId : '...', // Your user pool id here
         ClientId : '...' // Your client id here
     };
     var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
 
     var attributeList = [];
-    
+
     var dataEmail = {
         Name : 'email',
         Value : 'email@mydomain.com'
@@ -259,7 +259,7 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
         Password : 'password',
     };
     var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-    var poolData = { 
+    var poolData = {
         UserPoolId : '...', // Your user pool id here
         ClientId : '...' // Your client id here
     };
@@ -312,6 +312,8 @@ Note also that if CognitoUser.authenticateUser throws ReferenceError: navigator 
 ```
 
 **Use case 6.** Verify user attribute for an authenticated user.
+
+Note that the inputVerificationCode method needs to be defined but does not need to actually do anything. If you would like the user to input the verification code on another page, you can set inputVerificationCode to null. If inputVerificationCode is null, onSuccess will be called immediately (assuming there is no error).
 
 ```javascript
     cognitoUser.getAttributeVerificationCode('email', {
@@ -419,7 +421,7 @@ Note also that if CognitoUser.authenticateUser throws ReferenceError: navigator 
     });
 ```
 
- 
+
 
 **Use case 13.** Deleting an authenticated user.
 
@@ -604,20 +606,20 @@ Note also that if CognitoUser.authenticateUser throws ReferenceError: navigator 
         },
 
         mfaRequired: function(codeDeliveryDetails) {
-            // MFA is required to complete user authentication. 
-            // Get the code from user and call 
+            // MFA is required to complete user authentication.
+            // Get the code from user and call
             cognitoUser.sendMFACode(mfaCode, this)
         },
 
         newPasswordRequired: function(userAttributes, requiredAttributes) {
-            // User was signed up by an admin and must provide new 
-            // password and required attributes, if any, to complete 
+            // User was signed up by an admin and must provide new
+            // password and required attributes, if any, to complete
             // authentication.
-	    
+
             // the api doesn't accept this field back
             delete userAttributes.email_verified;
-            
-            // Get these details and call 
+
+            // Get these details and call
             cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, this);
         }
     });
@@ -638,7 +640,7 @@ Note also that if CognitoUser.authenticateUser throws ReferenceError: navigator 
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
 * For Amazon Cognito Identity request handling: "https://cognito-idp.us-east-1.amazonaws.com"
   * This endpoint may change based on which region your Identity Pool was created in.
- 
+
 For most frameworks you can whitelist the domain by whitelisting all AWS endpoints with "*.amazonaws.com".
 
 ## Random numbers
@@ -700,7 +702,7 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
    * Removed moment.js as a dependency.
 
 **v1.0.0:**
-* GA release. In this GA service launch, the following new features have been added to Amazon Cognito Your User Pools. 
+* GA release. In this GA service launch, the following new features have been added to Amazon Cognito Your User Pools.
 
 *  Whats new
    * Webpack support.
@@ -710,8 +712,8 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
    * Configurable expiration time for refresh tokens.
    * Set custom FROM and REPLY-TO for email verification messages.
    * Search users in your pool using user attributes.
-   * Global sign-out for a user. 
-   * Removed dependency to sjcl bytes codec. 
+   * Global sign-out for a user.
+   * Removed dependency to sjcl bytes codec.
 
 * What has changed
    * Authentication flow in Javascript SDK now uses Custom Authentication API

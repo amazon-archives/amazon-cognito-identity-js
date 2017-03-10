@@ -1082,7 +1082,10 @@ export default class CognitoUser {
       if (err) {
         return callback.onFailure(err);
       }
-      return callback.inputVerificationCode(data);
+      if (typeof callback.inputVerificationCode === 'function') {
+        return callback.inputVerificationCode(data);
+      }
+      return callback.onSuccess();
     });
     return undefined;
   }
