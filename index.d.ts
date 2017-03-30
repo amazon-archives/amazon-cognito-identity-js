@@ -48,6 +48,7 @@ declare module "amazon-cognito-identity-js" {
         public confirmPassword(verificationCode: string, newPassword: string, callbacks: { onSuccess: () => void, onFailure: (err: Error) => void }): void;
         public setDeviceStatusRemembered(callbacks: { onSuccess: (success: string) => void, onFailure: (err: any) => void }): void;
         public setDeviceStatusNotRemembered(callbacks: { onSuccess: (success: string) => void, onFailure: (err: any) => void }): void;
+        public getDevice(callbacks: {onSuccess: (success: string) => void, onFailure: (err: Error) => void}): any;
         public sendMFACode(confirmationCode: string, callbacks: { onSuccess: (session: CognitoUserSession) => void, onFailure: (err: any) => void }): void;
         public completeNewPasswordChallenge(newPassword: string,
                                             requiredAttributeData: any,
