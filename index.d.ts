@@ -65,6 +65,7 @@ declare module "amazon-cognito-identity-js" {
         public updateAttributes(attributes: ICognitoUserAttributeData[], callback: NodeCallback<Error,string>): void;
         public deleteAttributes(attributeList: string[], callback: NodeCallback<Error, string>): void;
         public getAttributeVerificationCode(name: string, callbacks: { onSuccess: () => void, onFailure: (err: Error) => void, inputVerificationCode: (data: string) => void }): void;
+        public deleteUser(callback: (err :Error, success: string)=>void): void;
     }
 
     export interface ICognitoUserAttributeData {
