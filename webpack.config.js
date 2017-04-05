@@ -18,15 +18,12 @@ var banner = '/*!\n' +
 ' * limitations under the License. \n' +
 ' */\n\n';
 
-module.exports = {
+var config = {
   entry: './enhance',
   output: {
-    path: 'dist',
-    filename: 'amazon-cognito-identity.min.js',
     libraryTarget: 'umd',
     library: 'AmazonCognitoIdentity'
   },
-  devtool: 'source-map',
   externals: {
     // This umd context config isn't in configuration documentation, but see example:
     // https://github.com/webpack/webpack/tree/master/examples/externals
@@ -45,11 +42,6 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    }),
     new webpack.BannerPlugin(banner, { raw: true })
   ],
   module: {
@@ -65,3 +57,16 @@ module.exports = {
     ]
   }
 };
+
+if (process.env.NODE_ENV === 'production') {
+  config.devtool = 'source-map';
+  config.plugins.push(
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      }
+    })
+  );
+}
+
+module.exports = config;
