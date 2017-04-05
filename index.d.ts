@@ -25,7 +25,7 @@ declare module "amazon-cognito-identity-js" {
     export class CognitoUser {
         constructor(data: ICognitoUserData);
 
-        public getSignInUserSession(): CognitoUserSession;
+        public getSignInUserSession(): CognitoUserSession | null;
         public getUsername(): string;
 
         public getAuthenticationFlowType(): string;
@@ -102,7 +102,7 @@ declare module "amazon-cognito-identity-js" {
 
         public signUp(username: string, password: string, userAttributes: CognitoUserAttribute[], validationData: CognitoUserAttribute[], callback: NodeCallback<Error,ISignUpResult>): void;
 
-        public getCurrentUser(): CognitoUser;
+        public getCurrentUser(): CognitoUser | null;
     }
 
     export interface ICognitoUserSessionData {
