@@ -403,10 +403,14 @@ Note that the inputVerificationCode method needs to be defined but does not need
 
 **Use case 12.** Starting and completing a forgot password flow for an unauthenticated user.
 
+Note that the inputVerificationCode method needs to be defined but does not need to actually do anything.
+If you would like the user to input the confirmation code on another page,
+you can make inputVerificationCode call a no-op
+
 ```javascript
     cognitoUser.forgotPassword({
-        onSuccess: function () {
-            // successfully initiated reset password request
+        onSuccess: function (result) {
+            console.log('call result: ' + result);
         },
         onFailure: function(err) {
             alert(err);
@@ -518,6 +522,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
         }
     });
 ```
+*note that you can not replace the login key with a variable because it will be interpreted literally. if you want to use a variable, the resolution to [issue 17](https://github.com/aws/amazon-cognito-identity-js/issues/162) has a working example*
 
 **Use case 18.** List all remembered devices for an authenticated user. In this case, we need to pass a limit on the number of devices retrieved at a time and a pagination token is returned to make subsequent calls. The pagination token can be subsequently passed. When making the first call, the pagination token should be null.
 
