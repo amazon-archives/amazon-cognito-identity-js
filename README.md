@@ -403,14 +403,10 @@ Note that the inputVerificationCode method needs to be defined but does not need
 
 **Use case 12.** Starting and completing a forgot password flow for an unauthenticated user.
 
-Note that the inputVerificationCode method needs to be defined but does not need to actually do anything.
-If you would like the user to input the confirmation code on another page,
-you can make inputVerificationCode call a no-op
-
 ```javascript
     cognitoUser.forgotPassword({
-        onSuccess: function (result) {
-            console.log('call result: ' + result);
+        onSuccess: function () {
+            // successfully initiated reset password request
         },
         onFailure: function(err) {
             alert(err);
