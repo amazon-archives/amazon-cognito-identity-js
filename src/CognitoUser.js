@@ -808,10 +808,10 @@ export default class CognitoUser {
       ClientId: this.pool.getClientId(),
       Username: this.username,
     }, err => {
-      if (err) {
+      if (err, result) {
         return callback(err, null);
       }
-      return callback(null, 'SUCCESS');
+      return callback(null, result);
     });
   }
 
