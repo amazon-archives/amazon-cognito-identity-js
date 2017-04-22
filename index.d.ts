@@ -17,9 +17,17 @@ declare module "amazon-cognito-identity-js" {
         public getValidationData(): any[];
     }
 
+    export interface ICognitoStorage {
+        setItem(key: string, value: string): void;
+        getItem(key: string): string;
+        removeItem(key: string): void;
+        clear(): void;
+    }
+
     export interface ICognitoUserData {
         Username: string;
         Pool: CognitoUserPool;
+        Storage?: ICognitoStorage;
     }
 
     export class CognitoUser {
@@ -92,6 +100,7 @@ declare module "amazon-cognito-identity-js" {
     export interface ICognitoUserPoolData {
         UserPoolId: string;
         ClientId: string;
+        Storage?: ICognitoStorage;
     }
 
     export class CognitoUserPool {

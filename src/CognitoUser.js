@@ -74,6 +74,7 @@ export default class CognitoUser {
    * @param {object} data Creation options
    * @param {string} data.Username The user's username.
    * @param {CognitoUserPool} data.Pool Pool containing the user.
+   * @param {object} data.Storage Optional storage object.
    */
   constructor(data) {
     if (data == null || data.Username == null || data.Pool == null) {
@@ -89,7 +90,7 @@ export default class CognitoUser {
     this.signInUserSession = null;
     this.authenticationFlowType = 'USER_SRP_AUTH';
 
-    this.storage = new StorageHelper().getStorage();
+    this.storage = data.Storage || new StorageHelper().getStorage();
   }
 
   /**
