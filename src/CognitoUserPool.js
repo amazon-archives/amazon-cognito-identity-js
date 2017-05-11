@@ -27,6 +27,7 @@ export default class CognitoUserPool {
    * @param {object} data Creation options.
    * @param {string} data.UserPoolId Cognito user pool id.
    * @param {string} data.ClientId User pool application client id.
+   * @param {object} data.Storage Optional storage object.
    */
   constructor(data) {
     const { UserPoolId, ClientId } = data || {};
@@ -43,7 +44,7 @@ export default class CognitoUserPool {
 
     this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19', region });
 
-    this.storage = new StorageHelper().getStorage();
+    this.storage = data.Storage || new StorageHelper().getStorage();
   }
 
   /**
@@ -89,6 +90,7 @@ export default class CognitoUserPool {
       const cognitoUser = {
         Username: username,
         Pool: this,
+        Storage: this.storage,
       };
 
       const returnData = {
@@ -114,6 +116,7 @@ export default class CognitoUserPool {
       const cognitoUser = {
         Username: lastAuthUser,
         Pool: this,
+        Storage: this.storage,
       };
 
       return new CognitoUser(cognitoUser);
