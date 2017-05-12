@@ -124,4 +124,12 @@ export default class CognitoUserPool {
 
     return null;
   }
+
+  /**
+   * This is used to return the storage
+   * @returns {object} the storage
+   */
+  getStorage() {
+    return this.storage;
+  }
 }

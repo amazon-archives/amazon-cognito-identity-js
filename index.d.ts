@@ -112,6 +112,7 @@ declare module "amazon-cognito-identity-js" {
         public signUp(username: string, password: string, userAttributes: CognitoUserAttribute[], validationData: CognitoUserAttribute[], callback: NodeCallback<Error,ISignUpResult>): void;
 
         public getCurrentUser(): CognitoUser | null;
+        public getStorage(): ICognitoStorage;
     }
 
     export interface ICognitoUserSessionData {

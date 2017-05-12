@@ -1488,7 +1488,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.signInUserSession = null;
 	    this.authenticationFlowType = 'USER_SRP_AUTH';
 
-	    this.storage = data.Storage || new _StorageHelper2.default().getStorage();
+	    this.storage = data.Storage || this.pool.getStorage() || new _StorageHelper2.default().getStorage();
 	  }
 
 	  /**
@@ -3404,6 +3404,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return null;
+	  };
+
+	  /**
+	   * This is used to return the storage
+	   * @returns {object} the storage
+	   */
+
+
+	  CognitoUserPool.prototype.getStorage = function getStorage() {
+	    return this.storage;
 	  };
 
 	  return CognitoUserPool;
