@@ -808,7 +808,7 @@ export default class CognitoUser {
     this.client.makeUnauthenticatedRequest('resendConfirmationCode', {
       ClientId: this.pool.getClientId(),
       Username: this.username,
-    }, err => {
+    }, (err, result) => {
       if (err, result) {
         return callback(err, null);
       }
