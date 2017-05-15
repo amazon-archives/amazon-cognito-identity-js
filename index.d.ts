@@ -27,7 +27,6 @@ declare module "amazon-cognito-identity-js" {
     export interface ICognitoUserData {
         Username: string;
         Pool: CognitoUserPool;
-        Storage?: ICognitoStorage;
     }
 
     export class CognitoUser {

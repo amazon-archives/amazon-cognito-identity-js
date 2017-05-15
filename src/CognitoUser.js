@@ -90,7 +90,7 @@ export default class CognitoUser {
     this.signInUserSession = null;
     this.authenticationFlowType = 'USER_SRP_AUTH';
 
-    this.storage = data.Storage || this.pool.getStorage() || new StorageHelper().getStorage();
+    this.storage = this.pool.getStorage();
   }
 
   /**

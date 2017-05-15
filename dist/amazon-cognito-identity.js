@@ -1488,7 +1488,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.signInUserSession = null;
 	    this.authenticationFlowType = 'USER_SRP_AUTH';
 
-	    this.storage = data.Storage || this.pool.getStorage() || new _StorageHelper2.default().getStorage();
+	    this.storage = this.pool.getStorage();
 	  }
 
 	  /**
@@ -3369,8 +3369,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var cognitoUser = {
 	        Username: username,
-	        Pool: _this,
-	        Storage: _this.storage
+	        Pool: _this
 	      };
 
 	      var returnData = {
@@ -3396,8 +3395,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (lastAuthUser) {
 	      var cognitoUser = {
 	        Username: lastAuthUser,
-	        Pool: this,
-	        Storage: this.storage
+	        Pool: this
 	      };
 
 	      return new _CognitoUser2.default(cognitoUser);
