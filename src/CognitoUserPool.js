@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
 
 import CognitoUser from './CognitoUser';
+import StorageHelper from './StorageHelper';
 
 /** @class */
 export default class CognitoUserPool {
@@ -26,18 +27,24 @@ export default class CognitoUserPool {
    * @param {object} data Creation options.
    * @param {string} data.UserPoolId Cognito user pool id.
    * @param {string} data.ClientId User pool application client id.
-   * @param {int=} data.Paranoia Random number generation paranoia level.
+   * @param {object} data.Storage Optional storage object.
    */
   constructor(data) {
-    if (data == null || data.UserPoolId == null || data.ClientId == null) {
-      throw new Error('Both user pool Id and client Id are required.');
+    const { UserPoolId, ClientId } = data || {};
+    if (!UserPoolId || !ClientId) {
+      throw new Error('Both UserPoolId and ClientId are required.');
     }
+    if (!/^[\w-]+_.+$/.test(UserPoolId)) {
+      throw new Error('Invalid UserPoolId format.');
+    }
+    const region = UserPoolId.split('_')[0];
 
-    this.userPoolId = data.UserPoolId;
-    this.clientId = data.ClientId;
-    this.paranoia = data.Paranoia || 0;
+    this.userPoolId = UserPoolId;
+    this.clientId = ClientId;
 
-    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19' });
+    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19', region });
+
+    this.storage = data.Storage || new StorageHelper().getStorage();
   }
 
   /**
@@ -52,22 +59,6 @@ export default class CognitoUserPool {
    */
   getClientId() {
     return this.clientId;
-  }
-
-  /**
-   * @returns {int} the paranoia level
-   */
-  getParanoia() {
-    return this.paranoia;
-  }
-
-  /**
-   * sets paranoia level
-   * @param {int} paranoia The new paranoia level.
-   * @returns {void}
-   */
-  setParanoia(paranoia) {
-    this.paranoia = paranoia;
   }
 
   /**
@@ -99,6 +90,7 @@ export default class CognitoUserPool {
       const cognitoUser = {
         Username: username,
         Pool: this,
+        Storage: this.storage,
       };
 
       const returnData = {
@@ -118,13 +110,13 @@ export default class CognitoUserPool {
    */
   getCurrentUser() {
     const lastUserKey = `CognitoIdentityServiceProvider.${this.clientId}.LastAuthUser`;
-    const storage = window.localStorage;
 
-    const lastAuthUser = storage.getItem(lastUserKey);
+    const lastAuthUser = this.storage.getItem(lastUserKey);
     if (lastAuthUser) {
       const cognitoUser = {
         Username: lastAuthUser,
         Pool: this,
+        Storage: this.storage,
       };
 
       return new CognitoUser(cognitoUser);

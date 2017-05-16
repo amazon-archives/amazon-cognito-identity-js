@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import * as sjcl from 'sjcl';
+import { util } from 'aws-sdk/global';
 
 /** @class */
 export default class CognitoIdToken {
@@ -40,8 +40,7 @@ export default class CognitoIdToken {
    */
   getExpiration() {
     const payload = this.jwtToken.split('.')[1];
-    const expiration = JSON.parse(
-      sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
+    const expiration = JSON.parse(util.base64.decode(payload).toString('utf8'));
     return expiration.exp;
   }
 }
