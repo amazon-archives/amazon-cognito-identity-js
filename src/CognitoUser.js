@@ -809,7 +809,7 @@ export default class CognitoUser {
       ClientId: this.pool.getClientId(),
       Username: this.username,
     }, (err, result) => {
-      if (err, result) {
+      if (err) {
         return callback(err, null);
       }
       return callback(null, result);
