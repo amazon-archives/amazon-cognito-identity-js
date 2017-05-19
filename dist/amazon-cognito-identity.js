@@ -2216,8 +2216,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.client.makeUnauthenticatedRequest('resendConfirmationCode', {
 	      ClientId: this.pool.getClientId(),
 	      Username: this.username
-	    }, function (err) {
-	      if (err, result) {
+	    }, function (err, result) {
+	      if (err) {
 	        return callback(err, null);
 	      }
 	      return callback(null, result);
