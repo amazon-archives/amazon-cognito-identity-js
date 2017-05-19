@@ -650,6 +650,10 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 ## Change Log
 
+**v1.18.0:**
+* What has changed
+  * Added missing result in resendConfirmationCode.
+
 **v1.17.0:**
 * What has changed
   * Added non-minified files.
