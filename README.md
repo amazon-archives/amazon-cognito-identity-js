@@ -273,6 +273,9 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
         onSuccess: function (result) {
             console.log('access token + ' + result.getAccessToken().getJwtToken());
 
+            //POTENTIAL: Region needs to be set if not already set previously elsewhere.
+            AWS.config.region = '<region>';
+
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                 IdentityPoolId : '...', // your identity pool id here
                 Logins : {
