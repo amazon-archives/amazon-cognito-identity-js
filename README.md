@@ -132,6 +132,18 @@ migration.
   }
   ```
 
+* You can now import either `AWSCognito` or `AWS`, depending on which library
+  you included in your webpack config.
+
+  ```javascript
+  var AWSCognito = require("aws-sdk");
+  // or
+  var AWS = require("aws-sdk");
+
+  // or with ES6 modules
+  import AWSCognito from "aws-sdk";
+  ```
+
 * Build your application bundle with `npm run build`
 
 
