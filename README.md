@@ -278,6 +278,7 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
 
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                 IdentityPoolId : '...', // your identity pool id here
+		RoleArn: 'IDENTITY_POOL_AUTHNETICATED_ROLE_ARN',
                 Logins : {
                     // Change the key below according to the specific region your user pool is in.
                     'cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>' : result.getIdToken().getJwtToken()
@@ -479,6 +480,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
 
             AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                 IdentityPoolId : '...', // your identity pool id here
+		RoleArn: 'IDENTITY_POOL_AUTHNETICATED_ROLE_ARN',
                 Logins : {
                     // Change the key below according to the specific region your user pool is in.
                     'cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>' : session.getIdToken().getJwtToken()
@@ -505,6 +507,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
                 // Add the User's Id Token to the Cognito credentials login map.
                 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                     IdentityPoolId: 'YOUR_IDENTITY_POOL_ID',
+		    RoleArn: 'IDENTITY_POOL_AUTHNETICATED_ROLE_ARN',
                     Logins: {
                         'cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>': result.getIdToken().getJwtToken()
                     }
