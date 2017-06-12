@@ -96,6 +96,7 @@ export default class CognitoUserPool {
       const returnData = {
         user: new CognitoUser(cognitoUser),
         userConfirmed: data.UserConfirmed,
+        userSub: data.UserSub,
       };
 
       return callback(null, returnData);

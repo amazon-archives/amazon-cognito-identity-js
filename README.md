@@ -653,6 +653,10 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 ## Change Log
 
+**v1.19.0:**
+* What has changed
+  * Added UserSub return on sign up
+
 **v1.18.0:**
 * What has changed
   * Added missing result in resendConfirmationCode.

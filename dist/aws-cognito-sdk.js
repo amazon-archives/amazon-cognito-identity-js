@@ -1739,7 +1739,8 @@ module.exports={
           },
           "CodeDeliveryDetails": {
             "shape": "S3y"
-          }
+          },
+          "UserSub": {}
         }
       },
       "authtype": "none"
