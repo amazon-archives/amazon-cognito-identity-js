@@ -151,6 +151,5 @@ declare module "amazon-cognito-identity-js" {
         constructor(refreshToken: string);
 
         public getToken(): string;
-        public getExpiration(): number;
     }
 }
