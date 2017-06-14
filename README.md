@@ -408,8 +408,9 @@ Note that the inputVerificationCode method needs to be defined but does not need
 
 ```javascript
     cognitoUser.forgotPassword({
-        onSuccess: function () {
+        onSuccess: function (data) {
             // successfully initiated reset password request
+	    console.log('CodeDeliveryData from forgotPassword: ' + data);
         },
         onFailure: function(err) {
             alert(err);
