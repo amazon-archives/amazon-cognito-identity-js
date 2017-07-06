@@ -74,6 +74,14 @@ declare module "amazon-cognito-identity-js" {
         public deleteAttributes(attributeList: string[], callback: NodeCallback<Error, string>): void;
         public getAttributeVerificationCode(name: string, callbacks: { onSuccess: () => void, onFailure: (err: Error) => void, inputVerificationCode: (data: string) => void }): void;
         public deleteUser(callback: (err :Error, success: string)=>void): void;
+        public enableMFA(callback: (err :Error, success: string) => void): void;
+        public disableMFA(callback: (err :Error, success: string) => void): void;
+        public getMFAOptions(callback: NodeCallback<Error, MFAOption[]>);
+    }
+    
+    export interface MFAOption {
+        DeliveryMedium: "SMS" |"EMAIL";
+        AttributeName: string;
     }
 
     export interface ICognitoUserAttributeData {
