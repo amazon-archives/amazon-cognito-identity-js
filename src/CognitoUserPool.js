@@ -30,7 +30,7 @@ export default class CognitoUserPool {
    * @param {object} data.Storage Optional storage object.
    */
   constructor(data) {
-    const { UserPoolId, ClientId } = data || {};
+    const { UserPoolId, ClientId, endpoint } = data || {};
     if (!UserPoolId || !ClientId) {
       throw new Error('Both UserPoolId and ClientId are required.');
     }
@@ -42,7 +42,7 @@ export default class CognitoUserPool {
     this.userPoolId = UserPoolId;
     this.clientId = ClientId;
 
-    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19', region });
+    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19', region, endpoint });
 
     this.storage = data.Storage || new StorageHelper().getStorage();
   }
