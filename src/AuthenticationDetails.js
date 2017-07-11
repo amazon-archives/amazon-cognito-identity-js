@@ -27,8 +27,8 @@ export default class AuthenticationDetails {
    */
   constructor(data) {
     const { ValidationData, Username, Password, AuthParameters } = data || {};
-    this.validationData = ValidationData || [];
-    this.authParameters = AuthParameters || [];
+    this.validationData = ValidationData || {};
+    this.authParameters = AuthParameters || {};
     this.username = Username;
     this.password = Password;
   }
