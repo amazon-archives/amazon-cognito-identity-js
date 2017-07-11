@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-import { util } from 'aws-sdk/global';
+import { Buffer } from 'buffer/';
+import { randomBytes, createHmac, createHash } from 'crypto-browserify';
 
 import BigInteger from './BigInteger';
 
@@ -52,7 +53,7 @@ export default class AuthenticationHelper {
     this.smallAValue = this.generateRandomSmallA();
     this.getLargeAValue(() => {});
 
-    this.infoBits = new util.Buffer('Caldera Derived Key', 'utf8');
+    this.infoBits = Buffer.from('Caldera Derived Key', 'utf8');
 
     this.poolName = PoolName;
   }
@@ -89,7 +90,7 @@ export default class AuthenticationHelper {
    * @private
    */
   generateRandomSmallA() {
-    const hexRandom = util.crypto.lib.randomBytes(128).toString('hex');
+    const hexRandom = randomBytes(128).toString('hex');
 
     const randomBigInt = new BigInteger(hexRandom, 16);
     const smallABigInt = randomBigInt.mod(this.N);
@@ -103,7 +104,7 @@ export default class AuthenticationHelper {
    * @private
    */
   generateRandomString() {
-    return util.crypto.lib.randomBytes(40).toString('base64');
+    return randomBytes(40).toString('base64');
   }
 
   /**
@@ -139,7 +140,7 @@ export default class AuthenticationHelper {
     const combinedString = `${deviceGroupKey}${username}:${this.randomPassword}`;
     const hashedString = this.hash(combinedString);
 
-    const hexRandom = util.crypto.lib.randomBytes(16).toString('hex');
+    const hexRandom = randomBytes(16).toString('hex');
     this.SaltToHashDevices = this.padHex(new BigInteger(hexRandom, 16));
 
     this.g.modPow(
@@ -198,7 +199,7 @@ export default class AuthenticationHelper {
    * @private
    */
   hash(buf) {
-    const hashHex = util.crypto.sha256(buf, 'hex');
+    const hashHex = createHash('sha256').update(buf).digest('hex');
     return (new Array(64 - hashHex.length).join('0')) + hashHex;
   }
 
@@ -209,7 +210,7 @@ export default class AuthenticationHelper {
    * @private
    */
   hexHash(hexStr) {
-    return this.hash(new util.Buffer(hexStr, 'hex'));
+    return this.hash(Buffer.from(hexStr, 'hex'));
   }
 
   /**
@@ -220,12 +221,12 @@ export default class AuthenticationHelper {
    * @private
    */
   computehkdf(ikm, salt) {
-    const prk = util.crypto.hmac(salt, ikm, 'buffer', 'sha256');
-    const infoBitsUpdate = util.buffer.concat([
+    const prk = createHmac('sha256', salt).update(ikm).digest();
+    const infoBitsUpdate = Buffer.concat([
       this.infoBits,
-      new util.Buffer(String.fromCharCode(1), 'utf8'),
+      Buffer.from(String.fromCharCode(1), 'utf8'),
     ]);
-    const hmac = util.crypto.hmac(prk, infoBitsUpdate, 'buffer', 'sha256');
+    const hmac = createHmac('sha256', prk).update(infoBitsUpdate).digest();
     return hmac.slice(0, 16);
   }
 
@@ -259,8 +260,8 @@ export default class AuthenticationHelper {
       }
 
       const hkdf = this.computehkdf(
-        new util.Buffer(this.padHex(sValue), 'hex'),
-        new util.Buffer(this.padHex(this.UValue.toString(16)), 'hex'));
+        Buffer.from(this.padHex(sValue), 'hex'),
+        Buffer.from(this.padHex(this.UValue.toString(16)), 'hex'));
 
       callback(null, hkdf);
     });

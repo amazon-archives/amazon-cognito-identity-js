@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { util } from 'aws-sdk/global';
+import { Buffer } from 'buffer/';
 
 /** @class */
 export default class CognitoJwtToken {
@@ -56,7 +56,7 @@ export default class CognitoJwtToken {
   decodePayload() {
     const payload = this.jwtToken.split('.')[1];
     try {
-      return JSON.parse(util.base64.decode(payload).toString('utf8'));
+      return JSON.parse(Buffer.from(payload, 'base64').toString('utf8'));
     } catch (err) {
       return {};
     }

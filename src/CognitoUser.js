@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-import { util } from 'aws-sdk/global';
+import { Buffer } from 'buffer/';
+import { createHmac } from 'crypto-browserify';
 
 import BigInteger from './BigInteger';
 import AuthenticationHelper from './AuthenticationHelper';
@@ -252,12 +253,14 @@ export default class CognitoUser {
 
             const dateNow = dateHelper.getNowString();
 
-            const signatureString = util.crypto.hmac(hkdf, util.buffer.concat([
-              new util.Buffer(this.pool.getUserPoolId().split('_')[1], 'utf8'),
-              new util.Buffer(this.username, 'utf8'),
-              new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
-              new util.Buffer(dateNow, 'utf8'),
-            ]), 'base64', 'sha256');
+            const signatureString = createHmac('sha256', hkdf)
+              .update(Buffer.concat([
+                Buffer.from(this.pool.getUserPoolId().split('_')[1], 'utf8'),
+                Buffer.from(this.username, 'utf8'),
+                Buffer.from(challengeParameters.SECRET_BLOCK, 'base64'),
+                Buffer.from(dateNow, 'utf8'),
+              ]))
+              .digest('base64');
 
             const challengeResponses = {};
 
@@ -398,12 +401,12 @@ export default class CognitoUser {
       }
 
       const deviceSecretVerifierConfig = {
-        Salt: new util.Buffer(
-            authenticationHelper.getSaltDevices(), 'hex'
-          ).toString('base64'),
-        PasswordVerifier: new util.Buffer(
-            authenticationHelper.getVerifierDevices(), 'hex'
-          ).toString('base64'),
+        Salt: Buffer.from(
+          authenticationHelper.getSaltDevices(), 'hex'
+        ).toString('base64'),
+        PasswordVerifier: Buffer.from(
+          authenticationHelper.getVerifierDevices(), 'hex'
+        ).toString('base64'),
       };
 
       this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
@@ -543,12 +546,14 @@ export default class CognitoUser {
 
             const dateNow = dateHelper.getNowString();
 
-            const signatureString = util.crypto.hmac(hkdf, util.buffer.concat([
-              new util.Buffer(this.deviceGroupKey, 'utf8'),
-              new util.Buffer(this.deviceKey, 'utf8'),
-              new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
-              new util.Buffer(dateNow, 'utf8'),
-            ]), 'base64', 'sha256');
+            const signatureString = createHmac('sha256', hkdf)
+            .update(Buffer.concat([
+              Buffer.from(this.deviceGroupKey, 'utf8'),
+              Buffer.from(this.deviceKey, 'utf8'),
+              Buffer.from(challengeParameters.SECRET_BLOCK, 'base64'),
+              Buffer.from(dateNow, 'utf8'),
+            ]))
+            .digest('base64');
 
             const challengeResponses = {};
 
@@ -720,12 +725,12 @@ export default class CognitoUser {
               }
 
               const deviceSecretVerifierConfig = {
-                Salt: new util.Buffer(
-                    authenticationHelper.getSaltDevices(), 'hex'
-                  ).toString('base64'),
-                PasswordVerifier: new util.Buffer(
-                    authenticationHelper.getVerifierDevices(), 'hex'
-                  ).toString('base64'),
+                Salt: Buffer.from(
+                  authenticationHelper.getSaltDevices(), 'hex'
+                ).toString('base64'),
+                PasswordVerifier: Buffer.from(
+                  authenticationHelper.getVerifierDevices(), 'hex'
+                ).toString('base64'),
               };
 
               this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
