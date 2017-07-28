@@ -76,7 +76,7 @@ declare module "amazon-cognito-identity-js" {
         public deleteUser(callback: (err :Error, success: string)=>void): void;
         public enableMFA(callback: (err :Error, success: string) => void): void;
         public disableMFA(callback: (err :Error, success: string) => void): void;
-        public getMFAOptions(callback: NodeCallback<Error, MFAOption[]>)
+        public getMFAOptions(callback: NodeCallback<Error, MFAOption[]>);
     }
 
     export interface MFAOption {
@@ -142,21 +142,21 @@ declare module "amazon-cognito-identity-js" {
     }
 
     export class CognitoAccessToken {
-        constructor(accessToken: string);
+        constructor({ AccessToken: string });
 
         public getJwtToken(): string;
         public getExpiration(): number;
     }
 
     export class CognitoIdToken {
-        constructor(idToken: string);
+        constructor({ IdToken: string });
 
         public getJwtToken(): string;
         public getExpiration(): number;
     }
 
     export class CognitoRefreshToken {
-        constructor(refreshToken: string);
+        constructor({ RefreshToken: string });
 
         public getToken(): string;
     }
