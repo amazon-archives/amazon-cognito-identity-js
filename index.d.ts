@@ -43,7 +43,7 @@ declare module "amazon-cognito-identity-js" {
         public refreshSession(refreshToken: CognitoRefreshToken, callback: NodeCallback<any, any>): void;
         public authenticateUser(authenticationDetails: AuthenticationDetails,
                                 callbacks: {
-                                    onSuccess: (session: CognitoUserSession) => void,
+                                    onSuccess: (session: CognitoUserSession, userConfirmationNecessary?: boolean) => void,
                                     onFailure: (err: any) => void,
                                     newPasswordRequired?: (userAttributes: any, requiredAttributes: any) => void,
                                     mfaRequired?: (challengeName: any, challengeParameters: any) => void,
@@ -143,21 +143,21 @@ declare module "amazon-cognito-identity-js" {
     }
 
     export class CognitoAccessToken {
-        constructor(accessToken: string);
+        constructor({ AccessToken: string });
 
         public getJwtToken(): string;
         public getExpiration(): number;
     }
 
     export class CognitoIdToken {
-        constructor(idToken: string);
+        constructor({ IdToken: string });
 
         public getJwtToken(): string;
         public getExpiration(): number;
     }
 
     export class CognitoRefreshToken {
-        constructor(refreshToken: string);
+        constructor({ RefreshToken: string });
 
         public getToken(): string;
     }
