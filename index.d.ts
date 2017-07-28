@@ -72,10 +72,10 @@ declare module "amazon-cognito-identity-js" {
         public getUserAttributes(callback: NodeCallback<Error, CognitoUserAttribute[]>): void;
         public updateAttributes(attributes: ICognitoUserAttributeData[], callback: NodeCallback<Error,string>): void;
         public deleteAttributes(attributeList: string[], callback: NodeCallback<Error, string>): void;
-        public getAttributeVerificationCode(name: string, callbacks: { onSuccess: () => void, onFailure: (err: Error) => void, inputVerificationCode: (data: string) => void }): void;
-        public deleteUser(callback: (err :Error, success: string)=>void): void;
-        public enableMFA(callback: (err :Error, success: string) => void): void;
-        public disableMFA(callback: (err :Error, success: string) => void): void;
+        public getAttributeVerificationCode(name: string, callback: { onSuccess: () => void, onFailure: (err: Error) => void, inputVerificationCode: (data: string) => void }): void;
+        public deleteUser(callback: NodeCallback<Error, string>): void;
+        public enableMFA(callback: NodeCallback<Error, string>): void;
+        public disableMFA(callback: NodeCallback<Error, string>): void;
         public getMFAOptions(callback: NodeCallback<Error, MFAOption[]>);
     }
 
@@ -103,6 +103,7 @@ declare module "amazon-cognito-identity-js" {
     export interface ISignUpResult {
         user: CognitoUser;
         userConfirmed: boolean;
+        userSub: string;
     }
 
     export interface ICognitoUserPoolData {
