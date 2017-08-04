@@ -23,10 +23,12 @@ export default class AuthenticationDetails {
    * @param {string} data.Username User being authenticated.
    * @param {string} data.Password Plain-text password to authenticate with.
    * @param {(AttributeArg[])?} data.ValidationData Application extra metadata.
+   * @param {(AttributeArg[])?} data.AuthParamaters Authentication paramaters for custom auth.
    */
   constructor(data) {
-    const { ValidationData, Username, Password } = data || {};
+    const { ValidationData, Username, Password, AuthParameters } = data || {};
     this.validationData = ValidationData || [];
+    this.authParameters = AuthParameters || [];
     this.username = Username;
     this.password = Password;
   }
@@ -50,5 +52,12 @@ export default class AuthenticationDetails {
    */
   getValidationData() {
     return this.validationData;
+  }
+
+  /**
+   * @returns {Array} the record's authParameters
+   */
+  getAuthParameters() {
+    return this.authParameters;
   }
 }

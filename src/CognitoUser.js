@@ -123,6 +123,43 @@ export default class CognitoUser {
     this.authenticationFlowType = authenticationFlowType;
   }
 
+
+  /**
+   * This is used for authenticating the user through the custom authentication flow.
+   * @param {AuthenticationDetails} authDetails Contains the authentication data
+   * @param {object} callback Result callback map.
+   * @param {onFailure} callback.onFailure Called on any error.
+   * @param {customChallenge} callback.customChallenge Custom challenge
+   *        response required to continue.
+   * @param {authSuccess} callback.onSuccess Called on success with the new session.
+   * @returns {void}
+   */
+  initiateAuth(authDetails, callback) {
+    const authParameters = authDetails.getAuthParameters();
+    authParameters.USERNAME = this.username;
+
+    this.client.makeUnauthenticatedRequest('initiateAuth', {
+      AuthFlow: 'CUSTOM_AUTH',
+      ClientId: this.pool.getClientId(),
+      AuthParameters: authParameters,
+      ClientMetadata: authDetails.getValidationData(),
+    }, (err, data) => {
+      if (err) {
+        return callback.onFailure(err);
+      }
+      const challengeName = data.ChallengeName;
+      const challengeParameters = data.ChallengeParameters;
+
+      if (challengeName === 'CUSTOM_CHALLENGE') {
+        this.Session = data.Session;
+        return callback.customChallenge(challengeParameters);
+      }
+      this.signInUserSession = this.getCognitoUserSession(data.AuthenticationResult);
+      this.cacheTokens();
+      return callback.onSuccess(this.signInUserSession);
+    });
+  }
+
   /**
    * This is used for authenticating the user. it calls the AuthenticationHelper for SRP related
    * stuff
