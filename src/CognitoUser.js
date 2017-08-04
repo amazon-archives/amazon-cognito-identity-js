@@ -1059,7 +1059,7 @@ export default class CognitoUser {
    * @param {onFailure} callback.onFailure Called on any error.
    * @param {inputVerificationCode?} callback.inputVerificationCode
    *    Optional callback raised instead of onSuccess with response data.
-   * @param {onSuccess<void>?} callback.onSuccess Called on success.
+   * @param {onSuccess} callback.onSuccess Called on success.
    * @returns {void}
    */
   forgotPassword(callback) {
@@ -1073,7 +1073,7 @@ export default class CognitoUser {
       if (typeof callback.inputVerificationCode === 'function') {
         return callback.inputVerificationCode(data);
       }
-      return callback.onSuccess();
+      return callback.onSuccess(data);
     });
   }
 

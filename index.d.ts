@@ -43,7 +43,7 @@ declare module "amazon-cognito-identity-js" {
         public refreshSession(refreshToken: CognitoRefreshToken, callback: NodeCallback<any, any>): void;
         public authenticateUser(authenticationDetails: AuthenticationDetails,
                                 callbacks: {
-                                    onSuccess: (session: CognitoUserSession) => void,
+                                    onSuccess: (session: CognitoUserSession, userConfirmationNecessary?: boolean) => void,
                                     onFailure: (err: any) => void,
                                     newPasswordRequired?: (userAttributes: any, requiredAttributes: any) => void,
                                     mfaRequired?: (challengeName: any, challengeParameters: any) => void,
@@ -52,7 +52,7 @@ declare module "amazon-cognito-identity-js" {
         public confirmRegistration(code: string, forceAliasCreation: boolean, callback: NodeCallback<any, any>): void;
         public resendConfirmationCode(callback: NodeCallback<Error, "SUCCESS">): void;
         public changePassword(oldPassword: string, newPassword: string, callback: NodeCallback<Error, "SUCCESS">): void;
-        public forgotPassword(callbacks: { onSuccess: () => void, onFailure: (err: Error) => void, inputVerificationCode?: (data: any) => void }): void;
+        public forgotPassword(callbacks: { onSuccess: (data: any) => void, onFailure: (err: Error) => void, inputVerificationCode?: (data: any) => void }): void;
         public confirmPassword(verificationCode: string, newPassword: string, callbacks: { onSuccess: () => void, onFailure: (err: Error) => void }): void;
         public setDeviceStatusRemembered(callbacks: { onSuccess: (success: string) => void, onFailure: (err: any) => void }): void;
         public setDeviceStatusNotRemembered(callbacks: { onSuccess: (success: string) => void, onFailure: (err: any) => void }): void;
@@ -72,8 +72,16 @@ declare module "amazon-cognito-identity-js" {
         public getUserAttributes(callback: NodeCallback<Error, CognitoUserAttribute[]>): void;
         public updateAttributes(attributes: ICognitoUserAttributeData[], callback: NodeCallback<Error,string>): void;
         public deleteAttributes(attributeList: string[], callback: NodeCallback<Error, string>): void;
-        public getAttributeVerificationCode(name: string, callbacks: { onSuccess: () => void, onFailure: (err: Error) => void, inputVerificationCode: (data: string) => void }): void;
-        public deleteUser(callback: (err :Error, success: string)=>void): void;
+        public getAttributeVerificationCode(name: string, callback: { onSuccess: () => void, onFailure: (err: Error) => void, inputVerificationCode: (data: string) => void }): void;
+        public deleteUser(callback: NodeCallback<Error, string>): void;
+        public enableMFA(callback: NodeCallback<Error, string>): void;
+        public disableMFA(callback: NodeCallback<Error, string>): void;
+        public getMFAOptions(callback: NodeCallback<Error, MFAOption[]>);
+    }
+
+    export interface MFAOption {
+        DeliveryMedium: "SMS" |"EMAIL";
+        AttributeName: string;
     }
 
     export interface ICognitoUserAttributeData {
@@ -95,6 +103,7 @@ declare module "amazon-cognito-identity-js" {
     export interface ISignUpResult {
         user: CognitoUser;
         userConfirmed: boolean;
+        userSub: string;
     }
 
     export interface ICognitoUserPoolData {
@@ -134,23 +143,22 @@ declare module "amazon-cognito-identity-js" {
     }
 
     export class CognitoAccessToken {
-        constructor(accessToken: string);
+        constructor({ AccessToken: string });
 
         public getJwtToken(): string;
         public getExpiration(): number;
     }
 
     export class CognitoIdToken {
-        constructor(idToken: string);
+        constructor({ IdToken: string });
 
         public getJwtToken(): string;
         public getExpiration(): number;
     }
 
     export class CognitoRefreshToken {
-        constructor(refreshToken: string);
+        constructor({ RefreshToken: string });
 
         public getToken(): string;
-        public getExpiration(): number;
     }
 }

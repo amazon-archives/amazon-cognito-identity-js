@@ -2533,7 +2533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {onFailure} callback.onFailure Called on any error.
 	   * @param {inputVerificationCode?} callback.inputVerificationCode
 	   *    Optional callback raised instead of onSuccess with response data.
-	   * @param {onSuccess<void>?} callback.onSuccess Called on success.
+	   * @param {onSuccess} callback.onSuccess Called on success.
 	   * @returns {void}
 	   */
 
@@ -2549,7 +2549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (typeof callback.inputVerificationCode === 'function') {
 	        return callback.inputVerificationCode(data);
 	      }
-	      return callback.onSuccess();
+	      return callback.onSuccess(data);
 	    });
 	  };
 
@@ -3399,7 +3399,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var _ref = data || {},
 	        UserPoolId = _ref.UserPoolId,
-	        ClientId = _ref.ClientId;
+	        ClientId = _ref.ClientId,
+	        endpoint = _ref.endpoint;
 
 	    if (!UserPoolId || !ClientId) {
 	      throw new Error('Both UserPoolId and ClientId are required.');
@@ -3412,7 +3413,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.userPoolId = UserPoolId;
 	    this.clientId = ClientId;
 
-	    this.client = new _cognitoidentityserviceprovider2.default({ apiVersion: '2016-04-19', region: region });
+	    this.client = new _cognitoidentityserviceprovider2.default({ apiVersion: '2016-04-19', region: region, endpoint: endpoint });
 
 	    this.storage = data.Storage || new _StorageHelper2.default().getStorage();
 	  }
