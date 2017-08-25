@@ -50,7 +50,7 @@ declare module "amazon-cognito-identity-js" {
                                     customChallenge?: (challengeParameters: any) => void
                                 }): void;
         public confirmRegistration(code: string, forceAliasCreation: boolean, callback: NodeCallback<any, any>): void;
-        public sendCustomChallengeAnswer(answerChallenge: any, callback:NodeCallback<any, any>):void;
+
         public resendConfirmationCode(callback: NodeCallback<Error, "SUCCESS">): void;
         public changePassword(oldPassword: string, newPassword: string, callback: NodeCallback<Error, "SUCCESS">): void;
         public forgotPassword(callbacks: { onSuccess: (data: any) => void, onFailure: (err: Error) => void, inputVerificationCode?: (data: any) => void }): void;
