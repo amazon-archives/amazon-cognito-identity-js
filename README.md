@@ -1,3 +1,32 @@
+# Cookie storage support 
+
+This is a fork of [Amazon Cognito Identity SDK for JavaScript repository](https://github.com/aws/amazon-cognito-identity-js).
+It adds support for cookies storage
+
+The core code wasn't modified, the only thing that was added is a dependency on [js-cookie](https://github.com/js-cookie/js-cookie) and the class CookieStorage, that handles the writing/reading operations in cookies.
+
+To use the CookieStorage you have to pass it in the constructor map of CognitoUserPool and CognitoUser (when constructed directly).:
+
+ ```js
+  var poolData = {
+      UserPoolId : '...', // Your user pool id here
+      ClientId : '...' // Your client id here
+      Storage: new AWSCognito.CognitoIdentityServiceProvider.CookieStorage({domain: "yourdomain.com"})
+  };
+
+  var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+
+  var userData = {
+      Username: 'username',
+      Pool: userPool,
+      Storage: new AWSCognito.CognitoIdentityServiceProvider.CookieStorage({domain: "yourdomain.com"})
+  };
+  ```
+  The CookieStorage object receives a map (data) in its constructor that may have these values:
+   * data.domain Cookies domain (mandatory).
+   * data.path Cookies path (default: '/')
+   * data.expires Cookie expiration (in days, default: 365)
+   
 # Amazon Cognito Identity SDK for JavaScript
 
 You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps. Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of millions of users, so you don't have to worry about building, securing, and scaling a solution to handle user management and authentication.
