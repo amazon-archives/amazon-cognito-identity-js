@@ -885,7 +885,7 @@ export default class CognitoUser {
       const refreshToken = new CognitoRefreshToken({
         RefreshToken: this.storage.getItem(refreshTokenKey),
       });
-      const clockDrift = this.storage.getItem(clockDriftKey) || 0;
+      const clockDrift = parseInt(this.storage.getItem(clockDriftKey), 0) || 0;
 
       const sessionData = {
         IdToken: idToken,
