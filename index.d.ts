@@ -126,9 +126,9 @@ declare module "amazon-cognito-identity-js" {
     }
 
     export interface ICognitoUserSessionData {
-        IdToken: string;
-        AccessToken: string;
-        RefreshToken?: string;
+        IdToken: CognitoIdToken;
+        AccessToken: CognitoRefreshToken;
+        RefreshToken?: CognitoAccessToken;
     }
 
     export class CognitoUserSession {
