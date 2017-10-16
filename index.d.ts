@@ -33,6 +33,7 @@ declare module "amazon-cognito-identity-js" {
     export class CognitoUser {
         constructor(data: ICognitoUserData);
 
+        public setSignInUserSession(CognitoUserSession): void;
         public getSignInUserSession(): CognitoUserSession | null;
         public getUsername(): string;
 
