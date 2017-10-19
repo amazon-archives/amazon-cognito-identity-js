@@ -19,9 +19,9 @@
 export default class CognitoUserSession {
   /**
    * Constructs a new CognitoUserSession object
-   * @param {string} IdToken The session's Id token.
-   * @param {string=} RefreshToken The session's refresh token.
-   * @param {string} AccessToken The session's access token.
+   * @param {CognitoIdToken} IdToken The session's Id token.
+   * @param {CognitoRefreshToken=} RefreshToken The session's refresh token.
+   * @param {CognitoAccessToken} AccessToken The session's access token.
    * @param {int} ClockDrift The saved computer's clock drift or undefined to force calculation.
    */
   constructor({ IdToken, RefreshToken, AccessToken, ClockDrift } = {}) {

@@ -157,6 +157,11 @@ For an example using babel-webpack of a React setup, see [babel-webpack example]
 
 For a working example using angular, see [cognito-angular2-quickstart](https://github.com/awslabs/aws-cognito-angular2-quickstart).
 
+For a working example using ember.js, see:
+
+- [aws-serverless-ember](https://github.com/awslabs/aws-serverless-ember).
+- [aws-mobilehub-ember](https://github.com/awslabs/aws-mobilehub-ember).
+
 If you are having issues when using Aurelia, please see the following [Stack Overflow post](http://stackoverflow.com/questions/39714424/how-can-i-get-the-amazon-cognito-identity-sdk-working-in-aurelia).
 
 ## Usage
@@ -638,6 +643,26 @@ Note that the inputVerificationCode method needs to be defined but does not need
             return;
         }
         console.log('MFA options for user ' + mfaOptions);
+    });
+```
+
+**Use case 25.** Authenticating a user with a passwordless custom flow.
+
+```javascript
+    cognitoUser.setAuthenticationFlowType('CUSTOM_AUTH');
+
+    cognitoUser.initiateAuth(authenticationDetails, {
+        onSuccess: function(result) {
+            // User authentication was successful
+        },
+        onFailure: function(err) {
+            // User authentication was not successful
+        },
+        customChallenge: function(challengeParameters) {
+            // User authentication depends on challenge response
+            var challengeResponses = 'challenge-answer'
+            cognitoUser.sendCustomChallengeAnswer(challengeResponses, this);
+        }
     });
 ```
 
