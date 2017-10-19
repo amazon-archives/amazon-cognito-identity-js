@@ -164,4 +164,12 @@ declare module "amazon-cognito-identity-js" {
 
         public getToken(): string;
     }
+
+    export class CookieStorage implements ICognitoStorage {
+        constructor(data);
+        setItem(key: string, value: string): void;
+        getItem(key: string): string;
+        removeItem(key: string): void;
+        clear(): void;
+    }
 }
