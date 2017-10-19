@@ -42,7 +42,11 @@ export default class CognitoUserPool {
     this.userPoolId = UserPoolId;
     this.clientId = ClientId;
 
-    this.client = new CognitoIdentityServiceProvider({ apiVersion: '2016-04-19', region, endpoint });
+    this.client = new CognitoIdentityServiceProvider({
+      apiVersion: '2016-04-19',
+      region,
+      endpoint,
+    });
 
     this.storage = data.Storage || new StorageHelper().getStorage();
   }

@@ -879,6 +879,7 @@ export default class CognitoUser {
     const idTokenKey = `${keyPrefix}.idToken`;
     const accessTokenKey = `${keyPrefix}.accessToken`;
     const refreshTokenKey = `${keyPrefix}.refreshToken`;
+    const clockDriftKey = `${keyPrefix}.clockDrift`;
 
     if (this.storage.getItem(idTokenKey)) {
       const idToken = new CognitoIdToken({
@@ -890,11 +891,13 @@ export default class CognitoUser {
       const refreshToken = new CognitoRefreshToken({
         RefreshToken: this.storage.getItem(refreshTokenKey),
       });
+      const clockDrift = parseInt(this.storage.getItem(clockDriftKey), 0) || 0;
 
       const sessionData = {
         IdToken: idToken,
         AccessToken: accessToken,
         RefreshToken: refreshToken,
+        ClockDrift: clockDrift,
       };
       const cachedSession = new CognitoUserSession(sessionData);
       if (cachedSession.isValid()) {
@@ -967,11 +970,13 @@ export default class CognitoUser {
     const idTokenKey = `${keyPrefix}.${this.username}.idToken`;
     const accessTokenKey = `${keyPrefix}.${this.username}.accessToken`;
     const refreshTokenKey = `${keyPrefix}.${this.username}.refreshToken`;
+    const clockDriftKey = `${keyPrefix}.${this.username}.clockDrift`;
     const lastUserKey = `${keyPrefix}.LastAuthUser`;
 
     this.storage.setItem(idTokenKey, this.signInUserSession.getIdToken().getJwtToken());
     this.storage.setItem(accessTokenKey, this.signInUserSession.getAccessToken().getJwtToken());
     this.storage.setItem(refreshTokenKey, this.signInUserSession.getRefreshToken().getToken());
+    this.storage.setItem(clockDriftKey, this.signInUserSession.getClockDrift());
     this.storage.setItem(lastUserKey, this.username);
   }
 

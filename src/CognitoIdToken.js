@@ -15,32 +15,15 @@
  * limitations under the License.
  */
 
-import { util } from 'aws-sdk/global';
+import CognitoJwtToken from './CognitoJwtToken';
 
 /** @class */
-export default class CognitoIdToken {
+export default class CognitoIdToken extends CognitoJwtToken {
   /**
    * Constructs a new CognitoIdToken object
    * @param {string=} IdToken The JWT Id token
    */
   constructor({ IdToken } = {}) {
-    // Assign object
-    this.jwtToken = IdToken || '';
-  }
-
-  /**
-   * @returns {string} the record's token.
-   */
-  getJwtToken() {
-    return this.jwtToken;
-  }
-
-  /**
-   * @returns {int} the token's expiration (exp member).
-   */
-  getExpiration() {
-    const payload = this.jwtToken.split('.')[1];
-    const expiration = JSON.parse(util.base64.decode(payload).toString('utf8'));
-    return expiration.exp;
+    super(IdToken || '');
   }
 }
