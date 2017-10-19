@@ -646,6 +646,26 @@ Note that the inputVerificationCode method needs to be defined but does not need
     });
 ```
 
+**Use case 25.** Authenticating a user with a passwordless custom flow.
+
+```javascript
+    cognitoUser.setAuthenticationFlowType('CUSTOM_AUTH');
+
+    cognitoUser.initiateAuth(authenticationDetails, {
+        onSuccess: function(result) {
+            // User authentication was successful
+        },
+        onFailure: function(err) {
+            // User authentication was not successful
+        },
+        customChallenge: function(challengeParameters) {
+            // User authentication depends on challenge response
+            var challengeResponses = 'challenge-answer'
+            cognitoUser.sendCustomChallengeAnswer(challengeResponses, this);
+        }
+    });
+```
+
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
 * For Amazon Cognito Identity request handling: "https://cognito-idp.us-east-1.amazonaws.com"
