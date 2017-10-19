@@ -93,6 +93,11 @@ export default class CognitoUser {
     this.storage = data.Storage || new StorageHelper().getStorage();
   }
 
+  /**
+   * Sets the session for this user
+   * @param {CognitoUserSession} signInUserSession the session
+   * @returns {void}
+   */
   setSignInUserSession(signInUserSession) {
     this.clearCachedTokens();
     this.signInUserSession = signInUserSession;
