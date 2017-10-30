@@ -694,7 +694,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
     });
 ```
 
-**Use case 25.** Using cookies to store cognito tokens
+**Use case 26.** Using cookies to store cognito tokens
 
 To use the CookieStorage you have to pass it in the constructor map of CognitoUserPool and CognitoUser (when constructed directly).:
 
@@ -717,6 +717,7 @@ The CookieStorage object receives a map (data) in its constructor that may have 
  * data.domain Cookies domain (mandatory).
  * data.path Cookies path (default: '/')
  * data.expires Cookie expiration (in days, default: 365)
+ * data.secure Cookie secure flag (default: true)
 
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
