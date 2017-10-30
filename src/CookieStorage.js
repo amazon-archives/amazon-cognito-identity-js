@@ -10,6 +10,7 @@ export default class CookieStorage {
    * @param {string} data.domain Cookies domain (mandatory).
    * @param {string} data.path Cookies path (default: '/')
    * @param {integer} data.expires Cookie expiration (in days, default: 365)
+   * @param {boolean} data.secure Cookie secure flag (default: true)
    */
   constructor(data) {
     this.domain = data.domain;
@@ -22,6 +23,11 @@ export default class CookieStorage {
       this.expires = data.expires;
     } else {
       this.expires = 365;
+    }
+    if (data.secure){
+      this.secure = data.secure;
+    } else {
+      this.secure = true;
     }
   }
 
@@ -52,7 +58,7 @@ export default class CookieStorage {
    * @returns {string} value - value that was deleted
    */
   removeItem(key) {
-    return Cookies.remove(key, { path: this.path, domain: this.domain, secure: true});
+    return Cookies.remove(key, { path: this.path, domain: this.domain, secure: this.secure});
   }
 
   /**
