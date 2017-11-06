@@ -24,7 +24,7 @@ export default class CookieStorage {
     } else {
       this.expires = 365;
     }
-    if (data.secure){
+    if (data.hasOwnProperty('secure')){
       this.secure = data.secure;
     } else {
       this.secure = true;
