@@ -200,106 +200,128 @@ export default class CognitoUser {
     }
 
     authParameters.USERNAME = this.username;
-    authParameters.SRP_A = authenticationHelper.getLargeAValue().toString(16);
-
-    if (this.authenticationFlowType === 'CUSTOM_AUTH') {
-      authParameters.CHALLENGE_NAME = 'SRP_A';
-    }
-
-    this.client.makeUnauthenticatedRequest('initiateAuth', {
-      AuthFlow: this.authenticationFlowType,
-      ClientId: this.pool.getClientId(),
-      AuthParameters: authParameters,
-      ClientMetadata: authDetails.getValidationData(),
-    }, (err, data) => {
-      if (err) {
-        return callback.onFailure(err);
+    authenticationHelper.getLargeAValue((errOnAValue, aValue) => {
+      // getLargeAValue callback start
+      if (errOnAValue) {
+        callback.onFailure(errOnAValue);
       }
 
-      const challengeParameters = data.ChallengeParameters;
+      authParameters.SRP_A = aValue.toString(16);
 
-      this.username = challengeParameters.USER_ID_FOR_SRP;
-      serverBValue = new BigInteger(challengeParameters.SRP_B, 16);
-      salt = new BigInteger(challengeParameters.SALT, 16);
-      this.getCachedDeviceKeyAndPassword();
-
-      const hkdf = authenticationHelper.getPasswordAuthenticationKey(
-        this.username,
-        authDetails.getPassword(),
-        serverBValue,
-        salt);
-
-      const dateNow = dateHelper.getNowString();
-
-      const signatureString = util.crypto.hmac(hkdf, util.buffer.concat([
-        new util.Buffer(this.pool.getUserPoolId().split('_')[1], 'utf8'),
-        new util.Buffer(this.username, 'utf8'),
-        new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
-        new util.Buffer(dateNow, 'utf8'),
-      ]), 'base64', 'sha256');
-
-      const challengeResponses = {};
-
-      challengeResponses.USERNAME = this.username;
-      challengeResponses.PASSWORD_CLAIM_SECRET_BLOCK = challengeParameters.SECRET_BLOCK;
-      challengeResponses.TIMESTAMP = dateNow;
-      challengeResponses.PASSWORD_CLAIM_SIGNATURE = signatureString;
-
-      if (this.deviceKey != null) {
-        challengeResponses.DEVICE_KEY = this.deviceKey;
+      if (this.authenticationFlowType === 'CUSTOM_AUTH') {
+        authParameters.CHALLENGE_NAME = 'SRP_A';
       }
 
-      const respondToAuthChallenge = (challenge, challengeCallback) =>
-        this.client.makeUnauthenticatedRequest('respondToAuthChallenge', challenge,
-          (errChallenge, dataChallenge) => {
-            if (errChallenge && errChallenge.code === 'ResourceNotFoundException' &&
-                errChallenge.message.toLowerCase().indexOf('device') !== -1) {
-              challengeResponses.DEVICE_KEY = null;
-              this.deviceKey = null;
-              this.randomPassword = null;
-              this.deviceGroupKey = null;
-              this.clearCachedDeviceKeyAndPassword();
-              return respondToAuthChallenge(challenge, challengeCallback);
-            }
-            return challengeCallback(errChallenge, dataChallenge);
-          });
-
-      respondToAuthChallenge({
-        ChallengeName: 'PASSWORD_VERIFIER',
+      this.client.makeUnauthenticatedRequest('initiateAuth', {
+        AuthFlow: this.authenticationFlowType,
         ClientId: this.pool.getClientId(),
-        ChallengeResponses: challengeResponses,
-        Session: data.Session,
-      }, (errAuthenticate, dataAuthenticate) => {
-        if (errAuthenticate) {
-          return callback.onFailure(errAuthenticate);
+        AuthParameters: authParameters,
+        ClientMetadata: authDetails.getValidationData(),
+      }, (err, data) => {
+        if (err) {
+          return callback.onFailure(err);
         }
 
-        const challengeName = dataAuthenticate.ChallengeName;
-        if (challengeName === 'NEW_PASSWORD_REQUIRED') {
-          this.Session = dataAuthenticate.Session;
-          let userAttributes = null;
-          let rawRequiredAttributes = null;
-          const requiredAttributes = [];
-          const userAttributesPrefix = authenticationHelper
-            .getNewPasswordRequiredChallengeUserAttributePrefix();
+        const challengeParameters = data.ChallengeParameters;
 
-          if (dataAuthenticate.ChallengeParameters) {
-            userAttributes = JSON.parse(
-              dataAuthenticate.ChallengeParameters.userAttributes);
-            rawRequiredAttributes = JSON.parse(
-              dataAuthenticate.ChallengeParameters.requiredAttributes);
-          }
+        this.username = challengeParameters.USER_ID_FOR_SRP;
+        serverBValue = new BigInteger(challengeParameters.SRP_B, 16);
+        salt = new BigInteger(challengeParameters.SALT, 16);
+        this.getCachedDeviceKeyAndPassword();
 
-          if (rawRequiredAttributes) {
-            for (let i = 0; i < rawRequiredAttributes.length; i++) {
-              requiredAttributes[i] = rawRequiredAttributes[i].substr(userAttributesPrefix.length);
+        authenticationHelper.getPasswordAuthenticationKey(
+          this.username,
+          authDetails.getPassword(),
+          serverBValue,
+          salt,
+          (errOnHkdf, hkdf) => {
+            // getPasswordAuthenticationKey callback start
+            if (errOnHkdf) {
+              callback.onFailure(errOnHkdf);
             }
-          }
-          return callback.newPasswordRequired(userAttributes, requiredAttributes);
-        }
-        return this.authenticateUserInternal(dataAuthenticate, authenticationHelper, callback);
+
+            const dateNow = dateHelper.getNowString();
+
+            const signatureString = util.crypto.hmac(hkdf, util.buffer.concat([
+              new util.Buffer(this.pool.getUserPoolId().split('_')[1], 'utf8'),
+              new util.Buffer(this.username, 'utf8'),
+              new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
+              new util.Buffer(dateNow, 'utf8'),
+            ]), 'base64', 'sha256');
+
+            const challengeResponses = {};
+
+            challengeResponses.USERNAME = this.username;
+            challengeResponses.PASSWORD_CLAIM_SECRET_BLOCK = challengeParameters.SECRET_BLOCK;
+            challengeResponses.TIMESTAMP = dateNow;
+            challengeResponses.PASSWORD_CLAIM_SIGNATURE = signatureString;
+
+            if (this.deviceKey != null) {
+              challengeResponses.DEVICE_KEY = this.deviceKey;
+            }
+
+            const respondToAuthChallenge = (challenge, challengeCallback) =>
+              this.client.makeUnauthenticatedRequest('respondToAuthChallenge', challenge,
+                (errChallenge, dataChallenge) => {
+                  if (errChallenge && errChallenge.code === 'ResourceNotFoundException' &&
+                      errChallenge.message.toLowerCase().indexOf('device') !== -1) {
+                    challengeResponses.DEVICE_KEY = null;
+                    this.deviceKey = null;
+                    this.randomPassword = null;
+                    this.deviceGroupKey = null;
+                    this.clearCachedDeviceKeyAndPassword();
+                    return respondToAuthChallenge(challenge, challengeCallback);
+                  }
+                  return challengeCallback(errChallenge, dataChallenge);
+                });
+
+            respondToAuthChallenge({
+              ChallengeName: 'PASSWORD_VERIFIER',
+              ClientId: this.pool.getClientId(),
+              ChallengeResponses: challengeResponses,
+              Session: data.Session,
+            }, (errAuthenticate, dataAuthenticate) => {
+              if (errAuthenticate) {
+                return callback.onFailure(errAuthenticate);
+              }
+
+              const challengeName = dataAuthenticate.ChallengeName;
+              if (challengeName === 'NEW_PASSWORD_REQUIRED') {
+                this.Session = dataAuthenticate.Session;
+                let userAttributes = null;
+                let rawRequiredAttributes = null;
+                const requiredAttributes = [];
+                const userAttributesPrefix = authenticationHelper
+                  .getNewPasswordRequiredChallengeUserAttributePrefix();
+
+                if (dataAuthenticate.ChallengeParameters) {
+                  userAttributes = JSON.parse(
+                    dataAuthenticate.ChallengeParameters.userAttributes);
+                  rawRequiredAttributes = JSON.parse(
+                    dataAuthenticate.ChallengeParameters.requiredAttributes);
+                }
+
+                if (rawRequiredAttributes) {
+                  for (let i = 0; i < rawRequiredAttributes.length; i++) {
+                    requiredAttributes[i] = rawRequiredAttributes[i].substr(
+                      userAttributesPrefix.length
+                    );
+                  }
+                }
+                return callback.newPasswordRequired(userAttributes, requiredAttributes);
+              }
+              return this.authenticateUserInternal(
+                dataAuthenticate,
+                authenticationHelper,
+                callback
+              );
+            });
+            return undefined;
+          // getPasswordAuthenticationKey callback end
+          });
+        return undefined;
       });
-      return undefined;
+      // getLargeAValue callback end
     });
   }
 
@@ -441,61 +463,79 @@ export default class CognitoUser {
 
     authParameters.USERNAME = this.username;
     authParameters.DEVICE_KEY = this.deviceKey;
-    authParameters.SRP_A = authenticationHelper.getLargeAValue().toString(16);
-
-    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
-      ChallengeName: 'DEVICE_SRP_AUTH',
-      ClientId: this.pool.getClientId(),
-      ChallengeResponses: authParameters,
-    }, (err, data) => {
-      if (err) {
-        return callback.onFailure(err);
+    authenticationHelper.getLargeAValue((errAValue, aValue) => {
+      // getLargeAValue callback start
+      if (errAValue) {
+        callback.onFailure(errAValue);
       }
 
-      const challengeParameters = data.ChallengeParameters;
-
-      const serverBValue = new BigInteger(challengeParameters.SRP_B, 16);
-      const salt = new BigInteger(challengeParameters.SALT, 16);
-
-      const hkdf = authenticationHelper.getPasswordAuthenticationKey(
-        this.deviceKey,
-        this.randomPassword,
-        serverBValue,
-        salt);
-
-      const dateNow = dateHelper.getNowString();
-
-      const signatureString = util.crypto.hmac(hkdf, util.buffer.concat([
-        new util.Buffer(this.deviceGroupKey, 'utf8'),
-        new util.Buffer(this.deviceKey, 'utf8'),
-        new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
-        new util.Buffer(dateNow, 'utf8'),
-      ]), 'base64', 'sha256');
-
-      const challengeResponses = {};
-
-      challengeResponses.USERNAME = this.username;
-      challengeResponses.PASSWORD_CLAIM_SECRET_BLOCK = challengeParameters.SECRET_BLOCK;
-      challengeResponses.TIMESTAMP = dateNow;
-      challengeResponses.PASSWORD_CLAIM_SIGNATURE = signatureString;
-      challengeResponses.DEVICE_KEY = this.deviceKey;
+      authParameters.SRP_A = aValue.toString(16);
 
       this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
-        ChallengeName: 'DEVICE_PASSWORD_VERIFIER',
+        ChallengeName: 'DEVICE_SRP_AUTH',
         ClientId: this.pool.getClientId(),
-        ChallengeResponses: challengeResponses,
-        Session: data.Session,
-      }, (errAuthenticate, dataAuthenticate) => {
-        if (errAuthenticate) {
-          return callback.onFailure(errAuthenticate);
+        ChallengeResponses: authParameters,
+      }, (err, data) => {
+        if (err) {
+          return callback.onFailure(err);
         }
 
-        this.signInUserSession = this.getCognitoUserSession(dataAuthenticate.AuthenticationResult);
-        this.cacheTokens();
+        const challengeParameters = data.ChallengeParameters;
 
-        return callback.onSuccess(this.signInUserSession);
+        const serverBValue = new BigInteger(challengeParameters.SRP_B, 16);
+        const salt = new BigInteger(challengeParameters.SALT, 16);
+
+        authenticationHelper.getPasswordAuthenticationKey(
+          this.deviceKey,
+          this.randomPassword,
+          serverBValue,
+          salt,
+          (errHkdf, hkdf) => {
+            // getPasswordAuthenticationKey callback start
+            if (errHkdf) {
+              return callback.onFailure(errHkdf);
+            }
+
+            const dateNow = dateHelper.getNowString();
+
+            const signatureString = util.crypto.hmac(hkdf, util.buffer.concat([
+              new util.Buffer(this.deviceGroupKey, 'utf8'),
+              new util.Buffer(this.deviceKey, 'utf8'),
+              new util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'),
+              new util.Buffer(dateNow, 'utf8'),
+            ]), 'base64', 'sha256');
+
+            const challengeResponses = {};
+
+            challengeResponses.USERNAME = this.username;
+            challengeResponses.PASSWORD_CLAIM_SECRET_BLOCK = challengeParameters.SECRET_BLOCK;
+            challengeResponses.TIMESTAMP = dateNow;
+            challengeResponses.PASSWORD_CLAIM_SIGNATURE = signatureString;
+            challengeResponses.DEVICE_KEY = this.deviceKey;
+
+            this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+              ChallengeName: 'DEVICE_PASSWORD_VERIFIER',
+              ClientId: this.pool.getClientId(),
+              ChallengeResponses: challengeResponses,
+              Session: data.Session,
+            }, (errAuthenticate, dataAuthenticate) => {
+              if (errAuthenticate) {
+                return callback.onFailure(errAuthenticate);
+              }
+
+              this.signInUserSession = this.getCognitoUserSession(
+                dataAuthenticate.AuthenticationResult
+              );
+              this.cacheTokens();
+
+              return callback.onSuccess(this.signInUserSession);
+            });
+            return undefined;
+            // getPasswordAuthenticationKey callback end
+          });
+        return undefined;
       });
-      return undefined;
+      // getLargeAValue callback end
     });
   }
 

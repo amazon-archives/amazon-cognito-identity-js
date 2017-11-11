@@ -167,7 +167,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.k = new _BigInteger2.default(this.hexHash('00' + this.N.toString(16) + '0' + this.g.toString(16)), 16);
 
 	    this.smallAValue = this.generateRandomSmallA();
-	    this.largeAValue = this.calculateA(this.smallAValue);
+	    this.getLargeAValue(function () {});
 
 	    this.infoBits = new _global.util.Buffer('Caldera Derived Key', 'utf8');
 
@@ -184,12 +184,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  /**
-	   * @returns {BigInteger} large A, a value generated from small A
+	   * @param {nodeCallback<BigInteger>} callback Called with (err, largeAValue)
+	   * @returns {void}
 	   */
 
 
-	  AuthenticationHelper.prototype.getLargeAValue = function getLargeAValue() {
-	    return this.largeAValue;
+	  AuthenticationHelper.prototype.getLargeAValue = function getLargeAValue(callback) {
+	    var _this = this;
+
+	    if (this.largeAValue) {
+	      callback(null, this.largeAValue);
+	    } else {
+	      this.calculateA(this.smallAValue, function (err, largeAValue) {
+	        if (err) {
+	          callback(err, null);
+	        }
+
+	        _this.largeAValue = largeAValue;
+	        callback(null, _this.largeAValue);
+	      });
+	    }
 	  };
 
 	  /**
@@ -250,11 +264,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * Generate salts and compute verifier.
 	   * @param {string} deviceGroupKey Devices to generate verifier for.
 	   * @param {string} username User to generate verifier for.
+	   * @param {nodeCallback<null>} callback Called with (err, null)
 	   * @returns {void}
 	   */
 
 
-	  AuthenticationHelper.prototype.generateHashDevice = function generateHashDevice(deviceGroupKey, username) {
+	  AuthenticationHelper.prototype.generateHashDevice = function generateHashDevice(deviceGroupKey, username, callback) {
+	    var _this2 = this;
+
 	    this.randomPassword = this.generateRandomString();
 	    var combinedString = '' + deviceGroupKey + username + ':' + this.randomPassword;
 	    var hashedString = this.hash(combinedString);
@@ -262,27 +279,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var hexRandom = _global.util.crypto.lib.randomBytes(16).toString('hex');
 	    this.SaltToHashDevices = this.padHex(new _BigInteger2.default(hexRandom, 16));
 
-	    var verifierDevicesNotPadded = this.g.modPow(new _BigInteger2.default(this.hexHash(this.SaltToHashDevices + hashedString), 16), this.N);
+	    this.g.modPow(new _BigInteger2.default(this.hexHash(this.SaltToHashDevices + hashedString), 16), this.N, function (err, verifierDevicesNotPadded) {
+	      if (err) {
+	        callback(err, null);
+	      }
 
-	    this.verifierDevices = this.padHex(verifierDevicesNotPadded);
+	      _this2.verifierDevices = _this2.padHex(verifierDevicesNotPadded);
+	      callback(null, null);
+	    });
 	  };
 
 	  /**
 	   * Calculate the client's public value A = g^a%N
 	   * with the generated random number a
 	   * @param {BigInteger} a Randomly generated small A.
-	   * @returns {BigInteger} Computed large A.
+	   * @param {nodeCallback<BigInteger>} callback Called with (err, largeAValue)
+	   * @returns {void}
 	   * @private
 	   */
 
 
-	  AuthenticationHelper.prototype.calculateA = function calculateA(a) {
-	    var A = this.g.modPow(a, this.N);
+	  AuthenticationHelper.prototype.calculateA = function calculateA(a, callback) {
+	    var _this3 = this;
 
-	    if (A.mod(this.N).equals(_BigInteger2.default.ZERO)) {
-	      throw new Error('Illegal paramater. A mod N cannot be 0.');
-	    }
-	    return A;
+	    this.g.modPow(a, this.N, function (err, A) {
+	      if (err) {
+	        callback(err, null);
+	      }
+
+	      if (A.mod(_this3.N).equals(_BigInteger2.default.ZERO)) {
+	        callback(new Error('Illegal paramater. A mod N cannot be 0.'), null);
+	      }
+
+	      callback(null, A);
+	    });
 	  };
 
 	  /**
@@ -348,11 +378,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {String} password Password.
 	   * @param {BigInteger} serverBValue Server B value.
 	   * @param {BigInteger} salt Generated salt.
-	   * @returns {Buffer} Computed HKDF value.
+	   * @param {nodeCallback<Buffer>} callback Called with (err, hkdfValue)
+	   * @returns {void}
 	   */
 
 
-	  AuthenticationHelper.prototype.getPasswordAuthenticationKey = function getPasswordAuthenticationKey(username, password, serverBValue, salt) {
+	  AuthenticationHelper.prototype.getPasswordAuthenticationKey = function getPasswordAuthenticationKey(username, password, serverBValue, salt, callback) {
+	    var _this4 = this;
+
 	    if (serverBValue.mod(this.N).equals(_BigInteger2.default.ZERO)) {
 	      throw new Error('B cannot be zero.');
 	    }
@@ -367,14 +400,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var usernamePasswordHash = this.hash(usernamePassword);
 
 	    var xValue = new _BigInteger2.default(this.hexHash(this.padHex(salt) + usernamePasswordHash), 16);
+	    this.calculateS(xValue, serverBValue, function (err, sValue) {
+	      if (err) {
+	        callback(err, null);
+	      }
 
-	    var gModPowXN = this.g.modPow(xValue, this.N);
-	    var intValue2 = serverBValue.subtract(this.k.multiply(gModPowXN));
-	    var sValue = intValue2.modPow(this.smallAValue.add(this.UValue.multiply(xValue)), this.N).mod(this.N);
+	      var hkdf = _this4.computehkdf(new _global.util.Buffer(_this4.padHex(sValue), 'hex'), new _global.util.Buffer(_this4.padHex(_this4.UValue.toString(16)), 'hex'));
 
-	    var hkdf = this.computehkdf(new _global.util.Buffer(this.padHex(sValue), 'hex'), new _global.util.Buffer(this.padHex(this.UValue.toString(16)), 'hex'));
+	      callback(null, hkdf);
+	    });
+	  };
 
-	    return hkdf;
+	  /**
+	   * Calculates the S value used in getPasswordAuthenticationKey
+	   * @param {BigInteger} xValue Salted password hash value.
+	   * @param {BigInteger} serverBValue Server B value.
+	   * @param {nodeCallback<string>} callback Called on success or error.
+	   * @returns {void}
+	   */
+
+
+	  AuthenticationHelper.prototype.calculateS = function calculateS(xValue, serverBValue, callback) {
+	    var _this5 = this;
+
+	    this.g.modPow(xValue, this.N, function (err, gModPowXN) {
+	      if (err) {
+	        callback(err, null);
+	      }
+
+	      var intValue2 = serverBValue.subtract(_this5.k.multiply(gModPowXN));
+	      intValue2.modPow(_this5.smallAValue.add(_this5.UValue.multiply(xValue)), _this5.N, function (err2, result) {
+	        if (err2) {
+	          callback(err2, null);
+	        }
+
+	        callback(null, result.mod(_this5.N));
+	      });
+	    });
 	  };
 
 	  /**
@@ -1102,7 +1164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Montgomery.prototype.sqrTo = montSqrTo;
 
 	// (public) this^e % m (HAC 14.85)
-	function bnModPow(e, m) {
+	function bnModPow(e, m, callback) {
 	  var i = e.bitLength(),
 	      k,
 	      r = nbv(1),
@@ -1175,7 +1237,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }
-	  return z.revert(r);
+	  var result = z.revert(r);
+	  callback(null, result);
+	  return result;
 	}
 
 	// protected
@@ -1647,93 +1711,108 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    authParameters.USERNAME = this.username;
-	    authParameters.SRP_A = authenticationHelper.getLargeAValue().toString(16);
-
-	    if (this.authenticationFlowType === 'CUSTOM_AUTH') {
-	      authParameters.CHALLENGE_NAME = 'SRP_A';
-	    }
-
-	    this.client.makeUnauthenticatedRequest('initiateAuth', {
-	      AuthFlow: this.authenticationFlowType,
-	      ClientId: this.pool.getClientId(),
-	      AuthParameters: authParameters,
-	      ClientMetadata: authDetails.getValidationData()
-	    }, function (err, data) {
-	      if (err) {
-	        return callback.onFailure(err);
+	    authenticationHelper.getLargeAValue(function (errOnAValue, aValue) {
+	      // getLargeAValue callback start
+	      if (errOnAValue) {
+	        callback.onFailure(errOnAValue);
 	      }
 
-	      var challengeParameters = data.ChallengeParameters;
+	      authParameters.SRP_A = aValue.toString(16);
 
-	      _this2.username = challengeParameters.USER_ID_FOR_SRP;
-	      serverBValue = new _BigInteger2.default(challengeParameters.SRP_B, 16);
-	      salt = new _BigInteger2.default(challengeParameters.SALT, 16);
-	      _this2.getCachedDeviceKeyAndPassword();
-
-	      var hkdf = authenticationHelper.getPasswordAuthenticationKey(_this2.username, authDetails.getPassword(), serverBValue, salt);
-
-	      var dateNow = dateHelper.getNowString();
-
-	      var signatureString = _global.util.crypto.hmac(hkdf, _global.util.buffer.concat([new _global.util.Buffer(_this2.pool.getUserPoolId().split('_')[1], 'utf8'), new _global.util.Buffer(_this2.username, 'utf8'), new _global.util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'), new _global.util.Buffer(dateNow, 'utf8')]), 'base64', 'sha256');
-
-	      var challengeResponses = {};
-
-	      challengeResponses.USERNAME = _this2.username;
-	      challengeResponses.PASSWORD_CLAIM_SECRET_BLOCK = challengeParameters.SECRET_BLOCK;
-	      challengeResponses.TIMESTAMP = dateNow;
-	      challengeResponses.PASSWORD_CLAIM_SIGNATURE = signatureString;
-
-	      if (_this2.deviceKey != null) {
-	        challengeResponses.DEVICE_KEY = _this2.deviceKey;
+	      if (_this2.authenticationFlowType === 'CUSTOM_AUTH') {
+	        authParameters.CHALLENGE_NAME = 'SRP_A';
 	      }
 
-	      var respondToAuthChallenge = function respondToAuthChallenge(challenge, challengeCallback) {
-	        return _this2.client.makeUnauthenticatedRequest('respondToAuthChallenge', challenge, function (errChallenge, dataChallenge) {
-	          if (errChallenge && errChallenge.code === 'ResourceNotFoundException' && errChallenge.message.toLowerCase().indexOf('device') !== -1) {
-	            challengeResponses.DEVICE_KEY = null;
-	            _this2.deviceKey = null;
-	            _this2.randomPassword = null;
-	            _this2.deviceGroupKey = null;
-	            _this2.clearCachedDeviceKeyAndPassword();
-	            return respondToAuthChallenge(challenge, challengeCallback);
-	          }
-	          return challengeCallback(errChallenge, dataChallenge);
-	        });
-	      };
-
-	      respondToAuthChallenge({
-	        ChallengeName: 'PASSWORD_VERIFIER',
+	      _this2.client.makeUnauthenticatedRequest('initiateAuth', {
+	        AuthFlow: _this2.authenticationFlowType,
 	        ClientId: _this2.pool.getClientId(),
-	        ChallengeResponses: challengeResponses,
-	        Session: data.Session
-	      }, function (errAuthenticate, dataAuthenticate) {
-	        if (errAuthenticate) {
-	          return callback.onFailure(errAuthenticate);
+	        AuthParameters: authParameters,
+	        ClientMetadata: authDetails.getValidationData()
+	      }, function (err, data) {
+	        if (err) {
+	          return callback.onFailure(err);
 	        }
 
-	        var challengeName = dataAuthenticate.ChallengeName;
-	        if (challengeName === 'NEW_PASSWORD_REQUIRED') {
-	          _this2.Session = dataAuthenticate.Session;
-	          var userAttributes = null;
-	          var rawRequiredAttributes = null;
-	          var requiredAttributes = [];
-	          var userAttributesPrefix = authenticationHelper.getNewPasswordRequiredChallengeUserAttributePrefix();
+	        var challengeParameters = data.ChallengeParameters;
 
-	          if (dataAuthenticate.ChallengeParameters) {
-	            userAttributes = JSON.parse(dataAuthenticate.ChallengeParameters.userAttributes);
-	            rawRequiredAttributes = JSON.parse(dataAuthenticate.ChallengeParameters.requiredAttributes);
+	        _this2.username = challengeParameters.USER_ID_FOR_SRP;
+	        serverBValue = new _BigInteger2.default(challengeParameters.SRP_B, 16);
+	        salt = new _BigInteger2.default(challengeParameters.SALT, 16);
+	        _this2.getCachedDeviceKeyAndPassword();
+
+	        authenticationHelper.getPasswordAuthenticationKey(_this2.username, authDetails.getPassword(), serverBValue, salt, function (errOnHkdf, hkdf) {
+	          // getPasswordAuthenticationKey callback start
+	          if (errOnHkdf) {
+	            callback.onFailure(errOnHkdf);
 	          }
 
-	          if (rawRequiredAttributes) {
-	            for (var i = 0; i < rawRequiredAttributes.length; i++) {
-	              requiredAttributes[i] = rawRequiredAttributes[i].substr(userAttributesPrefix.length);
+	          var dateNow = dateHelper.getNowString();
+
+	          var signatureString = _global.util.crypto.hmac(hkdf, _global.util.buffer.concat([new _global.util.Buffer(_this2.pool.getUserPoolId().split('_')[1], 'utf8'), new _global.util.Buffer(_this2.username, 'utf8'), new _global.util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'), new _global.util.Buffer(dateNow, 'utf8')]), 'base64', 'sha256');
+
+	          var challengeResponses = {};
+
+	          challengeResponses.USERNAME = _this2.username;
+	          challengeResponses.PASSWORD_CLAIM_SECRET_BLOCK = challengeParameters.SECRET_BLOCK;
+	          challengeResponses.TIMESTAMP = dateNow;
+	          challengeResponses.PASSWORD_CLAIM_SIGNATURE = signatureString;
+
+	          if (_this2.deviceKey != null) {
+	            challengeResponses.DEVICE_KEY = _this2.deviceKey;
+	          }
+
+	          var respondToAuthChallenge = function respondToAuthChallenge(challenge, challengeCallback) {
+	            return _this2.client.makeUnauthenticatedRequest('respondToAuthChallenge', challenge, function (errChallenge, dataChallenge) {
+	              if (errChallenge && errChallenge.code === 'ResourceNotFoundException' && errChallenge.message.toLowerCase().indexOf('device') !== -1) {
+	                challengeResponses.DEVICE_KEY = null;
+	                _this2.deviceKey = null;
+	                _this2.randomPassword = null;
+	                _this2.deviceGroupKey = null;
+	                _this2.clearCachedDeviceKeyAndPassword();
+	                return respondToAuthChallenge(challenge, challengeCallback);
+	              }
+	              return challengeCallback(errChallenge, dataChallenge);
+	            });
+	          };
+
+	          respondToAuthChallenge({
+	            ChallengeName: 'PASSWORD_VERIFIER',
+	            ClientId: _this2.pool.getClientId(),
+	            ChallengeResponses: challengeResponses,
+	            Session: data.Session
+	          }, function (errAuthenticate, dataAuthenticate) {
+	            if (errAuthenticate) {
+	              return callback.onFailure(errAuthenticate);
 	            }
-	          }
-	          return callback.newPasswordRequired(userAttributes, requiredAttributes);
-	        }
-	        return _this2.authenticateUserInternal(dataAuthenticate, authenticationHelper, callback);
+
+	            var challengeName = dataAuthenticate.ChallengeName;
+	            if (challengeName === 'NEW_PASSWORD_REQUIRED') {
+	              _this2.Session = dataAuthenticate.Session;
+	              var userAttributes = null;
+	              var rawRequiredAttributes = null;
+	              var requiredAttributes = [];
+	              var userAttributesPrefix = authenticationHelper.getNewPasswordRequiredChallengeUserAttributePrefix();
+
+	              if (dataAuthenticate.ChallengeParameters) {
+	                userAttributes = JSON.parse(dataAuthenticate.ChallengeParameters.userAttributes);
+	                rawRequiredAttributes = JSON.parse(dataAuthenticate.ChallengeParameters.requiredAttributes);
+	              }
+
+	              if (rawRequiredAttributes) {
+	                for (var i = 0; i < rawRequiredAttributes.length; i++) {
+	                  requiredAttributes[i] = rawRequiredAttributes[i].substr(userAttributesPrefix.length);
+	                }
+	              }
+	              return callback.newPasswordRequired(userAttributes, requiredAttributes);
+	            }
+	            return _this2.authenticateUserInternal(dataAuthenticate, authenticationHelper, callback);
+	          });
+	          return undefined;
+	          // getPasswordAuthenticationKey callback end
+	        });
+	        return undefined;
 	      });
-	      return undefined;
+	      // getLargeAValue callback end
 	    });
 	  };
 
@@ -1877,52 +1956,67 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    authParameters.USERNAME = this.username;
 	    authParameters.DEVICE_KEY = this.deviceKey;
-	    authParameters.SRP_A = authenticationHelper.getLargeAValue().toString(16);
-
-	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
-	      ChallengeName: 'DEVICE_SRP_AUTH',
-	      ClientId: this.pool.getClientId(),
-	      ChallengeResponses: authParameters
-	    }, function (err, data) {
-	      if (err) {
-	        return callback.onFailure(err);
+	    authenticationHelper.getLargeAValue(function (errAValue, aValue) {
+	      // getLargeAValue callback start
+	      if (errAValue) {
+	        callback.onFailure(errAValue);
 	      }
 
-	      var challengeParameters = data.ChallengeParameters;
-
-	      var serverBValue = new _BigInteger2.default(challengeParameters.SRP_B, 16);
-	      var salt = new _BigInteger2.default(challengeParameters.SALT, 16);
-
-	      var hkdf = authenticationHelper.getPasswordAuthenticationKey(_this5.deviceKey, _this5.randomPassword, serverBValue, salt);
-
-	      var dateNow = dateHelper.getNowString();
-
-	      var signatureString = _global.util.crypto.hmac(hkdf, _global.util.buffer.concat([new _global.util.Buffer(_this5.deviceGroupKey, 'utf8'), new _global.util.Buffer(_this5.deviceKey, 'utf8'), new _global.util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'), new _global.util.Buffer(dateNow, 'utf8')]), 'base64', 'sha256');
-
-	      var challengeResponses = {};
-
-	      challengeResponses.USERNAME = _this5.username;
-	      challengeResponses.PASSWORD_CLAIM_SECRET_BLOCK = challengeParameters.SECRET_BLOCK;
-	      challengeResponses.TIMESTAMP = dateNow;
-	      challengeResponses.PASSWORD_CLAIM_SIGNATURE = signatureString;
-	      challengeResponses.DEVICE_KEY = _this5.deviceKey;
+	      authParameters.SRP_A = aValue.toString(16);
 
 	      _this5.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
-	        ChallengeName: 'DEVICE_PASSWORD_VERIFIER',
+	        ChallengeName: 'DEVICE_SRP_AUTH',
 	        ClientId: _this5.pool.getClientId(),
-	        ChallengeResponses: challengeResponses,
-	        Session: data.Session
-	      }, function (errAuthenticate, dataAuthenticate) {
-	        if (errAuthenticate) {
-	          return callback.onFailure(errAuthenticate);
+	        ChallengeResponses: authParameters
+	      }, function (err, data) {
+	        if (err) {
+	          return callback.onFailure(err);
 	        }
 
-	        _this5.signInUserSession = _this5.getCognitoUserSession(dataAuthenticate.AuthenticationResult);
-	        _this5.cacheTokens();
+	        var challengeParameters = data.ChallengeParameters;
 
-	        return callback.onSuccess(_this5.signInUserSession);
+	        var serverBValue = new _BigInteger2.default(challengeParameters.SRP_B, 16);
+	        var salt = new _BigInteger2.default(challengeParameters.SALT, 16);
+
+	        authenticationHelper.getPasswordAuthenticationKey(_this5.deviceKey, _this5.randomPassword, serverBValue, salt, function (errHkdf, hkdf) {
+	          // getPasswordAuthenticationKey callback start
+	          if (errHkdf) {
+	            return callback.onFailure(errHkdf);
+	          }
+
+	          var dateNow = dateHelper.getNowString();
+
+	          var signatureString = _global.util.crypto.hmac(hkdf, _global.util.buffer.concat([new _global.util.Buffer(_this5.deviceGroupKey, 'utf8'), new _global.util.Buffer(_this5.deviceKey, 'utf8'), new _global.util.Buffer(challengeParameters.SECRET_BLOCK, 'base64'), new _global.util.Buffer(dateNow, 'utf8')]), 'base64', 'sha256');
+
+	          var challengeResponses = {};
+
+	          challengeResponses.USERNAME = _this5.username;
+	          challengeResponses.PASSWORD_CLAIM_SECRET_BLOCK = challengeParameters.SECRET_BLOCK;
+	          challengeResponses.TIMESTAMP = dateNow;
+	          challengeResponses.PASSWORD_CLAIM_SIGNATURE = signatureString;
+	          challengeResponses.DEVICE_KEY = _this5.deviceKey;
+
+	          _this5.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	            ChallengeName: 'DEVICE_PASSWORD_VERIFIER',
+	            ClientId: _this5.pool.getClientId(),
+	            ChallengeResponses: challengeResponses,
+	            Session: data.Session
+	          }, function (errAuthenticate, dataAuthenticate) {
+	            if (errAuthenticate) {
+	              return callback.onFailure(errAuthenticate);
+	            }
+
+	            _this5.signInUserSession = _this5.getCognitoUserSession(dataAuthenticate.AuthenticationResult);
+	            _this5.cacheTokens();
+
+	            return callback.onSuccess(_this5.signInUserSession);
+	          });
+	          return undefined;
+	          // getPasswordAuthenticationKey callback end
+	        });
+	        return undefined;
 	      });
-	      return undefined;
+	      // getLargeAValue callback end
 	    });
 	  };
 
@@ -3413,7 +3507,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.userPoolId = UserPoolId;
 	    this.clientId = ClientId;
 
-	    this.client = new _cognitoidentityserviceprovider2.default({ apiVersion: '2016-04-19', region: region, endpoint: endpoint });
+	    this.client = new _cognitoidentityserviceprovider2.default({
+	      apiVersion: '2016-04-19',
+	      region: region,
+	      endpoint: endpoint
+	    });
 
 	    this.storage = data.Storage || new _StorageHelper2.default().getStorage();
 	  }
