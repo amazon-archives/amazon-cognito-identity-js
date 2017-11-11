@@ -50,7 +50,7 @@ export default class AuthenticationHelper {
     this.k = new BigInteger(this.hexHash(`00${this.N.toString(16)}0${this.g.toString(16)}`), 16);
 
     this.smallAValue = this.generateRandomSmallA();
-    this.largeAValue = this.calculateA(this.smallAValue);
+    this.getLargeAValue(() => {});
 
     this.infoBits = new util.Buffer('Caldera Derived Key', 'utf8');
 
@@ -65,10 +65,22 @@ export default class AuthenticationHelper {
   }
 
   /**
-   * @returns {BigInteger} large A, a value generated from small A
+   * @param {nodeCallback<BigInteger>} callback Called with (err, largeAValue)
+   * @returns {void}
    */
-  getLargeAValue() {
-    return this.largeAValue;
+  getLargeAValue(callback) {
+    if (this.largeAValue) {
+      callback(null, this.largeAValue);
+    } else {
+      this.calculateA(this.smallAValue, (err, largeAValue) => {
+        if (err) {
+          callback(err, null);
+        }
+
+        this.largeAValue = largeAValue;
+        callback(null, this.largeAValue);
+      });
+    }
   }
 
   /**
@@ -119,9 +131,10 @@ export default class AuthenticationHelper {
    * Generate salts and compute verifier.
    * @param {string} deviceGroupKey Devices to generate verifier for.
    * @param {string} username User to generate verifier for.
+   * @param {nodeCallback<null>} callback Called with (err, null)
    * @returns {void}
    */
-  generateHashDevice(deviceGroupKey, username) {
+  generateHashDevice(deviceGroupKey, username, callback) {
     this.randomPassword = this.generateRandomString();
     const combinedString = `${deviceGroupKey}${username}:${this.randomPassword}`;
     const hashedString = this.hash(combinedString);
@@ -129,27 +142,39 @@ export default class AuthenticationHelper {
     const hexRandom = util.crypto.lib.randomBytes(16).toString('hex');
     this.SaltToHashDevices = this.padHex(new BigInteger(hexRandom, 16));
 
-    const verifierDevicesNotPadded = this.g.modPow(
+    this.g.modPow(
       new BigInteger(this.hexHash(this.SaltToHashDevices + hashedString), 16),
-      this.N);
+      this.N,
+      (err, verifierDevicesNotPadded) => {
+        if (err) {
+          callback(err, null);
+        }
 
-    this.verifierDevices = this.padHex(verifierDevicesNotPadded);
+        this.verifierDevices = this.padHex(verifierDevicesNotPadded);
+        callback(null, null);
+      });
   }
 
   /**
    * Calculate the client's public value A = g^a%N
    * with the generated random number a
    * @param {BigInteger} a Randomly generated small A.
-   * @returns {BigInteger} Computed large A.
+   * @param {nodeCallback<BigInteger>} callback Called with (err, largeAValue)
+   * @returns {void}
    * @private
    */
-  calculateA(a) {
-    const A = this.g.modPow(a, this.N);
+  calculateA(a, callback) {
+    this.g.modPow(a, this.N, (err, A) => {
+      if (err) {
+        callback(err, null);
+      }
 
-    if (A.mod(this.N).equals(BigInteger.ZERO)) {
-      throw new Error('Illegal paramater. A mod N cannot be 0.');
-    }
-    return A;
+      if (A.mod(this.N).equals(BigInteger.ZERO)) {
+        callback(new Error('Illegal paramater. A mod N cannot be 0.'), null);
+      }
+
+      callback(null, A);
+    });
   }
 
   /**
@@ -210,9 +235,10 @@ export default class AuthenticationHelper {
    * @param {String} password Password.
    * @param {BigInteger} serverBValue Server B value.
    * @param {BigInteger} salt Generated salt.
-   * @returns {Buffer} Computed HKDF value.
+   * @param {nodeCallback<Buffer>} callback Called with (err, hkdfValue)
+   * @returns {void}
    */
-  getPasswordAuthenticationKey(username, password, serverBValue, salt) {
+  getPasswordAuthenticationKey(username, password, serverBValue, salt, callback) {
     if (serverBValue.mod(this.N).equals(BigInteger.ZERO)) {
       throw new Error('B cannot be zero.');
     }
@@ -227,19 +253,45 @@ export default class AuthenticationHelper {
     const usernamePasswordHash = this.hash(usernamePassword);
 
     const xValue = new BigInteger(this.hexHash(this.padHex(salt) + usernamePasswordHash), 16);
+    this.calculateS(xValue, serverBValue, (err, sValue) => {
+      if (err) {
+        callback(err, null);
+      }
 
-    const gModPowXN = this.g.modPow(xValue, this.N);
-    const intValue2 = serverBValue.subtract(this.k.multiply(gModPowXN));
-    const sValue = intValue2.modPow(
-      this.smallAValue.add(this.UValue.multiply(xValue)),
-      this.N
-    ).mod(this.N);
+      const hkdf = this.computehkdf(
+        new util.Buffer(this.padHex(sValue), 'hex'),
+        new util.Buffer(this.padHex(this.UValue.toString(16)), 'hex'));
 
-    const hkdf = this.computehkdf(
-      new util.Buffer(this.padHex(sValue), 'hex'),
-      new util.Buffer(this.padHex(this.UValue.toString(16)), 'hex'));
+      callback(null, hkdf);
+    });
+  }
 
-    return hkdf;
+  /**
+   * Calculates the S value used in getPasswordAuthenticationKey
+   * @param {BigInteger} xValue Salted password hash value.
+   * @param {BigInteger} serverBValue Server B value.
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
+   */
+  calculateS(xValue, serverBValue, callback) {
+    this.g.modPow(xValue, this.N, (err, gModPowXN) => {
+      if (err) {
+        callback(err, null);
+      }
+
+      const intValue2 = serverBValue.subtract(this.k.multiply(gModPowXN));
+      intValue2.modPow(
+        this.smallAValue.add(this.UValue.multiply(xValue)),
+        this.N,
+        (err2, result) => {
+          if (err2) {
+            callback(err2, null);
+          }
+
+          callback(null, result.mod(this.N));
+        }
+      );
+    });
   }
 
   /**

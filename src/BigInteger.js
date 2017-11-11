@@ -682,7 +682,7 @@ Montgomery.prototype.mulTo = montMulTo;
 Montgomery.prototype.sqrTo = montSqrTo;
 
 // (public) this^e % m (HAC 14.85)
-function bnModPow(e, m) {
+function bnModPow(e, m, callback) {
   var i = e.bitLength(), k, r = nbv(1), z = new Montgomery(m);
   if (i <= 0) return r;
   else if (i < 18) k = 1;
@@ -752,7 +752,9 @@ function bnModPow(e, m) {
       }
     }
   }
-  return z.revert(r);
+  var result = z.revert(r);
+  callback(null, result);
+  return result;
 }
 
 // protected

@@ -134,6 +134,27 @@ migration.
 
 * Build your application bundle with `npm run build`
 
+## Install for React Native
+
+See [Using NPM and Webpack](https://github.com/aws/amazon-cognito-identity-js#using-npm-and-webpack) for more information on NPM.
+
+* Install and add to your dependencies the Amazon Cognito Identity SDK for JavaScript:
+
+```
+npm install --save amazon-cognito-identity-js
+```
+
+* Install react-native-cli if you have not already:
+
+```
+npm install -g react-native-cli
+```
+
+* Link the native modules to your project:
+
+```
+react-native link amazon-cognito-identity-js
+```
 
 ## Configuration
 
