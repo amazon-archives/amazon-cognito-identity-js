@@ -707,6 +707,10 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 ## Change Log
 
+**v1.23.0:**
+* What has changed
+  * Added react native optimizations for BigInteger
+
 **v1.19.0:**
 * What has changed
   * Added UserSub return on sign up
