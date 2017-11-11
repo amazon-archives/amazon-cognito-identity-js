@@ -12,7 +12,7 @@ http://www-cs-students.stanford.edu/%7Etjw/jsbn/jsbn.js
 ==                 JKBigInteger library Notice                        ==
 =========================================================================
 
-This product includes the JKBigInteger library licensed under the MIT licensed.
+This product includes the JKBigInteger library licensed under the MIT license.
 
 Copyright (C) 2013 Jānis Kiršteins
 
