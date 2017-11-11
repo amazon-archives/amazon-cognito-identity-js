@@ -25,7 +25,7 @@
 		exports["AmazonCognitoIdentity"] = factory(require("aws-sdk/global"), require("aws-sdk/clients/cognitoidentityserviceprovider"));
 	else
 		root["AmazonCognitoIdentity"] = factory(root["AWSCognito"], root["AWSCognito"]["CognitoIdentityServiceProvider"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_12__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_13__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -76,7 +76,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _src = __webpack_require__(15);
+	var _src = __webpack_require__(16);
 
 	Object.keys(_src).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -88,7 +88,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _cognitoidentityserviceprovider = __webpack_require__(12);
+	var _cognitoidentityserviceprovider = __webpack_require__(13);
 
 	var _cognitoidentityserviceprovider2 = _interopRequireDefault(_cognitoidentityserviceprovider);
 
@@ -101,13 +101,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.keys(enhancements).forEach(function (key) {
 	  _cognitoidentityserviceprovider2.default[key] = enhancements[key];
 	});
-
-	// The version of crypto-browserify included by aws-sdk only
-	// checks for window.crypto, not window.msCrypto as used by
-	// IE 11 – so we set it explicitly here
-	if (typeof window !== 'undefined' && !window.crypto && window.msCrypto) {
-	  window.crypto = window.msCrypto;
-	}
 
 /***/ }),
 /* 1 */
@@ -1284,27 +1277,37 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	var _global = __webpack_require__(1);
+	var _CognitoJwtToken2 = __webpack_require__(6);
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } } /*
-	                                                                                                                                                           * Copyright 2016 Amazon.com,
-	                                                                                                                                                           * Inc. or its affiliates. All Rights Reserved.
-	                                                                                                                                                           *
-	                                                                                                                                                           * Licensed under the Amazon Software License (the "License").
-	                                                                                                                                                           * You may not use this file except in compliance with the
-	                                                                                                                                                           * License. A copy of the License is located at
-	                                                                                                                                                           *
-	                                                                                                                                                           *     http://aws.amazon.com/asl/
-	                                                                                                                                                           *
-	                                                                                                                                                           * or in the "license" file accompanying this file. This file is
-	                                                                                                                                                           * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-	                                                                                                                                                           * CONDITIONS OF ANY KIND, express or implied. See the License
-	                                                                                                                                                           * for the specific language governing permissions and
-	                                                                                                                                                           * limitations under the License.
-	                                                                                                                                                           */
+	var _CognitoJwtToken3 = _interopRequireDefault(_CognitoJwtToken2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2016 Amazon.com,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Inc. or its affiliates. All Rights Reserved.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Licensed under the Amazon Software License (the "License").
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You may not use this file except in compliance with the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * License. A copy of the License is located at
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *     http://aws.amazon.com/asl/
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * or in the "license" file accompanying this file. This file is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * CONDITIONS OF ANY KIND, express or implied. See the License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * for the specific language governing permissions and
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * limitations under the License.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 
 	/** @class */
-	var CognitoAccessToken = function () {
+	var CognitoAccessToken = function (_CognitoJwtToken) {
+	  _inherits(CognitoAccessToken, _CognitoJwtToken);
+
 	  /**
 	   * Constructs a new CognitoAccessToken object
 	   * @param {string=} AccessToken The JWT access token.
@@ -1315,37 +1318,73 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _classCallCheck(this, CognitoAccessToken);
 
-	    // Assign object
-	    this.jwtToken = AccessToken || '';
+	    return _possibleConstructorReturn(this, _CognitoJwtToken.call(this, AccessToken || ''));
 	  }
 
-	  /**
-	   * @returns {string} the record's token.
-	   */
-
-
-	  CognitoAccessToken.prototype.getJwtToken = function getJwtToken() {
-	    return this.jwtToken;
-	  };
-
-	  /**
-	   * @returns {int} the token's expiration (exp member).
-	   */
-
-
-	  CognitoAccessToken.prototype.getExpiration = function getExpiration() {
-	    var payload = this.jwtToken.split('.')[1];
-	    var expiration = JSON.parse(_global.util.base64.decode(payload).toString('utf8'));
-	    return expiration.exp;
-	  };
-
 	  return CognitoAccessToken;
-	}();
+	}(_CognitoJwtToken3.default);
 
 	exports.default = CognitoAccessToken;
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	var _CognitoJwtToken2 = __webpack_require__(6);
+
+	var _CognitoJwtToken3 = _interopRequireDefault(_CognitoJwtToken2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*!
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2016 Amazon.com,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Inc. or its affiliates. All Rights Reserved.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Licensed under the Amazon Software License (the "License").
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You may not use this file except in compliance with the
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * License. A copy of the License is located at
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *     http://aws.amazon.com/asl/
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * or in the "license" file accompanying this file. This file is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * CONDITIONS OF ANY KIND, express or implied. See the License
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * for the specific language governing permissions and
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * limitations under the License.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+	/** @class */
+	var CognitoIdToken = function (_CognitoJwtToken) {
+	  _inherits(CognitoIdToken, _CognitoJwtToken);
+
+	  /**
+	   * Constructs a new CognitoIdToken object
+	   * @param {string=} IdToken The JWT Id token
+	   */
+	  function CognitoIdToken() {
+	    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	        IdToken = _ref.IdToken;
+
+	    _classCallCheck(this, CognitoIdToken);
+
+	    return _possibleConstructorReturn(this, _CognitoJwtToken.call(this, IdToken || ''));
+	  }
+
+	  return CognitoIdToken;
+	}(_CognitoJwtToken3.default);
+
+	exports.default = CognitoIdToken;
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1372,19 +1411,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                                                                                                                                           */
 
 	/** @class */
-	var CognitoIdToken = function () {
+	var CognitoJwtToken = function () {
 	  /**
-	   * Constructs a new CognitoIdToken object
-	   * @param {string=} IdToken The JWT Id token
+	   * Constructs a new CognitoJwtToken object
+	   * @param {string=} token The JWT token.
 	   */
-	  function CognitoIdToken() {
-	    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-	        IdToken = _ref.IdToken;
-
-	    _classCallCheck(this, CognitoIdToken);
+	  function CognitoJwtToken(token) {
+	    _classCallCheck(this, CognitoJwtToken);
 
 	    // Assign object
-	    this.jwtToken = IdToken || '';
+	    this.jwtToken = token || '';
+	    this.payload = this.decodePayload();
 	  }
 
 	  /**
@@ -1392,7 +1429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 
-	  CognitoIdToken.prototype.getJwtToken = function getJwtToken() {
+	  CognitoJwtToken.prototype.getJwtToken = function getJwtToken() {
 	    return this.jwtToken;
 	  };
 
@@ -1401,19 +1438,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 
-	  CognitoIdToken.prototype.getExpiration = function getExpiration() {
-	    var payload = this.jwtToken.split('.')[1];
-	    var expiration = JSON.parse(_global.util.base64.decode(payload).toString('utf8'));
-	    return expiration.exp;
+	  CognitoJwtToken.prototype.getExpiration = function getExpiration() {
+	    return this.payload.exp;
 	  };
 
-	  return CognitoIdToken;
+	  /**
+	   * @returns {int} the token's "issued at" (iat member).
+	   */
+
+
+	  CognitoJwtToken.prototype.getIssuedAt = function getIssuedAt() {
+	    return this.payload.iat;
+	  };
+
+	  /**
+	   * @returns {object} the token's payload.
+	   */
+
+
+	  CognitoJwtToken.prototype.decodePayload = function decodePayload() {
+	    var payload = this.jwtToken.split('.')[1];
+	    try {
+	      return JSON.parse(_global.util.base64.decode(payload).toString('utf8'));
+	    } catch (err) {
+	      return {};
+	    }
+	  };
+
+	  return CognitoJwtToken;
 	}();
 
-	exports.default = CognitoIdToken;
+	exports.default = CognitoJwtToken;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -1470,7 +1528,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = CognitoRefreshToken;
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1495,23 +1553,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _CognitoIdToken2 = _interopRequireDefault(_CognitoIdToken);
 
-	var _CognitoRefreshToken = __webpack_require__(6);
+	var _CognitoRefreshToken = __webpack_require__(7);
 
 	var _CognitoRefreshToken2 = _interopRequireDefault(_CognitoRefreshToken);
 
-	var _CognitoUserSession = __webpack_require__(9);
+	var _CognitoUserSession = __webpack_require__(10);
 
 	var _CognitoUserSession2 = _interopRequireDefault(_CognitoUserSession);
 
-	var _DateHelper = __webpack_require__(10);
+	var _DateHelper = __webpack_require__(11);
 
 	var _DateHelper2 = _interopRequireDefault(_DateHelper);
 
-	var _CognitoUserAttribute = __webpack_require__(8);
+	var _CognitoUserAttribute = __webpack_require__(9);
 
 	var _CognitoUserAttribute2 = _interopRequireDefault(_CognitoUserAttribute);
 
-	var _StorageHelper = __webpack_require__(11);
+	var _StorageHelper = __webpack_require__(12);
 
 	var _StorageHelper2 = _interopRequireDefault(_StorageHelper);
 
@@ -1600,6 +1658,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.storage = data.Storage || new _StorageHelper2.default().getStorage();
 	  }
+
+	  /**
+	   * Sets the session for this user
+	   * @param {CognitoUserSession} signInUserSession the session
+	   * @returns {void}
+	   */
+
+
+	  CognitoUser.prototype.setSignInUserSession = function setSignInUserSession(signInUserSession) {
+	    this.clearCachedTokens();
+	    this.signInUserSession = signInUserSession;
+	    this.cacheTokens();
+	  };
 
 	  /**
 	   * @returns {CognitoUserSession} the current session for this user
@@ -2426,6 +2497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var idTokenKey = keyPrefix + '.idToken';
 	    var accessTokenKey = keyPrefix + '.accessToken';
 	    var refreshTokenKey = keyPrefix + '.refreshToken';
+	    var clockDriftKey = keyPrefix + '.clockDrift';
 
 	    if (this.storage.getItem(idTokenKey)) {
 	      var idToken = new _CognitoIdToken2.default({
@@ -2437,11 +2509,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var refreshToken = new _CognitoRefreshToken2.default({
 	        RefreshToken: this.storage.getItem(refreshTokenKey)
 	      });
+	      var clockDrift = parseInt(this.storage.getItem(clockDriftKey), 0) || 0;
 
 	      var sessionData = {
 	        IdToken: idToken,
 	        AccessToken: accessToken,
-	        RefreshToken: refreshToken
+	        RefreshToken: refreshToken,
+	        ClockDrift: clockDrift
 	      };
 	      var cachedSession = new _CognitoUserSession2.default(sessionData);
 	      if (cachedSession.isValid()) {
@@ -2519,11 +2593,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var idTokenKey = keyPrefix + '.' + this.username + '.idToken';
 	    var accessTokenKey = keyPrefix + '.' + this.username + '.accessToken';
 	    var refreshTokenKey = keyPrefix + '.' + this.username + '.refreshToken';
+	    var clockDriftKey = keyPrefix + '.' + this.username + '.clockDrift';
 	    var lastUserKey = keyPrefix + '.LastAuthUser';
 
 	    this.storage.setItem(idTokenKey, this.signInUserSession.getIdToken().getJwtToken());
 	    this.storage.setItem(accessTokenKey, this.signInUserSession.getAccessToken().getJwtToken());
 	    this.storage.setItem(refreshTokenKey, this.signInUserSession.getRefreshToken().getToken());
+	    this.storage.setItem(clockDriftKey, this.signInUserSession.getClockDrift());
 	    this.storage.setItem(lastUserKey, this.username);
 	  };
 
@@ -2937,7 +3013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = CognitoUser;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3050,7 +3126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = CognitoUserAttribute;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3080,15 +3156,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	var CognitoUserSession = function () {
 	  /**
 	   * Constructs a new CognitoUserSession object
-	   * @param {string} IdToken The session's Id token.
-	   * @param {string=} RefreshToken The session's refresh token.
-	   * @param {string} AccessToken The session's access token.
+	   * @param {CognitoIdToken} IdToken The session's Id token.
+	   * @param {CognitoRefreshToken=} RefreshToken The session's refresh token.
+	   * @param {CognitoAccessToken} AccessToken The session's access token.
+	   * @param {int} ClockDrift The saved computer's clock drift or undefined to force calculation.
 	   */
 	  function CognitoUserSession() {
 	    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
 	        IdToken = _ref.IdToken,
 	        RefreshToken = _ref.RefreshToken,
-	        AccessToken = _ref.AccessToken;
+	        AccessToken = _ref.AccessToken,
+	        ClockDrift = _ref.ClockDrift;
 
 	    _classCallCheck(this, CognitoUserSession);
 
@@ -3099,6 +3177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.idToken = IdToken;
 	    this.refreshToken = RefreshToken;
 	    this.accessToken = AccessToken;
+	    this.clockDrift = ClockDrift === undefined ? this.calculateClockDrift() : ClockDrift;
 	  }
 
 	  /**
@@ -3129,16 +3208,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  /**
+	   * @returns {int} the session's clock drift
+	   */
+
+
+	  CognitoUserSession.prototype.getClockDrift = function getClockDrift() {
+	    return this.clockDrift;
+	  };
+
+	  /**
+	   * @returns {int} the computer's clock drift
+	   */
+
+
+	  CognitoUserSession.prototype.calculateClockDrift = function calculateClockDrift() {
+	    var now = Math.floor(new Date() / 1000);
+	    var iat = Math.min(this.accessToken.getIssuedAt(), this.idToken.getIssuedAt());
+
+	    return now - iat;
+	  };
+
+	  /**
 	   * Checks to see if the session is still valid based on session expiry information found
-	   * in tokens and the current time
+	   * in tokens and the current time (adjusted with clock drift)
 	   * @returns {boolean} if the session is still valid
 	   */
 
 
 	  CognitoUserSession.prototype.isValid = function isValid() {
 	    var now = Math.floor(new Date() / 1000);
+	    var adjusted = now - this.clockDrift;
 
-	    return now < this.accessToken.getExpiration() && now < this.idToken.getExpiration();
+	    return adjusted < this.accessToken.getExpiration() && adjusted < this.idToken.getExpiration();
 	  };
 
 	  return CognitoUserSession;
@@ -3147,7 +3248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = CognitoUserSession;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3222,7 +3323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = DateHelper;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3342,13 +3443,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = StorageHelper;
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_12__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_13__;
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -3441,22 +3542,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = AuthenticationDetails;
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _cognitoidentityserviceprovider = __webpack_require__(12);
+	var _cognitoidentityserviceprovider = __webpack_require__(13);
 
 	var _cognitoidentityserviceprovider2 = _interopRequireDefault(_cognitoidentityserviceprovider);
 
-	var _CognitoUser = __webpack_require__(7);
+	var _CognitoUser = __webpack_require__(8);
 
 	var _CognitoUser2 = _interopRequireDefault(_CognitoUser);
 
-	var _StorageHelper = __webpack_require__(11);
+	var _StorageHelper = __webpack_require__(12);
 
 	var _StorageHelper2 = _interopRequireDefault(_StorageHelper);
 
@@ -3610,14 +3711,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = CognitoUserPool;
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _AuthenticationDetails = __webpack_require__(13);
+	var _AuthenticationDetails = __webpack_require__(14);
 
 	Object.defineProperty(exports, 'AuthenticationDetails', {
 	  enumerable: true,
@@ -3653,7 +3754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-	var _CognitoRefreshToken = __webpack_require__(6);
+	var _CognitoRefreshToken = __webpack_require__(7);
 
 	Object.defineProperty(exports, 'CognitoRefreshToken', {
 	  enumerable: true,
@@ -3662,7 +3763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-	var _CognitoUser = __webpack_require__(7);
+	var _CognitoUser = __webpack_require__(8);
 
 	Object.defineProperty(exports, 'CognitoUser', {
 	  enumerable: true,
@@ -3671,7 +3772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-	var _CognitoUserAttribute = __webpack_require__(8);
+	var _CognitoUserAttribute = __webpack_require__(9);
 
 	Object.defineProperty(exports, 'CognitoUserAttribute', {
 	  enumerable: true,
@@ -3680,7 +3781,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-	var _CognitoUserPool = __webpack_require__(14);
+	var _CognitoUserPool = __webpack_require__(15);
 
 	Object.defineProperty(exports, 'CognitoUserPool', {
 	  enumerable: true,
@@ -3689,7 +3790,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-	var _CognitoUserSession = __webpack_require__(9);
+	var _CognitoUserSession = __webpack_require__(10);
 
 	Object.defineProperty(exports, 'CognitoUserSession', {
 	  enumerable: true,
@@ -3698,7 +3799,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-	var _DateHelper = __webpack_require__(10);
+	var _DateHelper = __webpack_require__(11);
 
 	Object.defineProperty(exports, 'DateHelper', {
 	  enumerable: true,
@@ -3708,6 +3809,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	// The version of crypto-browserify included by aws-sdk only
+	// checks for window.crypto, not window.msCrypto as used by
+	// IE 11 – so we set it explicitly here
+	if (typeof window !== 'undefined' && !window.crypto && window.msCrypto) {
+	  window.crypto = window.msCrypto;
+	}
 
 /***/ })
 /******/ ])
