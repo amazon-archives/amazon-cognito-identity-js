@@ -436,7 +436,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
     cognitoUser.forgotPassword({
         onSuccess: function (data) {
             // successfully initiated reset password request
-	    console.log('CodeDeliveryData from forgotPassword: ' + data);
+	          console.log('CodeDeliveryData from forgotPassword: ' + data);
         },
         onFailure: function(err) {
             alert(err);
@@ -446,7 +446,14 @@ Note that the inputVerificationCode method needs to be defined but does not need
             console.log('Code sent to: ' + data);
             var verificationCode = prompt('Please input verification code ' ,'');
             var newPassword = prompt('Enter new password ' ,'');
-            cognitoUser.confirmPassword(verificationCode, newPassword, this);
+            cognitoUser.confirmPassword(verificationCode, newPassword, {
+                onSuccess() {
+                    console.log('Password confirmed!');
+                },
+                onFailure(err) {
+                    console.log('Password not confirmed!');
+                }
+            });
         }
     });
 ```
