@@ -1033,7 +1033,7 @@ export default class CognitoUser {
     this.storage.setItem(idTokenKey, this.signInUserSession.getIdToken().getJwtToken());
     this.storage.setItem(accessTokenKey, this.signInUserSession.getAccessToken().getJwtToken());
     this.storage.setItem(refreshTokenKey, this.signInUserSession.getRefreshToken().getToken());
-    this.storage.setItem(clockDriftKey, this.signInUserSession.getClockDrift());
+    this.storage.setItem(clockDriftKey, `${this.signInUserSession.getClockDrift()}`);
     this.storage.setItem(lastUserKey, this.username);
   }
 
