@@ -60,7 +60,8 @@
   "jsnext:main": "es/index.js",
   "types": "./index.d.ts",
   "dependencies": {
-    "aws-sdk": "^2.6.0"
+    "aws-sdk": "^2.6.0",
+    "js-cookie": "^2.1.4"
   },
   "devDependencies": {
     "babel-cli": "^6.23.0",
