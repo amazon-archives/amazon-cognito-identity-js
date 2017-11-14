@@ -279,6 +279,7 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
 
 **Use case 4.** Authenticating a user and establishing a user session with the Amazon Cognito Identity service.
 
+
 ```javascript
     var authenticationData = {
         Username : 'username',
@@ -630,7 +631,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
     });
 ```
 
-**Use case 23.** Authenticate a user and set new password for a user that was created using AdminCreateUser API
+**Use case 23.** Authenticate a user and set new password for a user that was created using AdminCreateUser API.
 
 ```javascript
 
@@ -662,7 +663,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
         }
     });
 ```
-**Use case 24.** Retrieve the MFA Options for the user in case MFA is optional
+**Use case 24.** Retrieve the MFA Options for the user in case MFA is optional.
 
 ```javascript
     cognitoUser.getMFAOptions(function(err, mfaOptions) {
