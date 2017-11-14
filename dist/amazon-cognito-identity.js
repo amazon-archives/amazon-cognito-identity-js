@@ -1926,33 +1926,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return callback.onSuccess(this.signInUserSession);
 	    }
 
-	    authenticationHelper.generateHashDevice(dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey, dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
-
-	    var deviceSecretVerifierConfig = {
-	      Salt: new _global.util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
-	      PasswordVerifier: new _global.util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64')
-	    };
-
-	    this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
-	    this.deviceGroupKey = newDeviceMetadata.DeviceGroupKey;
-	    this.randomPassword = authenticationHelper.getRandomPassword();
-
-	    this.client.makeUnauthenticatedRequest('confirmDevice', {
-	      DeviceKey: newDeviceMetadata.DeviceKey,
-	      AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
-	      DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
-	      DeviceName: navigator.userAgent
-	    }, function (errConfirm, dataConfirm) {
-	      if (errConfirm) {
-	        return callback.onFailure(errConfirm);
+	    authenticationHelper.generateHashDevice(dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey, dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey, function (errGenHash) {
+	      if (errGenHash) {
+	        return callback.onFailure(errGenHash);
 	      }
 
-	      _this3.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
-	      _this3.cacheDeviceKeyAndPassword();
-	      if (dataConfirm.UserConfirmationNecessary === true) {
-	        return callback.onSuccess(_this3.signInUserSession, dataConfirm.UserConfirmationNecessary);
-	      }
-	      return callback.onSuccess(_this3.signInUserSession);
+	      var deviceSecretVerifierConfig = {
+	        Salt: new _global.util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
+	        PasswordVerifier: new _global.util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64')
+	      };
+
+	      _this3.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
+	      _this3.deviceGroupKey = newDeviceMetadata.DeviceGroupKey;
+	      _this3.randomPassword = authenticationHelper.getRandomPassword();
+
+	      _this3.client.makeUnauthenticatedRequest('confirmDevice', {
+	        DeviceKey: newDeviceMetadata.DeviceKey,
+	        AccessToken: _this3.signInUserSession.getAccessToken().getJwtToken(),
+	        DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
+	        DeviceName: navigator.userAgent
+	      }, function (errConfirm, dataConfirm) {
+	        if (errConfirm) {
+	          return callback.onFailure(errConfirm);
+	        }
+
+	        _this3.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
+	        _this3.cacheDeviceKeyAndPassword();
+	        if (dataConfirm.UserConfirmationNecessary === true) {
+	          return callback.onSuccess(_this3.signInUserSession, dataConfirm.UserConfirmationNecessary);
+	        }
+	        return callback.onSuccess(_this3.signInUserSession);
+	      });
+	      return undefined;
 	    });
 	    return undefined;
 	  };
@@ -2202,33 +2207,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      var authenticationHelper = new _AuthenticationHelper2.default(_this7.pool.getUserPoolId().split('_')[1]);
-	      authenticationHelper.generateHashDevice(dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey, dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
-
-	      var deviceSecretVerifierConfig = {
-	        Salt: new _global.util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
-	        PasswordVerifier: new _global.util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64')
-	      };
-
-	      _this7.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
-	      _this7.deviceGroupKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey;
-	      _this7.randomPassword = authenticationHelper.getRandomPassword();
-
-	      _this7.client.makeUnauthenticatedRequest('confirmDevice', {
-	        DeviceKey: dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey,
-	        AccessToken: _this7.signInUserSession.getAccessToken().getJwtToken(),
-	        DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
-	        DeviceName: navigator.userAgent
-	      }, function (errConfirm, dataConfirm) {
-	        if (errConfirm) {
-	          return callback.onFailure(errConfirm);
+	      authenticationHelper.generateHashDevice(dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey, dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey, function (errGenHash) {
+	        if (errGenHash) {
+	          return callback.onFailure(errGenHash);
 	        }
 
-	        _this7.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
-	        _this7.cacheDeviceKeyAndPassword();
-	        if (dataConfirm.UserConfirmationNecessary === true) {
-	          return callback.onSuccess(_this7.signInUserSession, dataConfirm.UserConfirmationNecessary);
-	        }
-	        return callback.onSuccess(_this7.signInUserSession);
+	        var deviceSecretVerifierConfig = {
+	          Salt: new _global.util.Buffer(authenticationHelper.getSaltDevices(), 'hex').toString('base64'),
+	          PasswordVerifier: new _global.util.Buffer(authenticationHelper.getVerifierDevices(), 'hex').toString('base64')
+	        };
+
+	        _this7.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
+	        _this7.deviceGroupKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey;
+	        _this7.randomPassword = authenticationHelper.getRandomPassword();
+
+	        _this7.client.makeUnauthenticatedRequest('confirmDevice', {
+	          DeviceKey: dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey,
+	          AccessToken: _this7.signInUserSession.getAccessToken().getJwtToken(),
+	          DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
+	          DeviceName: navigator.userAgent
+	        }, function (errConfirm, dataConfirm) {
+	          if (errConfirm) {
+	            return callback.onFailure(errConfirm);
+	          }
+
+	          _this7.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
+	          _this7.cacheDeviceKeyAndPassword();
+	          if (dataConfirm.UserConfirmationNecessary === true) {
+	            return callback.onSuccess(_this7.signInUserSession, dataConfirm.UserConfirmationNecessary);
+	          }
+	          return callback.onSuccess(_this7.signInUserSession);
+	        });
+	        return undefined;
 	      });
 	      return undefined;
 	    });
