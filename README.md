@@ -696,7 +696,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
 
 **Use case 26.** Using cookies to store cognito tokens
 
-To use the CookieStorage you have to pass it in the constructor map of CognitoUserPool and CognitoUser (when constructed directly).:
+To use the CookieStorage you have to pass it in the constructor map of CognitoUserPool and CognitoUser (when constructed directly):
 
  ```js
   var poolData = {
@@ -714,7 +714,7 @@ To use the CookieStorage you have to pass it in the constructor map of CognitoUs
   };
   ```
 The CookieStorage object receives a map (data) in its constructor that may have these values:
- * data.domain Cookies domain (mandatory).
+ * data.domain Cookies domain (mandatory)
  * data.path Cookies path (default: '/')
  * data.expires Cookie expiration (in days, default: 365)
  * data.secure Cookie secure flag (default: true)
