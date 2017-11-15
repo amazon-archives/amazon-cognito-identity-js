@@ -733,6 +733,10 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 ## Change Log
 
+**v1.26.0:**
+* What has changed
+  * Fixed typescript typings.
+
 **v1.25.0:**
 * What has changed
   * Added cookie storage support and solved bug related to clock drift parsing.
