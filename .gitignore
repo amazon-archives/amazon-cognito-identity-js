@@ -2,3 +2,12 @@
 npm-debug.log
 
 /docs/
+
+es
+lib
+
+ios/RNAWSCognito.xcodeproj/xcuserdata/
+ios/RNAWSCognito.project.xcworkspace/xcuserdata/
+ios/RNAWSCognito.xcodeproj/project.xcworkspace/xcuserdata/
+
+.DS_Store

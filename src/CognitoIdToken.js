@@ -15,33 +15,15 @@
  * limitations under the License.
  */
 
-import * as sjcl from 'sjcl';
+import CognitoJwtToken from './CognitoJwtToken';
 
 /** @class */
-export default class CognitoIdToken {
+export default class CognitoIdToken extends CognitoJwtToken {
   /**
    * Constructs a new CognitoIdToken object
    * @param {string=} IdToken The JWT Id token
    */
   constructor({ IdToken } = {}) {
-    // Assign object
-    this.jwtToken = IdToken || '';
-  }
-
-  /**
-   * @returns {string} the record's token.
-   */
-  getJwtToken() {
-    return this.jwtToken;
-  }
-
-  /**
-   * @returns {int} the token's expiration (exp member).
-   */
-  getExpiration() {
-    const payload = this.jwtToken.split('.')[1];
-    const expiration = JSON.parse(
-      sjcl.codec.utf8String.fromBits(sjcl.codec.base64.toBits(payload)));
-    return expiration.exp;
+    super(IdToken || '');
   }
 }
