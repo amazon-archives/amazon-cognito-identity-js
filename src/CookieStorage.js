@@ -19,7 +19,7 @@ export default class CookieStorage {
     } else {
       this.path = '/';
     }
-    if (data.expire){
+    if (data.hasOwnProperty('expires')){
       this.expires = data.expires;
     } else {
       this.expires = 365;
