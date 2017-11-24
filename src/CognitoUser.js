@@ -154,6 +154,7 @@ export default class CognitoUser {
       ClientId: this.pool.getClientId(),
       AuthParameters: authParameters,
       ClientMetadata: authDetails.getValidationData(),
+      UserContextData: this.getUserContextData(),
     }, (err, data) => {
       if (err) {
         return callback.onFailure(err);
@@ -217,6 +218,7 @@ export default class CognitoUser {
         ClientId: this.pool.getClientId(),
         AuthParameters: authParameters,
         ClientMetadata: authDetails.getValidationData(),
+        UserContextData: this.getUserContextData(),
       }, (err, data) => {
         if (err) {
           return callback.onFailure(err);
@@ -280,6 +282,7 @@ export default class CognitoUser {
               ClientId: this.pool.getClientId(),
               ChallengeResponses: challengeResponses,
               Session: data.Session,
+              UserContextData: this.getUserContextData(),
             }, (errAuthenticate, dataAuthenticate) => {
               if (errAuthenticate) {
                 return callback.onFailure(errAuthenticate);
@@ -340,6 +343,21 @@ export default class CognitoUser {
     if (challengeName === 'SMS_MFA') {
       this.Session = dataAuthenticate.Session;
       return callback.mfaRequired(challengeName, challengeParameters);
+    }
+
+    if (challengeName === 'SELECT_MFA_TYPE') {
+      this.Session = dataAuthenticate.Session;
+      return callback.selectMFAType(challengeName, challengeParameters);
+    }
+
+    if (challengeName === 'MFA_SETUP') {
+      this.Session = dataAuthenticate.Session;
+      return callback.mfaSetup(challengeName, challengeParameters);
+    }
+
+    if (challengeName === 'SOFTWARE_TOKEN_MFA') {
+      this.Session = dataAuthenticate.Session;
+      return callback.totpRequired(challengeName, challengeParameters);
     }
 
     if (challengeName === 'CUSTOM_CHALLENGE') {
@@ -435,6 +453,7 @@ export default class CognitoUser {
       ClientId: this.pool.getClientId(),
       ChallengeResponses: finalUserAttributes,
       Session: this.Session,
+      UserContextData: this.getUserContextData(),
     }, (errAuthenticate, dataAuthenticate) => {
       if (errAuthenticate) {
         return callback.onFailure(errAuthenticate);
@@ -475,6 +494,7 @@ export default class CognitoUser {
         ChallengeName: 'DEVICE_SRP_AUTH',
         ClientId: this.pool.getClientId(),
         ChallengeResponses: authParameters,
+        UserContextData: this.getUserContextData(),
       }, (err, data) => {
         if (err) {
           return callback.onFailure(err);
@@ -518,6 +538,7 @@ export default class CognitoUser {
               ClientId: this.pool.getClientId(),
               ChallengeResponses: challengeResponses,
               Session: data.Session,
+              UserContextData: this.getUserContextData(),
             }, (errAuthenticate, dataAuthenticate) => {
               if (errAuthenticate) {
                 return callback.onFailure(errAuthenticate);
@@ -552,6 +573,7 @@ export default class CognitoUser {
       ConfirmationCode: confirmationCode,
       Username: this.username,
       ForceAliasCreation: forceAliasCreation,
+      UserContextData: this.getUserContextData(),
     }, err => {
       if (err) {
         return callback(err, null);
@@ -580,6 +602,7 @@ export default class CognitoUser {
       ChallengeResponses: challengeResponses,
       ClientId: this.pool.getClientId(),
       Session: this.Session,
+      UserContextData: this.getUserContextData(),
     }, (err, data) => {
       if (err) {
         return callback.onFailure(err);
@@ -602,24 +625,30 @@ export default class CognitoUser {
    * This is used by the user once he has an MFA code
    * @param {string} confirmationCode The MFA code entered by the user.
    * @param {object} callback Result callback map.
+   * @param {string} mfaType The mfa we are replying to.
    * @param {onFailure} callback.onFailure Called on any error.
    * @param {authSuccess} callback.onSuccess Called on success with the new session.
    * @returns {void}
    */
-  sendMFACode(confirmationCode, callback) {
+  sendMFACode(confirmationCode, callback, mfaType) {
     const challengeResponses = {};
     challengeResponses.USERNAME = this.username;
     challengeResponses.SMS_MFA_CODE = confirmationCode;
+    mfaType = mfaType || 'SMS_MFA';
+    if (mfaType === 'SOFTWARE_TOKEN_MFA') {
+      challengeResponses.SOFTWARE_TOKEN_MFA_CODE = confirmationCode;
+    }
 
     if (this.deviceKey != null) {
       challengeResponses.DEVICE_KEY = this.deviceKey;
     }
 
     this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
-      ChallengeName: 'SMS_MFA',
+      ChallengeName: mfaType,
       ChallengeResponses: challengeResponses,
       ClientId: this.pool.getClientId(),
       Session: this.Session,
+      UserContextData: this.getUserContextData(),
     }, (err, dataAuthenticate) => {
       if (err) {
         return callback.onFailure(err);
@@ -713,6 +742,35 @@ export default class CognitoUser {
    * @returns {void}
    */
   enableMFA(callback) {
+    if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
+      return callback(new Error('User is not authenticated'), null);
+    }
+
+    const mfaOptions = [];
+    const mfaEnabled = {
+      DeliveryMedium: 'SMS',
+      AttributeName: 'phone_number',
+    };
+    mfaOptions.push(mfaEnabled);
+
+    this.client.makeUnauthenticatedRequest('setUserSettings', {
+      MFAOptions: mfaOptions,
+      AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
+    }, err => {
+      if (err) {
+        return callback(err, null);
+      }
+      return callback(null, 'SUCCESS');
+    });
+    return undefined;
+  }
+
+  /**
+   * This is used by an authenticated user to enable MFA for himself
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
+   */
+  setUserMfaPreference(callback) {
     if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
       return callback(new Error('User is not authenticated'), null);
     }
@@ -896,6 +954,7 @@ export default class CognitoUser {
     this.client.makeUnauthenticatedRequest('resendConfirmationCode', {
       ClientId: this.pool.getClientId(),
       Username: this.username,
+      UserContextData: this.getUserContextData(),
     }, (err, result) => {
       if (err) {
         return callback(err, null);
@@ -986,6 +1045,7 @@ export default class CognitoUser {
       ClientId: this.pool.getClientId(),
       AuthFlow: 'REFRESH_TOKEN_AUTH',
       AuthParameters: authParameters,
+      UserContextData: this.getUserContextData(),
     }, (err, authResult) => {
       if (err) {
         if (err.code === 'NotAuthorizedException') {
@@ -1122,6 +1182,7 @@ export default class CognitoUser {
     this.client.makeUnauthenticatedRequest('forgotPassword', {
       ClientId: this.pool.getClientId(),
       Username: this.username,
+      UserContextData: this.getUserContextData(),
     }, (err, data) => {
       if (err) {
         return callback.onFailure(err);
@@ -1148,6 +1209,7 @@ export default class CognitoUser {
       Username: this.username,
       ConfirmationCode: confirmationCode,
       Password: newPassword,
+      UserContextData: this.getUserContextData(),
     }, err => {
       if (err) {
         return callback.onFailure(err);
@@ -1389,5 +1451,140 @@ export default class CognitoUser {
   signOut() {
     this.signInUserSession = null;
     this.clearCachedTokens();
+  }
+
+  /**
+   * This is used by a user trying to select a given MFA
+   * @param {string} the mfa the user wants
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
+   */
+  sendMFASelectionAnswer(answerChallenge, callback) {
+    const challengeResponses = {};
+    challengeResponses.USERNAME = this.username;
+    challengeResponses.ANSWER = answerChallenge;
+
+    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+      ChallengeName: 'SELECT_MFA_TYPE',
+      ChallengeResponses: challengeResponses,
+      ClientId: this.pool.getClientId(),
+      Session: this.Session,
+      UserContextData: this.getUserContextData(),
+    }, (err, data) => {
+      if (err) {
+        return callback.onFailure(err);
+      }
+      this.Session = data.Session;
+      if (ANSWER === 'SMS_MFA') {
+        return callback.mfaRequired(challengeName, challengeParameters);
+      }
+      if (ANSWER === 'SOFTWARE_TOKEN_MFA') {
+        return callback.totpRequired(challengeName, challengeParameters);
+      }
+    });
+  }
+
+  /**
+   * This returns the user context data for advanced security feature.
+   */
+  getUserContextData() {
+    var pool = this.pool;
+    return pool.getUserContextData(this.username);
+  }
+
+  /**
+   * This is used by an authenticated or a user trying to authenticate to associate a TOTP MFA
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @returns {void}
+   */
+  associateSoftwareToken(callback) {
+    if (!(this.signInUserSession != null && this.signInUserSession.isValid())) {
+      console.log('calling associate software token')
+      this.client.makeUnauthenticatedRequest('associateSoftwareToken', {
+        Session: this.Session
+      }, (err, data) => {
+        if (err) {
+          return callback.onFailure(err);
+        }
+        this.Session = data.Session;
+        return callback.associateSecretCode(data.SecretCode);
+      });
+    } else {
+      this.client.makeUnauthenticatedRequest('associateSoftwareToken', {
+        AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
+      }, (err, data) => {
+        if (err) {
+          return callback.onFailure(err);
+        }
+	return callback.associateSecretCode(data.SecretCode);
+      });
+    }
+  }
+
+  /**
+   * This is used by an authenticated or a user trying to authenticate to associate a TOTP MFA      
+   * @param {nodeCallback<string>} callback Called on success or error.
+   * @param {string} totpCode The MFA code entered by the user.
+   * @param {string} friendlyDeviceName The device name we are assigning to the device.
+   * @returns {void}
+   */
+  verifySoftwareToken(totpCode, friendlyDeviceName, callback) {
+    if (!(this.signInUserSession != null && this.signInUserSession.isValid())) {
+      this.client.makeUnauthenticatedRequest('verifySoftwareToken', {
+        Session: this.Session,
+        UserCode: totpCode,
+        FriendlyDeviceName : friendlyDeviceName
+      }, (err, data) => {
+        if (err) {
+          return callback.onFailure(err);
+        }
+       	this.Session = data.Session;
+        const challengeResponses = {};
+        challengeResponses.USERNAME = this.username;
+
+        this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+          ChallengeName: 'MFA_SETUP',
+          ClientId: this.pool.getClientId(),
+          ChallengeResponses : challengeResponses,
+          Session: this.Session,
+          UserContextData: this.getUserContextData(),
+        }, (err, data) => {
+          if (err) {
+            return callback.onFailure(err);
+          }
+          this.signInUserSession = this.getCognitoUserSession(data.AuthenticationResult);
+          this.cacheTokens();
+          return callback.onSuccess(this.signInUserSession);
+        });
+      });
+    } else {
+      this.client.makeUnauthenticatedRequest('verifySoftwareToken', {
+        AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
+       	UserCode: totpCode,
+       	FriendlyDeviceName : friendlyDeviceName
+      }, (err, data) => {
+        if (err) {
+          return callback.onFailure(err);
+        }
+       	this.Session = data.Session;
+        const challengeResponses = {};
+        challengeResponses.USERNAME = this.username;
+
+        this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+          ChallengeName: 'MFA_SETUP',
+          ClientId: this.pool.getClientId(),
+          ChallengeResponses : challengeResponses,
+          Session: this.Session,
+          UserContextData: this.getUserContextData(),
+        }, (err, data) => {
+          if (err) {
+            return callback.onFailure(err);
+          }
+          this.signInUserSession = this.getCognitoUserSession(data.AuthenticationResult);
+          this.cacheTokens();
+          return callback.onSuccess(this.signInUserSession);
+        });
+      });
+    }
   }
 }
