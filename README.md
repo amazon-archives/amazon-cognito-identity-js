@@ -279,6 +279,7 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
 
 **Use case 4.** Authenticating a user and establishing a user session with the Amazon Cognito Identity service.
 
+
 ```javascript
     var authenticationData = {
         Username : 'username',
@@ -309,10 +310,17 @@ The usage examples below use the unqualified names for types in the Amazon Cogni
                     'cognito-idp.<region>.amazonaws.com/<YOUR_USER_POOL_ID>' : result.getIdToken().getJwtToken()
                 }
             });
-
-            // Instantiate aws sdk service objects now that the credentials have been updated.
-            // example: var s3 = new AWS.S3();
-
+            
+            //refreshes credentials using AWS.CognitoIdentity.getCredentialsForIdentity()
+            AWS.config.credentials.refresh((error) => {
+                if (error) {
+                     console.error(error);
+                } else {
+                     // Instantiate aws sdk service objects now that the credentials have been updated.
+                     // example: var s3 = new AWS.S3();
+                     console.log('Successfully logged!');
+                }
+            });
         },
 
         onFailure: function(err) {
@@ -630,7 +638,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
     });
 ```
 
-**Use case 23.** Authenticate a user and set new password for a user that was created using AdminCreateUser API
+**Use case 23.** Authenticate a user and set new password for a user that was created using AdminCreateUser API.
 
 ```javascript
 
@@ -662,7 +670,7 @@ Note that the inputVerificationCode method needs to be defined but does not need
         }
     });
 ```
-**Use case 24.** Retrieve the MFA Options for the user in case MFA is optional
+**Use case 24.** Retrieve the MFA Options for the user in case MFA is optional.
 
 ```javascript
     cognitoUser.getMFAOptions(function(err, mfaOptions) {
@@ -694,6 +702,31 @@ Note that the inputVerificationCode method needs to be defined but does not need
     });
 ```
 
+**Use case 26.** Using cookies to store cognito tokens
+
+To use the CookieStorage you have to pass it in the constructor map of CognitoUserPool and CognitoUser (when constructed directly):
+
+ ```js
+  var poolData = {
+      UserPoolId : '...', // Your user pool id here
+      ClientId : '...' // Your client id here
+      Storage: new AWSCognito.CognitoIdentityServiceProvider.CookieStorage({domain: ".yourdomain.com"})
+  };
+
+  var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+
+  var userData = {
+      Username: 'username',
+      Pool: userPool,
+      Storage: new AWSCognito.CognitoIdentityServiceProvider.CookieStorage({domain: ".yourdomain.com"})
+  };
+  ```
+The CookieStorage object receives a map (data) in its constructor that may have these values:
+ * data.domain Cookies domain (mandatory)
+ * data.path Cookies path (default: '/')
+ * data.expires Cookie expiration (in days, default: 365)
+ * data.secure Cookie secure flag (default: true)
+
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
 * For Amazon Cognito Identity request handling: "https://cognito-idp.us-east-1.amazonaws.com"
@@ -706,6 +739,18 @@ For most frameworks you can whitelist the domain by whitelisting all AWS endpoin
 In order to authenticate with the Amazon Cognito Identity Service, the client needs to generate a random number as part of the SRP protocol. The AWS SDK is only compatible with modern browsers, and these include support for cryptographically strong random values. If you do need to support older browsers then you should be aware that this is less secure, and if possible include a strong polyfill for `window.crypto.getRandomValues()` before including this library.
 
 ## Change Log
+
+**v1.26.0:**
+* What has changed
+  * Fixed typescript typings.
+
+**v1.25.0:**
+* What has changed
+  * Added cookie storage support and solved bug related to clock drift parsing.
+
+**v1.24.0:**
+* What has changed
+  * Fixed bug related to missing callback
 
 **v1.23.0:**
 * What has changed

@@ -1,7 +1,7 @@
 {
   "name": "amazon-cognito-identity-js",
   "description": "Amazon Cognito Identity Provider JavaScript SDK",
-  "version": "1.23.0",
+  "version": "1.26.0",
   "author": {
     "name": "Amazon Web Services",
     "email": "aws@amazon.com",
@@ -60,7 +60,8 @@
   "jsnext:main": "es/index.js",
   "types": "./index.d.ts",
   "dependencies": {
-    "aws-sdk": "^2.6.0"
+    "aws-sdk": "^2.6.0",
+    "js-cookie": "^2.1.4"
   },
   "devDependencies": {
     "babel-cli": "^6.23.0",

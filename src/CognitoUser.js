@@ -380,38 +380,44 @@ export default class CognitoUser {
 
     authenticationHelper.generateHashDevice(
       dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey,
-      dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
-
-    const deviceSecretVerifierConfig = {
-      Salt: new util.Buffer(
-          authenticationHelper.getSaltDevices(), 'hex'
-        ).toString('base64'),
-      PasswordVerifier: new util.Buffer(
-          authenticationHelper.getVerifierDevices(), 'hex'
-        ).toString('base64'),
-    };
-
-    this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
-    this.deviceGroupKey = newDeviceMetadata.DeviceGroupKey;
-    this.randomPassword = authenticationHelper.getRandomPassword();
-
-    this.client.makeUnauthenticatedRequest('confirmDevice', {
-      DeviceKey: newDeviceMetadata.DeviceKey,
-      AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
-      DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
-      DeviceName: navigator.userAgent,
-    }, (errConfirm, dataConfirm) => {
-      if (errConfirm) {
-        return callback.onFailure(errConfirm);
+      dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey,
+    (errGenHash) => {
+      if (errGenHash) {
+        return callback.onFailure(errGenHash);
       }
 
-      this.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
-      this.cacheDeviceKeyAndPassword();
-      if (dataConfirm.UserConfirmationNecessary === true) {
-        return callback.onSuccess(
-          this.signInUserSession, dataConfirm.UserConfirmationNecessary);
-      }
-      return callback.onSuccess(this.signInUserSession);
+      const deviceSecretVerifierConfig = {
+        Salt: new util.Buffer(
+            authenticationHelper.getSaltDevices(), 'hex'
+          ).toString('base64'),
+        PasswordVerifier: new util.Buffer(
+            authenticationHelper.getVerifierDevices(), 'hex'
+          ).toString('base64'),
+      };
+
+      this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
+      this.deviceGroupKey = newDeviceMetadata.DeviceGroupKey;
+      this.randomPassword = authenticationHelper.getRandomPassword();
+
+      this.client.makeUnauthenticatedRequest('confirmDevice', {
+        DeviceKey: newDeviceMetadata.DeviceKey,
+        AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
+        DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
+        DeviceName: navigator.userAgent,
+      }, (errConfirm, dataConfirm) => {
+        if (errConfirm) {
+          return callback.onFailure(errConfirm);
+        }
+
+        this.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
+        this.cacheDeviceKeyAndPassword();
+        if (dataConfirm.UserConfirmationNecessary === true) {
+          return callback.onSuccess(
+            this.signInUserSession, dataConfirm.UserConfirmationNecessary);
+        }
+        return callback.onSuccess(this.signInUserSession);
+      });
+      return undefined;
     });
     return undefined;
   }
@@ -672,41 +678,47 @@ export default class CognitoUser {
         this.pool.getUserPoolId().split('_')[1]);
       authenticationHelper.generateHashDevice(
         dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceGroupKey,
-        dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey);
+        dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey,
+        (errGenHash) => {
+          if (errGenHash) {
+            return callback.onFailure(errGenHash);
+          }
 
-      const deviceSecretVerifierConfig = {
-        Salt: new util.Buffer(
-            authenticationHelper.getSaltDevices(), 'hex'
-          ).toString('base64'),
-        PasswordVerifier: new util.Buffer(
-            authenticationHelper.getVerifierDevices(), 'hex'
-          ).toString('base64'),
-      };
+          const deviceSecretVerifierConfig = {
+            Salt: new util.Buffer(
+                authenticationHelper.getSaltDevices(), 'hex'
+              ).toString('base64'),
+            PasswordVerifier: new util.Buffer(
+                authenticationHelper.getVerifierDevices(), 'hex'
+              ).toString('base64'),
+          };
 
-      this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
-      this.deviceGroupKey = dataAuthenticate.AuthenticationResult
-        .NewDeviceMetadata.DeviceGroupKey;
-      this.randomPassword = authenticationHelper.getRandomPassword();
+          this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
+          this.deviceGroupKey = dataAuthenticate.AuthenticationResult
+            .NewDeviceMetadata.DeviceGroupKey;
+          this.randomPassword = authenticationHelper.getRandomPassword();
 
-      this.client.makeUnauthenticatedRequest('confirmDevice', {
-        DeviceKey: dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey,
-        AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
-        DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
-        DeviceName: navigator.userAgent,
-      }, (errConfirm, dataConfirm) => {
-        if (errConfirm) {
-          return callback.onFailure(errConfirm);
-        }
+          this.client.makeUnauthenticatedRequest('confirmDevice', {
+            DeviceKey: dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey,
+            AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
+            DeviceSecretVerifierConfig: deviceSecretVerifierConfig,
+            DeviceName: navigator.userAgent,
+          }, (errConfirm, dataConfirm) => {
+            if (errConfirm) {
+              return callback.onFailure(errConfirm);
+            }
 
-        this.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
-        this.cacheDeviceKeyAndPassword();
-        if (dataConfirm.UserConfirmationNecessary === true) {
-          return callback.onSuccess(
-            this.signInUserSession,
-            dataConfirm.UserConfirmationNecessary);
-        }
-        return callback.onSuccess(this.signInUserSession);
-      });
+            this.deviceKey = dataAuthenticate.AuthenticationResult.NewDeviceMetadata.DeviceKey;
+            this.cacheDeviceKeyAndPassword();
+            if (dataConfirm.UserConfirmationNecessary === true) {
+              return callback.onSuccess(
+                this.signInUserSession,
+                dataConfirm.UserConfirmationNecessary);
+            }
+            return callback.onSuccess(this.signInUserSession);
+          });
+          return undefined;
+        });
       return undefined;
     });
   }
@@ -1081,7 +1093,7 @@ export default class CognitoUser {
     this.storage.setItem(idTokenKey, this.signInUserSession.getIdToken().getJwtToken());
     this.storage.setItem(accessTokenKey, this.signInUserSession.getAccessToken().getJwtToken());
     this.storage.setItem(refreshTokenKey, this.signInUserSession.getRefreshToken().getToken());
-    this.storage.setItem(clockDriftKey, this.signInUserSession.getClockDrift());
+    this.storage.setItem(clockDriftKey, `${this.signInUserSession.getClockDrift()}`);
     this.storage.setItem(lastUserKey, this.username);
   }
 
