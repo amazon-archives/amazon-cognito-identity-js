@@ -28,8 +28,9 @@ export default class CognitoUserPool {
    * @param {string} data.UserPoolId Cognito user pool id.
    * @param {string} data.ClientId User pool application client id.
    * @param {object} data.Storage Optional storage object.
-   * @param {boolean} data.AdvancedSecurityDataCollectionFlag Optional: boolean flag indicating if the
-   *        data collection is enabled to support cognito advanced security features. By default, this 
+   * @param {boolean} data.AdvancedSecurityDataCollectionFlag Optional:
+   *        boolean flag indicating if the data collection is enabled
+   *        to support cognito advanced security features. By default, this
    *        flag is set to true.
    */
   constructor(data) {
@@ -50,9 +51,10 @@ export default class CognitoUserPool {
       region,
       endpoint,
     });
-    
+
     /**
-     * By default, AdvancedSecurityDataCollectionFlag is set to true, if no input value is provided. 
+     * By default, AdvancedSecurityDataCollectionFlag is set to true,
+     * if no input value is provided.
      */
     this.advancedSecurityDataCollectionFlag = true;
     if (AdvancedSecurityDataCollectionFlag) {
@@ -143,22 +145,26 @@ export default class CognitoUserPool {
 
   /**
    * This method returns the encoded data string used for cognito advanced security feature.
-   * This would be generated only when developer has included the JS used for collecting the 
+   * This would be generated only when developer has included the JS used for collecting the
    * data on their client. Please refer to documentation to know more about using AdvancedSecurity
-   * features 
+   * features
+   * @param {string} username the username for the context data
+   * @returns {string} the user context data
    **/
   getUserContextData(username) {
-    if (typeof AmazonCognitoAdvancedSecurityData === "undefined") {
+    if (typeof AmazonCognitoAdvancedSecurityData === 'undefined') {
       return {};
     }
+    const amazonCognitoAdvancedSecurityDataConst = AmazonCognitoAdvancedSecurityData;
 
     if (this.advancedSecurityDataCollectionFlag) {
-      var advancedSecurityData = AmazonCognitoAdvancedSecurityData.getData(username, this.userPoolId, this.clientId);
-      if (advancedSecurityData){
-          var userContextData = {
-            EncodedData: advancedSecurityData
-          };
-          return userContextData;
+      const advancedSecurityData = amazonCognitoAdvancedSecurityDataConst.getData(username,
+          this.userPoolId, this.clientId);
+      if (advancedSecurityData) {
+        const userContextData = {
+          EncodedData: advancedSecurityData,
+        };
+        return userContextData;
       }
     }
     return {};

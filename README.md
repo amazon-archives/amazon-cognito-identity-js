@@ -704,6 +704,9 @@ Note that the inputVerificationCode method needs to be defined but does not need
 
 **Use case 26.** Using cookies to store cognito tokens
 
+```javascript
+```
+
 To use the CookieStorage you have to pass it in the constructor map of CognitoUserPool and CognitoUser (when constructed directly):
 
  ```js
@@ -726,6 +729,53 @@ The CookieStorage object receives a map (data) in its constructor that may have 
  * data.path Cookies path (default: '/')
  * data.expires Cookie expiration (in days, default: 365)
  * data.secure Cookie secure flag (default: true)
+
+**Use case 27.** Selecting the MFA method and authenticating using TOTP.
+
+        var authenticationData = {
+            Username : 'username',
+            Password : 'password',
+        };
+        var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+        var poolData = {
+            UserPoolId : '...', // Your user pool id here
+            ClientId : '...' // Your client id here
+        };
+        var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+        var userData = {
+            Username : 'username',
+            Pool : userPool
+        };
+        var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+
+        cognitoUser.authenticateUser(authenticationDetails, {
+            onSuccess: function (result) {
+                console.log('access token + ' + result.getAccessToken().getJwtToken());
+            },
+      
+            onFailure: function(err) {
+                alert(err);
+            },
+
+            mfaSetup: function(challengeName, challengeParameters) {
+                cognitoUser.associateSoftwareToken(this);
+            },
+
+            associateSecretCode : function(secretCode) {
+                var challengeAnswer = prompt('Please input the TOTP code.' ,'');
+                cognitoUser.verifySoftwareToken(challengeAnswer, 'My TOTP device', this);
+            },
+
+            selectMFAType : function(challengeName, challengeParameters) {
+                var mfaType = prompt('Please select the MFA method.', '');
+                cognitoUser.sendMFASelectionAnswer(mfaType, this);
+            },
+
+            totpRequired : function(secretCode) {
+                var challengeAnswer = prompt('Please input the TOTP code.' ,'');
+                cognitoUser.sendMFACode(challengeAnswer, this, 'SOFTWARE_TOKEN_MFA');
+            }
+        });
 
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
