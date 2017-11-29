@@ -155,7 +155,9 @@ export default class CognitoUserPool {
     if (typeof AmazonCognitoAdvancedSecurityData === 'undefined') {
       return {};
     }
+    /* eslint-disable */
     const amazonCognitoAdvancedSecurityDataConst = AmazonCognitoAdvancedSecurityData;
+    /* eslint-enable */
 
     if (this.advancedSecurityDataCollectionFlag) {
       const advancedSecurityData = amazonCognitoAdvancedSecurityDataConst.getData(username,

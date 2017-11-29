@@ -1,5 +1,5 @@
 
-import * as Cookies from "js-cookie";
+import * as Cookies from 'js-cookie';
 
 /** @class */
 export default class CookieStorage {
@@ -19,12 +19,12 @@ export default class CookieStorage {
     } else {
       this.path = '/';
     }
-    if (data.hasOwnProperty('expires')){
+    if (Object.prototype.hasOwnProperty.call(data, 'expires')) {
       this.expires = data.expires;
     } else {
       this.expires = 365;
     }
-    if (data.hasOwnProperty('secure')){
+    if (Object.prototype.hasOwnProperty.call(data, 'secure')) {
       this.secure = data.secure;
     } else {
       this.secure = true;
@@ -38,7 +38,12 @@ export default class CookieStorage {
    * @returns {string} value that was set
    */
   setItem(key, value) {
-    Cookies.set(key, value, {path: this.path, expires: this.expires, domain: this.domain});
+    Cookies.set(key, value, {
+      path: this.path,
+      expires: this.expires,
+      domain: this.domain,
+    }
+    );
     return Cookies.get(key);
   }
 
@@ -49,7 +54,7 @@ export default class CookieStorage {
    * @returns {string} the data item
    */
   getItem(key) {
-    return Cookies.get(key)
+    return Cookies.get(key);
   }
 
   /**
@@ -58,7 +63,12 @@ export default class CookieStorage {
    * @returns {string} value - value that was deleted
    */
   removeItem(key) {
-    return Cookies.remove(key, { path: this.path, domain: this.domain, secure: this.secure});
+    return Cookies.remove(key, {
+      path: this.path,
+      domain: this.domain,
+      secure: this.secure,
+    }
+    );
   }
 
   /**
@@ -66,8 +76,8 @@ export default class CookieStorage {
    * @returns {string} nothing
    */
   clear() {
-    var cookies = Cookies.get();
-    var index;
+    const cookies = Cookies.get();
+    let index;
     for (index = 0; index < cookies.length; ++index) {
       Cookies.remove(cookies[index]);
     }

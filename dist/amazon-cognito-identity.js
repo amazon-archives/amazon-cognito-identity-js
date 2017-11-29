@@ -1732,7 +1732,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      AuthFlow: 'CUSTOM_AUTH',
 	      ClientId: this.pool.getClientId(),
 	      AuthParameters: authParameters,
-	      ClientMetadata: authDetails.getValidationData()
+	      ClientMetadata: authDetails.getValidationData(),
+	      UserContextData: this.getUserContextData()
 	    }, function (err, data) {
 	      if (err) {
 	        return callback.onFailure(err);
@@ -1798,7 +1799,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        AuthFlow: _this2.authenticationFlowType,
 	        ClientId: _this2.pool.getClientId(),
 	        AuthParameters: authParameters,
-	        ClientMetadata: authDetails.getValidationData()
+	        ClientMetadata: authDetails.getValidationData(),
+	        UserContextData: _this2.getUserContextData()
 	      }, function (err, data) {
 	        if (err) {
 	          return callback.onFailure(err);
@@ -1850,7 +1852,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            ChallengeName: 'PASSWORD_VERIFIER',
 	            ClientId: _this2.pool.getClientId(),
 	            ChallengeResponses: challengeResponses,
-	            Session: data.Session
+	            Session: data.Session,
+	            UserContextData: _this2.getUserContextData()
 	          }, function (errAuthenticate, dataAuthenticate) {
 	            if (errAuthenticate) {
 	              return callback.onFailure(errAuthenticate);
@@ -1906,6 +1909,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (challengeName === 'SMS_MFA') {
 	      this.Session = dataAuthenticate.Session;
 	      return callback.mfaRequired(challengeName, challengeParameters);
+	    }
+
+	    if (challengeName === 'SELECT_MFA_TYPE') {
+	      this.Session = dataAuthenticate.Session;
+	      return callback.selectMFAType(challengeName, challengeParameters);
+	    }
+
+	    if (challengeName === 'MFA_SETUP') {
+	      this.Session = dataAuthenticate.Session;
+	      return callback.mfaSetup(challengeName, challengeParameters);
+	    }
+
+	    if (challengeName === 'SOFTWARE_TOKEN_MFA') {
+	      this.Session = dataAuthenticate.Session;
+	      return callback.totpRequired(challengeName, challengeParameters);
 	    }
 
 	    if (challengeName === 'CUSTOM_CHALLENGE') {
@@ -2000,7 +2018,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      ChallengeName: 'NEW_PASSWORD_REQUIRED',
 	      ClientId: this.pool.getClientId(),
 	      ChallengeResponses: finalUserAttributes,
-	      Session: this.Session
+	      Session: this.Session,
+	      UserContextData: this.getUserContextData()
 	    }, function (errAuthenticate, dataAuthenticate) {
 	      if (errAuthenticate) {
 	        return callback.onFailure(errAuthenticate);
@@ -2043,7 +2062,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _this5.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
 	        ChallengeName: 'DEVICE_SRP_AUTH',
 	        ClientId: _this5.pool.getClientId(),
-	        ChallengeResponses: authParameters
+	        ChallengeResponses: authParameters,
+	        UserContextData: _this5.getUserContextData()
 	      }, function (err, data) {
 	        if (err) {
 	          return callback.onFailure(err);
@@ -2076,7 +2096,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            ChallengeName: 'DEVICE_PASSWORD_VERIFIER',
 	            ClientId: _this5.pool.getClientId(),
 	            ChallengeResponses: challengeResponses,
-	            Session: data.Session
+	            Session: data.Session,
+	            UserContextData: _this5.getUserContextData()
 	          }, function (errAuthenticate, dataAuthenticate) {
 	            if (errAuthenticate) {
 	              return callback.onFailure(errAuthenticate);
@@ -2110,7 +2131,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      ClientId: this.pool.getClientId(),
 	      ConfirmationCode: confirmationCode,
 	      Username: this.username,
-	      ForceAliasCreation: forceAliasCreation
+	      ForceAliasCreation: forceAliasCreation,
+	      UserContextData: this.getUserContextData()
 	    }, function (err) {
 	      if (err) {
 	        return callback(err, null);
@@ -2142,7 +2164,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      ChallengeName: 'CUSTOM_CHALLENGE',
 	      ChallengeResponses: challengeResponses,
 	      ClientId: this.pool.getClientId(),
-	      Session: this.Session
+	      Session: this.Session,
+	      UserContextData: this.getUserContextData()
 	    }, function (err, data) {
 	      if (err) {
 	        return callback.onFailure(err);
@@ -2165,28 +2188,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * This is used by the user once he has an MFA code
 	   * @param {string} confirmationCode The MFA code entered by the user.
 	   * @param {object} callback Result callback map.
+	   * @param {string} mfaType The mfa we are replying to.
 	   * @param {onFailure} callback.onFailure Called on any error.
 	   * @param {authSuccess} callback.onSuccess Called on success with the new session.
 	   * @returns {void}
 	   */
 
 
-	  CognitoUser.prototype.sendMFACode = function sendMFACode(confirmationCode, callback) {
+	  CognitoUser.prototype.sendMFACode = function sendMFACode(confirmationCode, callback, mfaType) {
 	    var _this7 = this;
 
 	    var challengeResponses = {};
 	    challengeResponses.USERNAME = this.username;
 	    challengeResponses.SMS_MFA_CODE = confirmationCode;
+	    var mfaTypeSelection = mfaType || 'SMS_MFA';
+	    if (mfaTypeSelection === 'SOFTWARE_TOKEN_MFA') {
+	      challengeResponses.SOFTWARE_TOKEN_MFA_CODE = confirmationCode;
+	    }
 
 	    if (this.deviceKey != null) {
 	      challengeResponses.DEVICE_KEY = this.deviceKey;
 	    }
 
 	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
-	      ChallengeName: 'SMS_MFA',
+	      ChallengeName: mfaTypeSelection,
 	      ChallengeResponses: challengeResponses,
 	      ClientId: this.pool.getClientId(),
-	      Session: this.Session
+	      Session: this.Session,
+	      UserContextData: this.getUserContextData()
 	    }, function (err, dataAuthenticate) {
 	      if (err) {
 	        return callback.onFailure(err);
@@ -2292,6 +2321,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.client.makeUnauthenticatedRequest('setUserSettings', {
 	      MFAOptions: mfaOptions,
+	      AccessToken: this.signInUserSession.getAccessToken().getJwtToken()
+	    }, function (err) {
+	      if (err) {
+	        return callback(err, null);
+	      }
+	      return callback(null, 'SUCCESS');
+	    });
+	    return undefined;
+	  };
+
+	  /**
+	   * This is used by an authenticated user to enable MFA for himself
+	   * @param {string[]} smsMfaSettings the sms mfa settings
+	   * @param {string[]} softwareTokenMfaSettings the software token mfa settings
+	   * @param {nodeCallback<string>} callback Called on success or error.
+	   * @returns {void}
+	   */
+
+
+	  CognitoUser.prototype.setUserMfaPreference = function setUserMfaPreference(smsMfaSettings, softwareTokenMfaSettings, callback) {
+	    if (this.signInUserSession == null || !this.signInUserSession.isValid()) {
+	      return callback(new Error('User is not authenticated'), null);
+	    }
+
+	    this.client.makeUnauthenticatedRequest('setUserMFAPreference', {
+	      SMSMfaSettings: smsMfaSettings,
+	      SoftwareTokenMfaSettings: softwareTokenMfaSettings,
 	      AccessToken: this.signInUserSession.getAccessToken().getJwtToken()
 	    }, function (err) {
 	      if (err) {
@@ -2476,7 +2532,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CognitoUser.prototype.resendConfirmationCode = function resendConfirmationCode(callback) {
 	    this.client.makeUnauthenticatedRequest('resendConfirmationCode', {
 	      ClientId: this.pool.getClientId(),
-	      Username: this.username
+	      Username: this.username,
+	      UserContextData: this.getUserContextData()
 	    }, function (err, result) {
 	      if (err) {
 	        return callback(err, null);
@@ -2571,7 +2628,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.client.makeUnauthenticatedRequest('initiateAuth', {
 	      ClientId: this.pool.getClientId(),
 	      AuthFlow: 'REFRESH_TOKEN_AUTH',
-	      AuthParameters: authParameters
+	      AuthParameters: authParameters,
+	      UserContextData: this.getUserContextData()
 	    }, function (err, authResult) {
 	      if (err) {
 	        if (err.code === 'NotAuthorizedException') {
@@ -2721,7 +2779,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CognitoUser.prototype.forgotPassword = function forgotPassword(callback) {
 	    this.client.makeUnauthenticatedRequest('forgotPassword', {
 	      ClientId: this.pool.getClientId(),
-	      Username: this.username
+	      Username: this.username,
+	      UserContextData: this.getUserContextData()
 	    }, function (err, data) {
 	      if (err) {
 	        return callback.onFailure(err);
@@ -2749,7 +2808,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      ClientId: this.pool.getClientId(),
 	      Username: this.username,
 	      ConfirmationCode: confirmationCode,
-	      Password: newPassword
+	      Password: newPassword,
+	      UserContextData: this.getUserContextData()
 	    }, function (err) {
 	      if (err) {
 	        return callback.onFailure(err);
@@ -3015,6 +3075,158 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CognitoUser.prototype.signOut = function signOut() {
 	    this.signInUserSession = null;
 	    this.clearCachedTokens();
+	  };
+
+	  /**
+	   * This is used by a user trying to select a given MFA
+	   * @param {string} answerChallenge the mfa the user wants
+	   * @param {nodeCallback<string>} callback Called on success or error.
+	   * @returns {void}
+	   */
+
+
+	  CognitoUser.prototype.sendMFASelectionAnswer = function sendMFASelectionAnswer(answerChallenge, callback) {
+	    var _this12 = this;
+
+	    var challengeResponses = {};
+	    challengeResponses.USERNAME = this.username;
+	    challengeResponses.ANSWER = answerChallenge;
+
+	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	      ChallengeName: 'SELECT_MFA_TYPE',
+	      ChallengeResponses: challengeResponses,
+	      ClientId: this.pool.getClientId(),
+	      Session: this.Session,
+	      UserContextData: this.getUserContextData()
+	    }, function (err, data) {
+	      if (err) {
+	        return callback.onFailure(err);
+	      }
+	      _this12.Session = data.Session;
+	      if (answerChallenge === 'SMS_MFA') {
+	        return callback.mfaRequired(data.challengeName, data.challengeParameters);
+	      }
+	      if (answerChallenge === 'SOFTWARE_TOKEN_MFA') {
+	        return callback.totpRequired(data.challengeName, data.challengeParameters);
+	      }
+	      return undefined;
+	    });
+	  };
+
+	  /**
+	   * This returns the user context data for advanced security feature.
+	   * @returns {void}
+	   */
+
+
+	  CognitoUser.prototype.getUserContextData = function getUserContextData() {
+	    var pool = this.pool;
+	    return pool.getUserContextData(this.username);
+	  };
+
+	  /**
+	   * This is used by an authenticated or a user trying to authenticate to associate a TOTP MFA
+	   * @param {nodeCallback<string>} callback Called on success or error.
+	   * @returns {void}
+	   */
+
+
+	  CognitoUser.prototype.associateSoftwareToken = function associateSoftwareToken(callback) {
+	    var _this13 = this;
+
+	    if (!(this.signInUserSession != null && this.signInUserSession.isValid())) {
+	      this.client.makeUnauthenticatedRequest('associateSoftwareToken', {
+	        Session: this.Session
+	      }, function (err, data) {
+	        if (err) {
+	          return callback.onFailure(err);
+	        }
+	        _this13.Session = data.Session;
+	        return callback.associateSecretCode(data.SecretCode);
+	      });
+	    } else {
+	      this.client.makeUnauthenticatedRequest('associateSoftwareToken', {
+	        AccessToken: this.signInUserSession.getAccessToken().getJwtToken()
+	      }, function (err, data) {
+	        if (err) {
+	          return callback.onFailure(err);
+	        }
+	        return callback.associateSecretCode(data.SecretCode);
+	      });
+	    }
+	  };
+
+	  /**
+	   * This is used by an authenticated or a user trying to authenticate to associate a TOTP MFA
+	   * @param {string} totpCode The MFA code entered by the user.
+	   * @param {string} friendlyDeviceName The device name we are assigning to the device.
+	   * @param {nodeCallback<string>} callback Called on success or error.
+	   * @returns {void}
+	   */
+
+
+	  CognitoUser.prototype.verifySoftwareToken = function verifySoftwareToken(totpCode, friendlyDeviceName, callback) {
+	    var _this14 = this;
+
+	    if (!(this.signInUserSession != null && this.signInUserSession.isValid())) {
+	      this.client.makeUnauthenticatedRequest('verifySoftwareToken', {
+	        Session: this.Session,
+	        UserCode: totpCode,
+	        FriendlyDeviceName: friendlyDeviceName
+	      }, function (err, data) {
+	        if (err) {
+	          return callback.onFailure(err);
+	        }
+	        _this14.Session = data.Session;
+	        var challengeResponses = {};
+	        challengeResponses.USERNAME = _this14.username;
+
+	        _this14.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	          ChallengeName: 'MFA_SETUP',
+	          ClientId: _this14.pool.getClientId(),
+	          ChallengeResponses: challengeResponses,
+	          Session: _this14.Session,
+	          UserContextData: _this14.getUserContextData()
+	        }, function (errRespond, dataRespond) {
+	          if (errRespond) {
+	            return callback.onFailure(errRespond);
+	          }
+	          _this14.signInUserSession = _this14.getCognitoUserSession(dataRespond.AuthenticationResult);
+	          _this14.cacheTokens();
+	          return callback.onSuccess(_this14.signInUserSession);
+	        });
+	        return undefined;
+	      });
+	    } else {
+	      this.client.makeUnauthenticatedRequest('verifySoftwareToken', {
+	        AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),
+	        UserCode: totpCode,
+	        FriendlyDeviceName: friendlyDeviceName
+	      }, function (err, data) {
+	        if (err) {
+	          return callback.onFailure(err);
+	        }
+	        _this14.Session = data.Session;
+	        var challengeResponses = {};
+	        challengeResponses.USERNAME = _this14.username;
+
+	        _this14.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	          ChallengeName: 'MFA_SETUP',
+	          ClientId: _this14.pool.getClientId(),
+	          ChallengeResponses: challengeResponses,
+	          Session: _this14.Session,
+	          UserContextData: _this14.getUserContextData()
+	        }, function (errRespond, dataRespond) {
+	          if (errRespond) {
+	            return callback.onFailure(errRespond);
+	          }
+	          _this14.signInUserSession = _this14.getCognitoUserSession(dataRespond.AuthenticationResult);
+	          _this14.cacheTokens();
+	          return callback.onSuccess(_this14.signInUserSession);
+	        });
+	        return undefined;
+	      });
+	    }
 	  };
 
 	  return CognitoUser;
@@ -3598,6 +3810,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {string} data.UserPoolId Cognito user pool id.
 	   * @param {string} data.ClientId User pool application client id.
 	   * @param {object} data.Storage Optional storage object.
+	   * @param {boolean} data.AdvancedSecurityDataCollectionFlag Optional:
+	   *        boolean flag indicating if the data collection is enabled
+	   *        to support cognito advanced security features. By default, this
+	   *        flag is set to true.
 	   */
 	  function CognitoUserPool(data) {
 	    _classCallCheck(this, CognitoUserPool);
@@ -3605,7 +3821,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _ref = data || {},
 	        UserPoolId = _ref.UserPoolId,
 	        ClientId = _ref.ClientId,
-	        endpoint = _ref.endpoint;
+	        endpoint = _ref.endpoint,
+	        AdvancedSecurityDataCollectionFlag = _ref.AdvancedSecurityDataCollectionFlag;
 
 	    if (!UserPoolId || !ClientId) {
 	      throw new Error('Both UserPoolId and ClientId are required.');
@@ -3624,6 +3841,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      endpoint: endpoint
 	    });
 
+	    /**
+	     * By default, AdvancedSecurityDataCollectionFlag is set to true,
+	     * if no input value is provided.
+	     */
+	    this.advancedSecurityDataCollectionFlag = true;
+	    if (AdvancedSecurityDataCollectionFlag) {
+	      this.advancedSecurityDataCollectionFlag = AdvancedSecurityDataCollectionFlag;
+	    }
 	    this.storage = data.Storage || new _StorageHelper2.default().getStorage();
 	  }
 
@@ -3669,7 +3894,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      Username: username,
 	      Password: password,
 	      UserAttributes: userAttributes,
-	      ValidationData: validationData
+	      ValidationData: validationData,
+	      UserContextData: this.getUserContextData(username)
 	    }, function (err, data) {
 	      if (err) {
 	        return callback(err, null);
@@ -3715,6 +3941,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return null;
 	  };
 
+	  /**
+	   * This method returns the encoded data string used for cognito advanced security feature.
+	   * This would be generated only when developer has included the JS used for collecting the
+	   * data on their client. Please refer to documentation to know more about using AdvancedSecurity
+	   * features
+	   * @param {string} username the username for the context data
+	   * @returns {string} the user context data
+	   **/
+
+
+	  CognitoUserPool.prototype.getUserContextData = function getUserContextData(username) {
+	    if (typeof AmazonCognitoAdvancedSecurityData === 'undefined') {
+	      return {};
+	    }
+	    /* eslint-disable */
+	    var amazonCognitoAdvancedSecurityDataConst = AmazonCognitoAdvancedSecurityData;
+	    /* eslint-enable */
+
+	    if (this.advancedSecurityDataCollectionFlag) {
+	      var advancedSecurityData = amazonCognitoAdvancedSecurityDataConst.getData(username, this.userPoolId, this.clientId);
+	      if (advancedSecurityData) {
+	        var userContextData = {
+	          EncodedData: advancedSecurityData
+	        };
+	        return userContextData;
+	      }
+	    }
+	    return {};
+	  };
+
 	  return CognitoUserPool;
 	}();
 
@@ -3756,12 +4012,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      this.path = '/';
 	    }
-	    if (data.expire) {
+	    if (Object.prototype.hasOwnProperty.call(data, 'expires')) {
 	      this.expires = data.expires;
 	    } else {
 	      this.expires = 365;
 	    }
-	    if (data.hasOwnProperty('secure')) {
+	    if (Object.prototype.hasOwnProperty.call(data, 'secure')) {
 	      this.secure = data.secure;
 	    } else {
 	      this.secure = true;
@@ -3777,7 +4033,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	  CookieStorage.prototype.setItem = function setItem(key, value) {
-	    Cookies.set(key, value, { path: this.path, expires: this.expires, domain: this.domain });
+	    Cookies.set(key, value, {
+	      path: this.path,
+	      expires: this.expires,
+	      domain: this.domain
+	    });
 	    return Cookies.get(key);
 	  };
 
@@ -3801,7 +4061,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	  CookieStorage.prototype.removeItem = function removeItem(key) {
-	    return Cookies.remove(key, { path: this.path, domain: this.domain, secure: this.secure });
+	    return Cookies.remove(key, {
+	      path: this.path,
+	      domain: this.domain,
+	      secure: this.secure
+	    });
 	  };
 
 	  /**
@@ -3812,7 +4076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  CookieStorage.prototype.clear = function clear() {
 	    var cookies = Cookies.get();
-	    var index;
+	    var index = void 0;
 	    for (index = 0; index < cookies.length; ++index) {
 	      Cookies.remove(cookies[index]);
 	    }

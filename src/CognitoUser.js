@@ -789,7 +789,7 @@ export default class CognitoUser {
       return callback(new Error('User is not authenticated'), null);
     }
 
-    this.client.makeUnauthenticatedRequest('setUserMfaPreference', {
+    this.client.makeUnauthenticatedRequest('setUserMFAPreference', {
       SMSMfaSettings: smsMfaSettings,
       SoftwareTokenMfaSettings: softwareTokenMfaSettings,
       AccessToken: this.signInUserSession.getAccessToken().getJwtToken(),

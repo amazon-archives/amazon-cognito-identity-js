@@ -774,8 +774,40 @@ The CookieStorage object receives a map (data) in its constructor that may have 
             totpRequired : function(secretCode) {
                 var challengeAnswer = prompt('Please input the TOTP code.' ,'');
                 cognitoUser.sendMFACode(challengeAnswer, this, 'SOFTWARE_TOKEN_MFA');
+            },
+
+            mfaRequired: function(codeDeliveryDetails) {
+                var verificationCode = prompt('Please input verification code' ,'');
+                cognitoUser.sendMFACode(verificationCode, this);
             }
         });
+
+**Use case 28.** Enabling and setting SMS MFA as the preferred MFA method for the user.
+
+        smsMfaSettings = {
+            PreferredMfa : true,
+            Enabled : true
+        };
+        cognitoUser.setUserMfaPreference(smsMfaSettings, null, function(err, result) {
+            if (err) {
+                alert(err);
+            }
+            console.log('call result ' + result)
+        });
+
+**Use case 29.** Enabling and setting TOTP MFA as the preferred MFA method for the user.
+
+       	totpMfaSettings = {
+            PreferredMfa : true,
+            Enabled : true
+        };
+        cognitoUser.setUserMfaPreference(null, totpMfaSettings, function(err, result) {
+            if (err) {
+                alert(err);
+            }
+            console.log('call result ' + result)
+        });
+
 
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
@@ -789,6 +821,10 @@ For most frameworks you can whitelist the domain by whitelisting all AWS endpoin
 In order to authenticate with the Amazon Cognito Identity Service, the client needs to generate a random number as part of the SRP protocol. The AWS SDK is only compatible with modern browsers, and these include support for cryptographically strong random values. If you do need to support older browsers then you should be aware that this is less secure, and if possible include a strong polyfill for `window.crypto.getRandomValues()` before including this library.
 
 ## Change Log
+
+**v1.27.0:**
+* What has changed
+  * Added support for TOTP and new MFA settings APIs.
 
 **v1.26.0:**
 * What has changed
