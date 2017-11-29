@@ -1728,13 +1728,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var authParameters = authDetails.getAuthParameters();
 	    authParameters.USERNAME = this.username;
 
-	    this.client.makeUnauthenticatedRequest('initiateAuth', {
+	    var jsonReq = {
 	      AuthFlow: 'CUSTOM_AUTH',
 	      ClientId: this.pool.getClientId(),
 	      AuthParameters: authParameters,
-	      ClientMetadata: authDetails.getValidationData(),
-	      UserContextData: this.getUserContextData()
-	    }, function (err, data) {
+	      ClientMetadata: authDetails.getValidationData()
+	    };
+	    if (this.getUserContextData()) {
+	      jsonReq.UserContextData = this.getUserContextData();
+	    }
+
+	    this.client.makeUnauthenticatedRequest('initiateAuth', jsonReq, function (err, data) {
 	      if (err) {
 	        return callback.onFailure(err);
 	      }
@@ -1795,13 +1799,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        authParameters.CHALLENGE_NAME = 'SRP_A';
 	      }
 
-	      _this2.client.makeUnauthenticatedRequest('initiateAuth', {
+	      var jsonReq = {
 	        AuthFlow: _this2.authenticationFlowType,
 	        ClientId: _this2.pool.getClientId(),
 	        AuthParameters: authParameters,
-	        ClientMetadata: authDetails.getValidationData(),
-	        UserContextData: _this2.getUserContextData()
-	      }, function (err, data) {
+	        ClientMetadata: authDetails.getValidationData()
+	      };
+	      if (_this2.getUserContextData(_this2.username)) {
+	        jsonReq.UserContextData = _this2.getUserContextData(_this2.username);
+	      }
+
+	      _this2.client.makeUnauthenticatedRequest('initiateAuth', jsonReq, function (err, data) {
 	        if (err) {
 	          return callback.onFailure(err);
 	        }
@@ -1848,13 +1856,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	          };
 
-	          respondToAuthChallenge({
+	          var jsonReqResp = {
 	            ChallengeName: 'PASSWORD_VERIFIER',
 	            ClientId: _this2.pool.getClientId(),
 	            ChallengeResponses: challengeResponses,
-	            Session: data.Session,
-	            UserContextData: _this2.getUserContextData()
-	          }, function (errAuthenticate, dataAuthenticate) {
+	            Session: data.Session
+	          };
+	          if (_this2.getUserContextData()) {
+	            jsonReqResp.UserContextData = _this2.getUserContextData();
+	          }
+	          respondToAuthChallenge(jsonReqResp, function (errAuthenticate, dataAuthenticate) {
 	            if (errAuthenticate) {
 	              return callback.onFailure(errAuthenticate);
 	            }
@@ -2014,13 +2025,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    finalUserAttributes.NEW_PASSWORD = newPassword;
 	    finalUserAttributes.USERNAME = this.username;
-	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	    var jsonReq = {
 	      ChallengeName: 'NEW_PASSWORD_REQUIRED',
 	      ClientId: this.pool.getClientId(),
 	      ChallengeResponses: finalUserAttributes,
-	      Session: this.Session,
-	      UserContextData: this.getUserContextData()
-	    }, function (errAuthenticate, dataAuthenticate) {
+	      Session: this.Session
+	    };
+	    if (this.getUserContextData()) {
+	      jsonReq.UserContextData = this.getUserContextData();
+	    }
+
+	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', jsonReq, function (errAuthenticate, dataAuthenticate) {
 	      if (errAuthenticate) {
 	        return callback.onFailure(errAuthenticate);
 	      }
@@ -2059,12 +2074,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      authParameters.SRP_A = aValue.toString(16);
 
-	      _this5.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	      var jsonReq = {
 	        ChallengeName: 'DEVICE_SRP_AUTH',
 	        ClientId: _this5.pool.getClientId(),
-	        ChallengeResponses: authParameters,
-	        UserContextData: _this5.getUserContextData()
-	      }, function (err, data) {
+	        ChallengeResponses: authParameters
+	      };
+	      if (_this5.getUserContextData()) {
+	        jsonReq.UserContextData = _this5.getUserContextData();
+	      }
+	      _this5.client.makeUnauthenticatedRequest('respondToAuthChallenge', jsonReq, function (err, data) {
 	        if (err) {
 	          return callback.onFailure(err);
 	        }
@@ -2092,13 +2110,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          challengeResponses.PASSWORD_CLAIM_SIGNATURE = signatureString;
 	          challengeResponses.DEVICE_KEY = _this5.deviceKey;
 
-	          _this5.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	          var jsonReqResp = {
 	            ChallengeName: 'DEVICE_PASSWORD_VERIFIER',
 	            ClientId: _this5.pool.getClientId(),
 	            ChallengeResponses: challengeResponses,
-	            Session: data.Session,
-	            UserContextData: _this5.getUserContextData()
-	          }, function (errAuthenticate, dataAuthenticate) {
+	            Session: data.Session
+	          };
+	          if (_this5.getUserContextData()) {
+	            jsonReqResp.UserContextData = _this5.getUserContextData();
+	          }
+
+	          _this5.client.makeUnauthenticatedRequest('respondToAuthChallenge', jsonReqResp, function (errAuthenticate, dataAuthenticate) {
 	            if (errAuthenticate) {
 	              return callback.onFailure(errAuthenticate);
 	            }
@@ -2127,13 +2149,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	  CognitoUser.prototype.confirmRegistration = function confirmRegistration(confirmationCode, forceAliasCreation, callback) {
-	    this.client.makeUnauthenticatedRequest('confirmSignUp', {
+	    var jsonReq = {
 	      ClientId: this.pool.getClientId(),
 	      ConfirmationCode: confirmationCode,
 	      Username: this.username,
-	      ForceAliasCreation: forceAliasCreation,
-	      UserContextData: this.getUserContextData()
-	    }, function (err) {
+	      ForceAliasCreation: forceAliasCreation
+	    };
+	    if (this.getUserContextData()) {
+	      jsonReq.UserContextData = this.getUserContextData();
+	    }
+	    this.client.makeUnauthenticatedRequest('confirmSignUp', jsonReq, function (err) {
 	      if (err) {
 	        return callback(err, null);
 	      }
@@ -2159,14 +2184,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var challengeResponses = {};
 	    challengeResponses.USERNAME = this.username;
 	    challengeResponses.ANSWER = answerChallenge;
-
-	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	    var jsonReq = {
 	      ChallengeName: 'CUSTOM_CHALLENGE',
 	      ChallengeResponses: challengeResponses,
 	      ClientId: this.pool.getClientId(),
-	      Session: this.Session,
-	      UserContextData: this.getUserContextData()
-	    }, function (err, data) {
+	      Session: this.Session
+	    };
+	    if (this.getUserContextData()) {
+	      jsonReq.UserContextData = this.getUserContextData();
+	    }
+	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', jsonReq, function (err, data) {
 	      if (err) {
 	        return callback.onFailure(err);
 	      }
@@ -2210,13 +2237,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      challengeResponses.DEVICE_KEY = this.deviceKey;
 	    }
 
-	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	    var jsonReq = {
 	      ChallengeName: mfaTypeSelection,
 	      ChallengeResponses: challengeResponses,
 	      ClientId: this.pool.getClientId(),
-	      Session: this.Session,
-	      UserContextData: this.getUserContextData()
-	    }, function (err, dataAuthenticate) {
+	      Session: this.Session
+	    };
+	    if (this.getUserContextData()) {
+	      jsonReq.UserContextData = this.getUserContextData();
+	    }
+
+	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', jsonReq, function (err, dataAuthenticate) {
 	      if (err) {
 	        return callback.onFailure(err);
 	      }
@@ -2530,11 +2561,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	  CognitoUser.prototype.resendConfirmationCode = function resendConfirmationCode(callback) {
-	    this.client.makeUnauthenticatedRequest('resendConfirmationCode', {
+	    var jsonReq = {
 	      ClientId: this.pool.getClientId(),
-	      Username: this.username,
-	      UserContextData: this.getUserContextData()
-	    }, function (err, result) {
+	      Username: this.username
+	    };
+
+	    this.client.makeUnauthenticatedRequest('resendConfirmationCode', jsonReq, function (err, result) {
 	      if (err) {
 	        return callback(err, null);
 	      }
@@ -2625,12 +2657,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      authParameters.DEVICE_KEY = this.deviceKey;
 	    }
 
-	    this.client.makeUnauthenticatedRequest('initiateAuth', {
+	    var jsonReq = {
 	      ClientId: this.pool.getClientId(),
 	      AuthFlow: 'REFRESH_TOKEN_AUTH',
-	      AuthParameters: authParameters,
-	      UserContextData: this.getUserContextData()
-	    }, function (err, authResult) {
+	      AuthParameters: authParameters
+	    };
+	    if (this.getUserContextData()) {
+	      jsonReq.UserContextData = this.getUserContextData();
+	    }
+	    this.client.makeUnauthenticatedRequest('initiateAuth', jsonReq, function (err, authResult) {
 	      if (err) {
 	        if (err.code === 'NotAuthorizedException') {
 	          _this9.clearCachedTokens();
@@ -2777,11 +2812,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	  CognitoUser.prototype.forgotPassword = function forgotPassword(callback) {
-	    this.client.makeUnauthenticatedRequest('forgotPassword', {
+	    var jsonReq = {
 	      ClientId: this.pool.getClientId(),
-	      Username: this.username,
-	      UserContextData: this.getUserContextData()
-	    }, function (err, data) {
+	      Username: this.username
+	    };
+	    if (this.getUserContextData()) {
+	      jsonReq.UserContextData = this.getUserContextData();
+	    }
+	    this.client.makeUnauthenticatedRequest('forgotPassword', jsonReq, function (err, data) {
 	      if (err) {
 	        return callback.onFailure(err);
 	      }
@@ -2804,13 +2842,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	  CognitoUser.prototype.confirmPassword = function confirmPassword(confirmationCode, newPassword, callback) {
-	    this.client.makeUnauthenticatedRequest('confirmForgotPassword', {
+	    var jsonReq = {
 	      ClientId: this.pool.getClientId(),
 	      Username: this.username,
 	      ConfirmationCode: confirmationCode,
-	      Password: newPassword,
-	      UserContextData: this.getUserContextData()
-	    }, function (err) {
+	      Password: newPassword
+	    };
+	    if (this.getUserContextData()) {
+	      jsonReq.UserContextData = this.getUserContextData();
+	    }
+	    this.client.makeUnauthenticatedRequest('confirmForgotPassword', jsonReq, function (err) {
 	      if (err) {
 	        return callback.onFailure(err);
 	      }
@@ -3092,13 +3133,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    challengeResponses.USERNAME = this.username;
 	    challengeResponses.ANSWER = answerChallenge;
 
-	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	    var jsonReq = {
 	      ChallengeName: 'SELECT_MFA_TYPE',
 	      ChallengeResponses: challengeResponses,
 	      ClientId: this.pool.getClientId(),
-	      Session: this.Session,
-	      UserContextData: this.getUserContextData()
-	    }, function (err, data) {
+	      Session: this.Session
+	    };
+	    if (this.getUserContextData()) {
+	      jsonReq.UserContextData = this.getUserContextData();
+	    }
+	    this.client.makeUnauthenticatedRequest('respondToAuthChallenge', jsonReq, function (err, data) {
 	      if (err) {
 	        return callback.onFailure(err);
 	      }
@@ -3180,14 +3224,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this14.Session = data.Session;
 	        var challengeResponses = {};
 	        challengeResponses.USERNAME = _this14.username;
-
-	        _this14.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	        var jsonReq = {
 	          ChallengeName: 'MFA_SETUP',
 	          ClientId: _this14.pool.getClientId(),
 	          ChallengeResponses: challengeResponses,
-	          Session: _this14.Session,
-	          UserContextData: _this14.getUserContextData()
-	        }, function (errRespond, dataRespond) {
+	          Session: _this14.Session
+	        };
+	        if (_this14.getUserContextData()) {
+	          jsonReq.UserContextData = _this14.getUserContextData();
+	        }
+	        _this14.client.makeUnauthenticatedRequest('respondToAuthChallenge', jsonReq, function (errRespond, dataRespond) {
 	          if (errRespond) {
 	            return callback.onFailure(errRespond);
 	          }
@@ -3209,14 +3255,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this14.Session = data.Session;
 	        var challengeResponses = {};
 	        challengeResponses.USERNAME = _this14.username;
-
-	        _this14.client.makeUnauthenticatedRequest('respondToAuthChallenge', {
+	        var jsonReq = {
 	          ChallengeName: 'MFA_SETUP',
 	          ClientId: _this14.pool.getClientId(),
 	          ChallengeResponses: challengeResponses,
-	          Session: _this14.Session,
-	          UserContextData: _this14.getUserContextData()
-	        }, function (errRespond, dataRespond) {
+	          Session: _this14.Session
+	        };
+	        if (_this14.getUserContextData()) {
+	          jsonReq.UserContextData = _this14.getUserContextData();
+	        }
+	        _this14.client.makeUnauthenticatedRequest('respondToAuthChallenge', jsonReq, function (errRespond, dataRespond) {
 	          if (errRespond) {
 	            return callback.onFailure(errRespond);
 	          }
@@ -3889,14 +3937,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CognitoUserPool.prototype.signUp = function signUp(username, password, userAttributes, validationData, callback) {
 	    var _this = this;
 
-	    this.client.makeUnauthenticatedRequest('signUp', {
+	    var jsonReq = {
 	      ClientId: this.clientId,
 	      Username: username,
 	      Password: password,
 	      UserAttributes: userAttributes,
-	      ValidationData: validationData,
-	      UserContextData: this.getUserContextData(username)
-	    }, function (err, data) {
+	      ValidationData: validationData
+	    };
+	    if (this.getUserContextData(username)) {
+	      jsonReq.UserContextData = this.getUserContextData(username);
+	    }
+	    this.client.makeUnauthenticatedRequest('signUp', jsonReq, function (err, data) {
 	      if (err) {
 	        return callback(err, null);
 	      }
@@ -3953,7 +4004,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  CognitoUserPool.prototype.getUserContextData = function getUserContextData(username) {
 	    if (typeof AmazonCognitoAdvancedSecurityData === 'undefined') {
-	      return {};
+	      return undefined;
 	    }
 	    /* eslint-disable */
 	    var amazonCognitoAdvancedSecurityDataConst = AmazonCognitoAdvancedSecurityData;

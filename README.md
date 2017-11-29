@@ -822,6 +822,10 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 ## Change Log
 
+**v1.28.0:**
+* What has changed
+  * Not sending UserContextData if it is not available.
+
 **v1.27.0:**
 * What has changed
   * Added support for TOTP and new MFA settings APIs.

@@ -92,14 +92,17 @@ export default class CognitoUserPool {
    * @returns {void}
    */
   signUp(username, password, userAttributes, validationData, callback) {
-    this.client.makeUnauthenticatedRequest('signUp', {
+    const jsonReq = {
       ClientId: this.clientId,
       Username: username,
       Password: password,
       UserAttributes: userAttributes,
       ValidationData: validationData,
-      UserContextData: this.getUserContextData(username),
-    }, (err, data) => {
+    };
+    if (this.getUserContextData(username)) {
+      jsonReq.UserContextData = this.getUserContextData(username);
+    }
+    this.client.makeUnauthenticatedRequest('signUp', jsonReq, (err, data) => {
       if (err) {
         return callback(err, null);
       }
@@ -153,7 +156,7 @@ export default class CognitoUserPool {
    **/
   getUserContextData(username) {
     if (typeof AmazonCognitoAdvancedSecurityData === 'undefined') {
-      return {};
+      return undefined;
     }
     /* eslint-disable */
     const amazonCognitoAdvancedSecurityDataConst = AmazonCognitoAdvancedSecurityData;
