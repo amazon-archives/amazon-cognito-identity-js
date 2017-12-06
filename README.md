@@ -492,6 +492,26 @@ Note that the inputVerificationCode method needs to be defined but does not need
     cognitoUser.globalSignOut(callback);
 ```
 
+**Use case 16 with React Native.**
+
+In React Native, loading the persisted current user information requires an extra async call to be made:
+
+```javascript
+    var poolData = {
+      UserPoolId : '...', // Your user pool id here
+      ClientId : '...' // Your client id here
+    };
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    
+    userPool.storage.sync(function(err, result) {
+      if (err) { }
+      else if (result === 'SUCCESS') {
+        var cognitoUser = userPool.getCurrentUser();
+        // Continue with steps in Use case 16
+      }
+    });
+```
+
 **Use case 16.** Retrieving the current user from local storage.
 
 ```javascript
