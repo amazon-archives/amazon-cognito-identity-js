@@ -56,10 +56,8 @@ export default class CognitoUserPool {
      * By default, AdvancedSecurityDataCollectionFlag is set to true,
      * if no input value is provided.
      */
-    this.advancedSecurityDataCollectionFlag = true;
-    if (AdvancedSecurityDataCollectionFlag) {
-      this.advancedSecurityDataCollectionFlag = AdvancedSecurityDataCollectionFlag;
-    }
+    this.advancedSecurityDataCollectionFlag = AdvancedSecurityDataCollectionFlag !== false;
+
     this.storage = data.Storage || new StorageHelper().getStorage();
   }
 
