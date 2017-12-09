@@ -752,6 +752,7 @@ The CookieStorage object receives a map (data) in its constructor that may have 
 
 **Use case 27.** Selecting the MFA method and authenticating using TOTP.
 
+ ```js
         var authenticationData = {
             Username : 'username',
             Password : 'password',
@@ -801,9 +802,11 @@ The CookieStorage object receives a map (data) in its constructor that may have 
                 cognitoUser.sendMFACode(verificationCode, this);
             }
         });
+  ```
 
 **Use case 28.** Enabling and setting SMS MFA as the preferred MFA method for the user.
 
+ ```js
         smsMfaSettings = {
             PreferredMfa : true,
             Enabled : true
@@ -814,9 +817,11 @@ The CookieStorage object receives a map (data) in its constructor that may have 
             }
             console.log('call result ' + result)
         });
+  ```
 
 **Use case 29.** Enabling and setting TOTP MFA as the preferred MFA method for the user.
 
+ ```js
        	totpMfaSettings = {
             PreferredMfa : true,
             Enabled : true
@@ -827,7 +832,7 @@ The CookieStorage object receives a map (data) in its constructor that may have 
             }
             console.log('call result ' + result)
         });
-
+  ```
 
 ## Network Configuration
 The Amazon Cognito Identity JavaScript SDK will make requests to the following endpoints
