@@ -42,6 +42,7 @@ export default class CookieStorage {
       path: this.path,
       expires: this.expires,
       domain: this.domain,
+      secure: this.secure
     }
     );
     return Cookies.get(key);
