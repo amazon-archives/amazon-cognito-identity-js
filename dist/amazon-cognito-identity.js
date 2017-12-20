@@ -3252,27 +3252,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (err) {
 	          return callback.onFailure(err);
 	        }
-	        _this14.Session = data.Session;
-	        var challengeResponses = {};
-	        challengeResponses.USERNAME = _this14.username;
-	        var jsonReq = {
-	          ChallengeName: 'MFA_SETUP',
-	          ClientId: _this14.pool.getClientId(),
-	          ChallengeResponses: challengeResponses,
-	          Session: _this14.Session
-	        };
-	        if (_this14.getUserContextData()) {
-	          jsonReq.UserContextData = _this14.getUserContextData();
-	        }
-	        _this14.client.makeUnauthenticatedRequest('respondToAuthChallenge', jsonReq, function (errRespond, dataRespond) {
-	          if (errRespond) {
-	            return callback.onFailure(errRespond);
-	          }
-	          _this14.signInUserSession = _this14.getCognitoUserSession(dataRespond.AuthenticationResult);
-	          _this14.cacheTokens();
-	          return callback.onSuccess(_this14.signInUserSession);
-	        });
-	        return undefined;
+	        return callback(null, data);
 	      });
 	    }
 	  };
@@ -3893,10 +3873,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * By default, AdvancedSecurityDataCollectionFlag is set to true,
 	     * if no input value is provided.
 	     */
-	    this.advancedSecurityDataCollectionFlag = true;
-	    if (AdvancedSecurityDataCollectionFlag) {
-	      this.advancedSecurityDataCollectionFlag = AdvancedSecurityDataCollectionFlag;
-	    }
+	    this.advancedSecurityDataCollectionFlag = AdvancedSecurityDataCollectionFlag !== false;
+
 	    this.storage = data.Storage || new _StorageHelper2.default().getStorage();
 	  }
 
@@ -4087,7 +4065,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Cookies.set(key, value, {
 	      path: this.path,
 	      expires: this.expires,
-	      domain: this.domain
+	      domain: this.domain,
+	      secure: this.secure
 	    });
 	    return Cookies.get(key);
 	  };

@@ -1627,28 +1627,7 @@ export default class CognitoUser {
         if (err) {
           return callback.onFailure(err);
         }
-        this.Session = data.Session;
-        const challengeResponses = {};
-        challengeResponses.USERNAME = this.username;
-        const jsonReq = {
-          ChallengeName: 'MFA_SETUP',
-          ClientId: this.pool.getClientId(),
-          ChallengeResponses: challengeResponses,
-          Session: this.Session,
-        };
-        if (this.getUserContextData()) {
-          jsonReq.UserContextData = this.getUserContextData();
-        }
-        this.client.makeUnauthenticatedRequest('respondToAuthChallenge',
-            jsonReq, (errRespond, dataRespond) => {
-              if (errRespond) {
-                return callback.onFailure(errRespond);
-              }
-              this.signInUserSession = this.getCognitoUserSession(dataRespond.AuthenticationResult);
-              this.cacheTokens();
-              return callback.onSuccess(this.signInUserSession);
-            });
-        return undefined;
+        return callback(null, data);
       });
     }
   }
