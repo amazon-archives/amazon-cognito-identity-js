@@ -847,6 +847,10 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 ## Change Log
 
+**v1.29.0:**
+* What has changed
+  * Fixing verify software token call to work with access token.
+
 **v1.28.0:**
 * What has changed
   * Not sending UserContextData if it is not available.
