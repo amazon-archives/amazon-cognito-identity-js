@@ -1,17 +1,11 @@
-import AWS from 'aws-sdk/global';
 import { NativeModules } from 'react-native';
-import * as enhancements from './src';
+import * as src from './src';
 
 import BigInteger from './src/BigInteger';
 
 export * from './src';
 
-
 const { RNAWSCognito } = NativeModules;
-
-Object.keys(enhancements).forEach(key => {
-  AWS.CognitoIdentityServiceProvider[key] = enhancements[key];
-});
 
 BigInteger.prototype.modPow = function nativeModPow(e, m, callback) {
   RNAWSCognito.computeModPow({
@@ -27,7 +21,7 @@ BigInteger.prototype.modPow = function nativeModPow(e, m, callback) {
   });
 };
 
-enhancements.AuthenticationHelper.prototype.calculateS =
+src.AuthenticationHelper.prototype.calculateS =
 function nativeComputeS(xValue, serverBValue, callback) {
   RNAWSCognito.computeS({
     g: this.g.toString(16),
@@ -45,15 +39,3 @@ function nativeComputeS(xValue, serverBValue, callback) {
   });
   return undefined;
 };
-
-const libraryVersion = '1.0';
-const libraryName = 'aws-amplify';
-const originalUserAgent = AWS.util.userAgent;
-if (originalUserAgent) {
-  AWS.util.userAgent = function newUserAgent() {
-    return `${libraryName}/${libraryVersion} ${originalUserAgent()}`;
-  };
-} else {
-  const previousUserAgent = AWS.config.customUserAgent || '';
-  AWS.config.update({ customUserAgent: `${libraryName}/${libraryVersion} ${previousUserAgent}` });
-}
