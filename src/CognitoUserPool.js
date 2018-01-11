@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 
-import CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
-
+import Client from './Client';
 import CognitoUser from './CognitoUser';
 import StorageHelper from './StorageHelper';
 
@@ -46,11 +45,7 @@ export default class CognitoUserPool {
     this.userPoolId = UserPoolId;
     this.clientId = ClientId;
 
-    this.client = new CognitoIdentityServiceProvider({
-      apiVersion: '2016-04-19',
-      region,
-      endpoint,
-    });
+    this.client = new Client(region, endpoint);
 
     /**
      * By default, AdvancedSecurityDataCollectionFlag is set to true,
@@ -100,7 +95,7 @@ export default class CognitoUserPool {
     if (this.getUserContextData(username)) {
       jsonReq.UserContextData = this.getUserContextData(username);
     }
-    this.client.makeUnauthenticatedRequest('signUp', jsonReq, (err, data) => {
+    this.client.request('SignUp', jsonReq, (err, data) => {
       if (err) {
         return callback(err, null);
       }

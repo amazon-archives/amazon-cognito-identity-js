@@ -19,26 +19,10 @@ var banner = '/*!\n' +
 ' */\n\n';
 
 var config = {
-  entry: './enhance',
+  entry: './src/index.js',
   output: {
     libraryTarget: 'umd',
     library: 'AmazonCognitoIdentity'
-  },
-  externals: {
-    // This umd context config isn't in configuration documentation, but see example:
-    // https://github.com/webpack/webpack/tree/master/examples/externals
-    'aws-sdk/global': {
-      root: ['AWSCognito'],
-      commonjs2: 'aws-sdk/global',
-      commonjs: 'aws-sdk/global',
-      amd: 'aws-sdk/global'
-    },
-    'aws-sdk/clients/cognitoidentityserviceprovider': {
-      root: ['AWSCognito', 'CognitoIdentityServiceProvider'],
-      commonjs2: 'aws-sdk/clients/cognitoidentityserviceprovider',
-      commonjs: 'aws-sdk/clients/cognitoidentityserviceprovider',
-      amd: 'aws-sdk/clients/cognitoidentityserviceprovider'
-    },
   },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
