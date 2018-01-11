@@ -16,7 +16,7 @@
  */
 
 import { Buffer } from 'buffer/';
-import { createHmac } from 'crypto-browserify';
+import createHmac from 'create-hmac';
 
 import BigInteger from './BigInteger';
 import AuthenticationHelper from './AuthenticationHelper';

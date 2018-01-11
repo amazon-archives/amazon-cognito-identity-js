@@ -16,7 +16,9 @@
  */
 
 import { Buffer } from 'buffer/';
-import { randomBytes, createHmac, createHash } from 'crypto-browserify';
+import randomBytes from 'randombytes';
+import createHmac from 'create-hmac';
+import createHash from 'create-hash';
 
 import BigInteger from './BigInteger';
 
