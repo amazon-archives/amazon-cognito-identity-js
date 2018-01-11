@@ -849,6 +849,10 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 ## Change Log
 
+**v1.30.0:**
+* What has changed
+  * Temporary fix to lock down the AWS SDK version to a compatible one.
+
 **v1.29.0:**
 * What has changed
   * Fixing verify software token call to work with access token.
