@@ -849,6 +849,10 @@ In order to authenticate with the Amazon Cognito Identity Service, the client ne
 
 ## Change Log
 
+**v1.31.0:**
+* What has changed
+  * Added lib folder.
+
 **v1.30.0:**
 * What has changed
   * Temporary fix to lock down the AWS SDK version to a compatible one.
