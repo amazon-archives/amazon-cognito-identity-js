@@ -21,7 +21,7 @@ export default class Client {
     const headers = {
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': `AWSCognitoIdentityProviderService.${operation}`,
-      'X-Amz-User-Agent': 'amazon-cognito-identity-js',
+      'X-Amz-User-Agent': 'aws-amplify/1.0',
     };
 
     const options = {
