@@ -2188,7 +2188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var authenticationHelper = new _AuthenticationHelper2.default(this.pool.getUserPoolId().split('_')[1]);
 	    this.getCachedDeviceKeyAndPassword();
 	    if (this.deviceKey != null) {
-	      authParameters.DEVICE_KEY = this.deviceKey;
+	      challengeResponses.DEVICE_KEY = this.deviceKey;
 	    }
 
 	    var jsonReq = {

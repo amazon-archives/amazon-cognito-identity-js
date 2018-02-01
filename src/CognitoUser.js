@@ -634,7 +634,7 @@ export default class CognitoUser {
       this.pool.getUserPoolId().split('_')[1]);
     this.getCachedDeviceKeyAndPassword();
     if (this.deviceKey != null) {
-      authParameters.DEVICE_KEY = this.deviceKey;
+      challengeResponses.DEVICE_KEY = this.deviceKey;
     }
 
     const jsonReq = {
