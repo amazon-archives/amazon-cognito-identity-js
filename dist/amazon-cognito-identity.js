@@ -2184,6 +2184,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var challengeResponses = {};
 	    challengeResponses.USERNAME = this.username;
 	    challengeResponses.ANSWER = answerChallenge;
+
+	    var authenticationHelper = new _AuthenticationHelper2.default(this.pool.getUserPoolId().split('_')[1]);
+	    this.getCachedDeviceKeyAndPassword();
+	    if (this.deviceKey != null) {
+	      challengeResponses.DEVICE_KEY = this.deviceKey;
+	    }
+
 	    var jsonReq = {
 	      ChallengeName: 'CUSTOM_CHALLENGE',
 	      ChallengeResponses: challengeResponses,
@@ -2198,16 +2205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return callback.onFailure(err);
 	      }
 
-	      var challengeName = data.ChallengeName;
-
-	      if (challengeName === 'CUSTOM_CHALLENGE') {
-	        _this6.Session = data.Session;
-	        return callback.customChallenge(data.ChallengeParameters);
-	      }
-
-	      _this6.signInUserSession = _this6.getCognitoUserSession(data.AuthenticationResult);
-	      _this6.cacheTokens();
-	      return callback.onSuccess(_this6.signInUserSession);
+	      return _this6.authenticateUserInternal(data, authenticationHelper, callback);
 	    });
 	  };
 
