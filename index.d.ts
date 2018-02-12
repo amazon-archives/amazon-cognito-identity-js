@@ -86,6 +86,7 @@ declare module "amazon-cognito-identity-js" {
             associateSecretCode: (secretCode: string) => void,
             onFailure: (err: any) => void
         });
+        public verifySoftwareToken(totpCode, friendlyDeviceName, callbacks: {onSuccess: (session: CognitoUserSession) => void, onFailure: (err: Error) => void}): any;
     }
 
     export interface MFAOption {
