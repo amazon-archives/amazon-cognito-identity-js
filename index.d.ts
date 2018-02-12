@@ -82,6 +82,10 @@ declare module "amazon-cognito-identity-js" {
         public enableMFA(callback: NodeCallback<Error, string>): void;
         public disableMFA(callback: NodeCallback<Error, string>): void;
         public getMFAOptions(callback: NodeCallback<Error, MFAOption[]>): void;
+        public associateSoftwareToken(callbacks: {
+            associateSecretCode: (secretCode: string) => void,
+            onFailure: (err: any) => void
+        });
     }
 
     export interface MFAOption {
