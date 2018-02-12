@@ -48,7 +48,10 @@ declare module "amazon-cognito-identity-js" {
                                     onFailure: (err: any) => void,
                                     newPasswordRequired?: (userAttributes: any, requiredAttributes: any) => void,
                                     mfaRequired?: (challengeName: any, challengeParameters: any) => void,
-                                    customChallenge?: (challengeParameters: any) => void
+                                    totpRequired?: (challengeName: any, challengeParameters: any) => void,
+                                    customChallenge?: (challengeName: any, challengeParameters: any) => void,
+                                    mfaSetup?: (challengeName: any, challengeParameters: any) => void,
+                                    selectMFAType?: (challengeName: any, challengeParameters: any) => void
                                 }): void;
         public confirmRegistration(code: string, forceAliasCreation: boolean, callback: NodeCallback<any, any>): void;
         public sendCustomChallengeAnswer(answerChallenge: any, callback:NodeCallback<any, any>):void;
