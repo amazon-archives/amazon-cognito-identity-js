@@ -1,6 +1,6 @@
 # Amazon Cognito Identity SDK for JavaScript
 
-**NOTE: We will not continue to develop this library as part of this Github repo but as part of the [AWS Amplify (https://github.com/aws/aws-amplify/tree/master/packages/amazon-cognito-identity-js) Github repo**
+**NOTE: We will not continue to develop this library as part of this Github repo but as part of the [AWS Amplify] (https://github.com/aws/aws-amplify/tree/master/packages/amazon-cognito-identity-js) Github repo**
 
 You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps. Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of millions of users, so you don't have to worry about building, securing, and scaling a solution to handle user management and authentication.
 
