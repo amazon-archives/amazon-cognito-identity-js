@@ -1,6 +1,6 @@
 # Amazon Cognito Identity SDK for JavaScript
 
-**NOTE: If you are receiving a "_global.util.crypto.lib.randomBytes is not a function" error, it is an issue we are actively working on. For a workaround have a look at the issue: https://github.com/aws/amazon-cognito-identity-js/issues/646**
+**NOTE: We will not continue to develop this library as part of this github repo but as part of [AWS Amplify https://github.com/aws/aws-amplify/tree/master/packages/amazon-cognito-identity-js] **
 
 You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps. Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of millions of users, so you don't have to worry about building, securing, and scaling a solution to handle user management and authentication.
 
